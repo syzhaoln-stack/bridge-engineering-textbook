@@ -75,6 +75,11 @@ format:
   html:
     theme: cosmo
     html-math-method: katex
+    grid:
+      sidebar-width: 230px
+      body-width: 1020px
+      margin-width: 190px
+      gutter-width: 1.25rem
     css:
       - styles.css
       - interactive/learning-cycle.css

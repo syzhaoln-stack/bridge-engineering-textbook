@@ -62,9 +62,47 @@ code {
   font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, serif;
 }
 
-@media (min-width: 992px) {
-  main.content {
-    max-width: 780px;
+/*
+ * Reading grid
+ * Keep the book navigation visible without allowing the two side columns to
+ * squeeze the lesson into a narrow strip. The right-hand chapter outline is
+ * useful on a large monitor; on a laptop or tablet, the text deserves the room.
+ */
+main.content {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+@media (min-width: 992px) and (max-width: 1239.98px) {
+  body.docked #quarto-content.page-columns {
+    grid-template-columns:
+      [screen-start] 1.25rem
+      [screen-start-inset page-start] minmax(76px, 96px)
+      [page-start-inset] 40px
+      [body-start-outset] 40px
+      [body-start] 1.25rem
+      [body-content-start] minmax(0, 1fr)
+      [body-content-end] 1.25rem
+      [body-end body-end-outset page-end-inset page-end] minmax(1.25rem, 0.12fr)
+      [screen-end-inset] 1.25rem
+      [screen-end];
+  }
+}
+
+@media (max-width: 1239.98px) {
+  #quarto-margin-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  body #quarto-content.page-columns {
+    grid-template-columns:
+      [screen-start screen-start-inset page-start page-start-inset body-start-outset body-start] 1.1rem
+      [body-content-start] minmax(0, 1fr)
+      [body-content-end] 1.1rem
+      [body-end body-end-outset page-end-inset page-end screen-end-inset screen-end];
   }
 }
 

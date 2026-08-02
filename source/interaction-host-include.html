@@ -1,0 +1,11 @@
+<script>
+(() => {
+  if (window.__bridgeInteractionHostLoader) return;
+  window.__bridgeInteractionHostLoader = true;
+  const script = document.createElement('script');
+  script.src = /\/(?:chapters|appendices)\/[^/]+\.html$/i.test(location.pathname)
+    ? '../interaction-host.js'
+    : 'interaction-host.js';
+  document.body.appendChild(script);
+})();
+</script>

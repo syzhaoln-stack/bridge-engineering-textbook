@@ -1,0 +1,118 @@
+# 读桥之前，先认识几张图
+
+桥梁工程里有些图会反复出现。它们并不难，只是过去常常先给名字、再给定义，学生还没看见问题，就先被术语拦住了。
+
+这一节反过来：先说图在回答什么，再记名字。读到后面忘了，随时回来。
+
+| 你真正想问的 | 先看什么 | 后面在哪里用 |
+|---|---|---|
+| 同一批材料，为什么压出来不一样？ | 一维曲线的中心和宽窄 | 荷载、材料、风、施工误差 |
+| “95%有保证”和“一座桥可靠”是一回事吗？ | 一个材料量的下侧位置；同一次出现的荷载与抗力 | 第3章可靠度 |
+| 车停在哪里最不利？ | 固定一个结果，让车沿桥移动 | 第4章移动荷载 |
+| 荷载到底怎样走到地面？ | 力箭头能否连续走到支座和地基 | 第5章传力路径 |
+| 结构变形以后，原来的算法还算数吗？ | 变形是否反过来明显改变内力与几何 | 拱桥、斜拉桥、悬索桥 |
+| 软件给了彩色云图，能信吗？ | 单位、平衡、边界和数量级 | 第17、18章 |
+
+## 概率密度不是发生概率
+
+先看最直观的一件事：曲线在哪一带比较高，说明试验结果更常落在那一带；一段区间下方的面积，说明结果落在这一段的比例。
+
+这条曲线叫概率密度。它下面的总面积为 1。平均值 $\mu$ 标出这团数据大致站在哪里，标准差 $\sigma$ 描述它散得有多开。
+
+<details class="math-step">
+<summary>想看数学写法，再展开</summary>
+
+$$
+P(a<X<b)=\int_a^b f_X(x)\,dx,
+\qquad
+\int_{-\infty}^{+\infty}f_X(x)\,dx=1
+$$
+
+</details>
+
+混凝土的曲线通常比同等生产控制条件下的钢材更宽，不是因为混凝土“不可靠”，而是因为它经历的原料、拌和、运输、浇筑、振捣和养护环节更多，离散性需要被看见。
+
+::: {.content-visible when-format="html"}
+<div class="manim-film">
+  <video controls preload="metadata" data-poster="../assets/videos/manim/01-concrete-guarantee-rate.jpg">
+    <source src="../assets/videos/manim/01-concrete-guarantee-rate.mp4" type="video/mp4">
+  </video>
+  <p>试块点怎样长成概率密度曲线，95%保证率又落在图的哪一边。</p>
+  <div class="manim-actions"><a href="../assets/code/manim/bridge_math_basics.py" download>下载动画源码</a><a href="../assets/code/manim/scenes.md" download>下载分镜说明</a><a href="../assets/code/manim/README.md" download>运行方法</a></div>
+</div>
+:::
+
+::: {.content-visible when-format="epub"}
+![混凝土试块、概率密度与95%保证率](../assets/videos/manim/01-concrete-guarantee-rate.jpg)
+:::
+
+## 保证率与可靠度，名字很近，问题不同
+
+材料强度的 95% 保证率，是在问：**这一批材料中，有多大比例不会低于所取的标准值？**
+
+结构可靠度是在问：**荷载与抗力同时波动时，结构落入失效状态的概率有多大？**
+
+先给两个字母贴上对象：$R$ 是这一次结构能提供的抗力，$S$ 是这一次荷载造成的需求。$R$ 不小于 $S$，这一次就承受得住；$R$ 小于 $S$，就落到了失效侧。
+
+<details class="math-step">
+<summary>把这句话压缩成一个式子</summary>
+
+$$
+g(R,S)=R-S
+$$
+
+</details>
+
+平均抗力大于平均荷载，并不能保证每一对 $R,S$ 都在安全侧。真正麻烦的是：荷载向右，抗力向左，而且赶在同一次。
+
+::: {.content-visible when-format="html"}
+<div class="manim-film">
+  <video controls preload="metadata" data-poster="../assets/videos/manim/02-reliability-one-to-joint.jpg">
+    <source src="../assets/videos/manim/02-reliability-one-to-joint.mp4" type="video/mp4">
+  </video>
+  <p>从两条一维曲线，到二维散点、失效边界和联合概率密度曲面。</p>
+  <div class="manim-actions"><a href="../assets/code/manim/bridge_math_basics.py" download>下载动画源码</a><a href="../assets/code/manim/scenes.md" download>下载分镜说明</a><a href="../assets/code/manim/README.md" download>运行方法</a></div>
+</div>
+:::
+
+::: {.content-visible when-format="epub"}
+![从边缘分布到联合概率密度与失效边界](../assets/videos/manim/02-reliability-one-to-joint.jpg)
+:::
+
+## 影响线：车在动，观察位置不动
+
+“车在哪里最危险”这个问题少了半句：**对谁最危险？看的是哪个位置的弯矩、剪力，还是某个支座的反力？**
+
+先固定一个效应，再让单位荷载沿桥走，把每个位置造成的效应画下来，这条线就是影响线。车在动，观察对象不动。换一个观察对象，影响线就变了，最不利位置也可能跟着变。
+
+::: {.content-visible when-format="html"}
+<div class="manim-film">
+  <video controls preload="metadata" data-poster="../assets/videos/manim/03-influence-line.jpg">
+    <source src="../assets/videos/manim/03-influence-line.mp4" type="video/mp4">
+  </video>
+  <p>同一辆车，先看右支座反力，再看跨中弯矩：目标一换，答案就换。</p>
+  <div class="manim-actions"><a href="../assets/code/manim/bridge_math_basics.py" download>下载动画源码</a><a href="../assets/code/manim/scenes.md" download>下载分镜说明</a><a href="../assets/code/manim/README.md" download>运行方法</a></div>
+</div>
+:::
+
+::: {.content-visible when-format="epub"}
+![移动荷载与两种不同观察目标的影响线](../assets/videos/manim/03-influence-line.jpg)
+:::
+
+## 平衡、刚度与传力路径
+
+桥再复杂，先过三道很朴素的门槛。
+
+第一，外力能不能平衡。竖向荷载是一百吨，竖向反力总和却只有六十吨，后面的云图越漂亮，问题越大。
+
+第二，力从哪里进来，又从哪里走到地面。桥面板把局部车轮力交给纵梁、横梁或箱梁，主梁再交给支座、桥墩和基础。中间任何一步突然断掉，都值得怀疑。
+
+第三，结构靠什么不愿意变形。材料刚度、截面形状、构件长度、连接与体系共同决定变形；强度只回答“会不会坏”，刚度还回答“它愿意变成什么样”。
+
+## 非线性：结构变了，题目也跟着变
+
+在线性问题里，荷载加一倍，内力和变形也加一倍，几个工况可以叠加。大变形拱桥、斜拉桥和悬索桥常常不能这样想：变形会改变几何，几何又会改变内力，索只能受拉，接触可能张开，材料也可能开裂或屈服。
+
+所以“非线性”不是一种更高级的按钮。它只是提醒我们：刚才的结构已经改变，不能还拿原来那道题的规则硬算。
+
+读到最后如果只记住一个动作，就记住这个：**先判断图在回答什么，再看它删掉了什么。**

@@ -1,0 +1,46 @@
+.section-flashcards--epub {
+  margin: 0.65em 0 1.2em;
+  color: #3f474d;
+}
+
+.section-flashcards--epub > p:first-child {
+  margin: 0 0 0.35em;
+  color: #786551;
+  font-size: 0.82em;
+}
+
+.section-flashcard--epub {
+  margin: 0.45em 0;
+  padding: 0.62em 0.72em;
+  border: 1px solid #ddd3c4;
+  border-left: 0.24em solid #b79469;
+  background: #f8f5ee;
+  page-break-inside: avoid;
+}
+
+.section-flashcard--epub p {
+  margin: 0.2em 0;
+  line-height: 1.52;
+}
+
+.section-flashcard--epub > p:first-child {
+  margin-bottom: 0.42em;
+  color: #2f3940;
+}
+
+.section-flashcard__taxonomy--epub {
+  margin: -0.12em 0 0.4em;
+  padding: 0.2em 0.42em;
+  color: #65584b;
+  background: #eee6d9;
+  font-size: 0.8em;
+}
+
+.section-flashcard__taxonomy--epub p {
+  margin: 0;
+}
+
+.section-flashcard--epub > p:last-child {
+  color: #786f67;
+  font-size: 0.78em;
+}

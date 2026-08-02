@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="data:,"/>
+<title>一截梁，在路上会经历什么？— 连续梁顶推实验</title>
+<style>
+:root{
+  --paper:#f7f9f9;--panel:#fff;--panel-s:#f1f5f5;
+  --ink:#102a36;--muted:#60737b;--accent:#1f8fa8;
+  --beam:#24577a;--nose:#e69b36;--active:#0b8f72;
+  --pos:#247db4;--neg:#c85c4a;--compare:#7257b7;
+  --line:#d7e1e3;--shadow:0 12px 30px rgba(16,42,54,.08);--r:14px;
+  --ff:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+  --fd:"Bahnschrift","Segoe UI","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;font-family:var(--ff);color:var(--ink);background:var(--paper)}
+.page{max-width:1240px;margin:0 auto;padding:18px 16px 30px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.lab-question{position:relative;margin-bottom:14px;padding:18px 20px 17px 24px;background:#eef5f6;border:1px solid #cbdfe3;border-radius:var(--r)}
+.lab-question::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--accent),var(--nose));border-radius:var(--r) 0 0 var(--r)}
+.kicker{font:700 11px/1.2 var(--ff);letter-spacing:.12em;color:#397080;margin-bottom:7px}
+.lab-question h1{font:700 25px/1.25 var(--fd);margin-bottom:7px}
+.lab-question p{max-width:900px;font-size:14px;line-height:1.65;color:#35505a}
+.prediction{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;margin-top:13px;max-width:900px}
+.prediction label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.prediction textarea{display:block;width:100%;min-height:50px;resize:vertical;padding:9px 11px;border:1px solid #b9ced2;border-radius:9px;background:#fff;color:var(--ink);font:13px/1.5 var(--ff)}
+.prediction-status{min-height:1.4em;margin-top:5px!important;font-size:11px!important;color:#56808a!important}
+.workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.72fr);gap:14px;align-items:start}
+.scene{padding:15px 16px 14px;min-width:0}
+.scene-head{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:8px}
+.scene-head h2{font-size:17px;margin-bottom:4px}
+.scene-head p{font-size:12px;line-height:1.55;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 11px;max-width:360px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);white-space:nowrap}
+.sw{width:10px;height:10px;border-radius:99px;flex:0 0 auto}
+
+/* controls */
+.controls{padding:16px;position:sticky;top:10px;background:#f9fbfb}
+.controls h2{font-size:16px;margin-bottom:4px}.controls>.hint{margin-bottom:11px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.ctl{padding:10px 11px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+.ctl-wide{grid-column:1/-1}
+.ctl label{display:block;margin-bottom:8px;font-size:12px;color:var(--muted)}
+.vr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.vr strong{font-size:15px}.vr span{font-size:10px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.br{display:grid;gap:9px}
+.pos-ctl{padding:11px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+.pos-ctl .vr strong{font-size:19px}
+.hint{font-size:11px;color:var(--muted);line-height:1.55;margin-top:4px}
+.side-stack{display:grid;grid-template-columns:1fr;gap:9px}
+.tbox{padding:11px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;gap:7px}
+.th{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.th strong{font-size:15px}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+button{min-height:44px;border:0;border-radius:9px;padding:10px 14px;font:600 13px/1 var(--ff);cursor:pointer;transition:transform .14s,box-shadow .14s}
+button:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(0,109,119,.14)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid rgba(31,143,168,.28);outline-offset:2px}
+.pri{color:#fff;background:linear-gradient(135deg,var(--accent),#009688)}
+.sec{color:var(--ink);background:rgba(32,48,64,.08)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}
+.stat{min-width:0;padding:11px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.stat-l{font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.03em}
+.stat-v{font:700 18px/1.1 var(--fd);overflow-wrap:anywhere}
+.stat-n{margin-top:6px;font-size:11px;color:var(--muted)}
+
+/* viz */
+.viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.viz{padding:18px 20px 16px;overflow:hidden}
+.viz h2{font-size:16px;margin-bottom:4px}
+.viz p{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.cw{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fffdf9;margin-bottom:10px}
+.cw:last-child{margin-bottom:0}
+svg{display:block;width:100%;height:auto;touch-action:none}
+.ft{position:absolute;right:9px;top:8px;background:rgba(255,255,255,.88);border:1px solid var(--line);padding:5px 8px;border-radius:7px;font-size:10px;color:var(--muted);z-index:2}
+.teaching{margin-top:10px;padding:12px 14px;border-radius:14px;
+  background:rgba(11,143,114,.07);border:1px solid rgba(11,143,114,.1);
+  font-size:12px;line-height:1.7;color:var(--ink)}
+.fn{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.65}
+.insight{margin-top:14px;padding:18px 20px;background:#102a36;color:#f4f8f9;border-radius:var(--r)}
+.insight .kicker{color:#7dc8d8}.insight h2{font-size:18px;margin-bottom:7px}.insight p{font-size:13px;line-height:1.7;color:#dbe7ea}.terms{margin-top:9px;font:600 11px/1.5 var(--ff);letter-spacing:.04em;color:#f3bd6c!important}
+.model-permission{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:14px;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--line)}
+.model-permission div{padding:13px 14px;background:#fff}.model-permission strong{display:block;margin-bottom:5px;font-size:11px;color:#367080}.model-permission span{display:block;font-size:11px;line-height:1.55;color:var(--muted)}
+.provenance{margin-top:9px;font-size:10px;line-height:1.55;color:#7b8b91}
+
+@media(max-width:1100px){
+  .workspace{grid-template-columns:1fr}.controls{position:static}.cg{grid-template-columns:repeat(3,1fr)}.ctl-wide{grid-column:auto}.side-stack{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:680px){
+  .page{padding:10px 8px 20px}.lab-question{padding:16px 14px 15px 18px}.lab-question h1{font-size:21px}.prediction{grid-template-columns:1fr}.scene{padding:12px 10px}.scene-head{display:block}.legend{justify-content:flex-start;margin-top:8px}.cg{grid-template-columns:1fr 1fr}.side-stack,.viz-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.model-permission{grid-template-columns:1fr 1fr}svg text{font-size:28px!important}.ft{position:static;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:7px 9px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="lab-question" aria-labelledby="lab-title">
+    <div class="kicker">先留一个判断</div>
+    <h1 id="lab-title">选中一截梁。它一路向前，会始终朝同一个方向弯吗？</h1>
+    <p>先凭直觉画一条趋势，或者写一句话。随后只做两件事：让这截梁越过两个支点；再打开导梁，看看哪些阶段真的变了。</p>
+    <div class="prediction">
+      <div>
+        <label for="predictionText">我现在的判断</label>
+        <textarea id="predictionText" placeholder="不求术语正确，只说你认为曲线会不会越过零线，以及为什么。"></textarea>
+        <p class="prediction-status" id="predictionStatus" aria-live="polite"></p>
+      </div>
+      <button id="savePrediction" class="sec" type="button">留住这句话</button>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <section class="card scene" aria-labelledby="scene-title">
+      <div class="scene-head">
+        <div><h2 id="scene-title">梁正在经过哪些支点</h2><p>拖动梁体或“顶推进度”。点梁上的一截，也可以用右侧滑杆选截面。</p></div>
+        <div class="legend" aria-label="图例">
+          <div class="legend-item"><span class="sw" style="background:var(--beam)"></span>主梁</div>
+          <div class="legend-item"><span class="sw" style="background:var(--nose)"></span>导梁</div>
+          <div class="legend-item"><span class="sw" style="background:var(--active)"></span>受力支点</div>
+          <div class="legend-item"><span class="sw" style="background:var(--pos)"></span>正弯矩</div>
+          <div class="legend-item"><span class="sw" style="background:var(--neg)"></span>负弯矩</div>
+        </div>
+      </div>
+      <div class="cw"><div class="ft">可拖动 · 可点选截面</div><svg id="svgStruct" viewBox="0 0 960 260" role="img" aria-label="顶推梁、导梁和桥墩的相对位置"></svg></div>
+      <div class="cw"><div class="ft" id="tagMoment">当前弯矩图</div><svg id="svgMoment" viewBox="0 0 960 280" role="img" aria-label="当前施工阶段的归一化弯矩图"></svg></div>
+      <div class="teaching" id="teachText" aria-live="polite">推进梁体，观察同一截面的弯矩方向是否会改变。</div>
+    </section>
+
+    <aside class="card controls" aria-labelledby="control-title">
+      <h2 id="control-title">改变施工条件</h2>
+      <div class="hint">先只动顶推进度；看出一次越过零线以后，再改变导梁。</div>
+      <div class="br">
+        <div class="pos-ctl">
+          <label for="rPos">顶推进度</label>
+          <div class="vr"><strong id="vPos">0.0 m</strong><span>主梁前端位置</span></div>
+          <input id="rPos" type="range" min="0" max="1000" step="1" value="170"/>
+        </div>
+        <div class="pos-ctl">
+          <label for="rTrack">跟踪哪一截梁</label>
+          <div class="vr"><strong id="vTrack">尚未选择</strong><span>距梁头</span></div>
+          <input id="rTrack" type="range" min="50" max="900" step="10" value="330"/>
+          <div class="hint">动一下滑杆，便会锁定一截随梁一起前进的截面。</div>
+        </div>
+      </div>
+      <div class="cg">
+        <div class="ctl"><label for="rPierCount">桥墩数量</label><div class="vr"><strong id="vPierCount">5</strong><span>个</span></div><input id="rPierCount" type="range" min="3" max="8" step="1" value="5"/></div>
+        <div class="ctl"><label for="rSpan">标准跨径</label><div class="vr"><strong id="vSpan">40 m</strong><span>墩间距</span></div><input id="rSpan" type="range" min="30" max="60" step="2" value="40"/></div>
+        <div class="ctl"><label for="rNoseLen">导梁长度</label><div class="vr"><strong id="vNoseLen">0.65 跨</strong><span>相对跨径</span></div><input id="rNoseLen" type="range" min="0.30" max="0.90" step="0.05" value="0.65"/></div>
+        <div class="ctl"><label for="rNoseW">导梁线重</label><div class="vr"><strong id="vNoseW">0.25 q</strong><span>相对主梁</span></div><input id="rNoseW" type="range" min="0.10" max="0.50" step="0.01" value="0.25"/></div>
+        <div class="ctl"><label for="rNoseEI">导梁刚度</label><div class="vr"><strong id="vNoseEI">0.25 EI</strong><span>相对主梁</span></div><input id="rNoseEI" type="range" min="0.10" max="1.00" step="0.05" value="0.25"/></div>
+        <div class="ctl"><div class="th"><strong>装上导梁</strong><input id="cbNose" type="checkbox" aria-label="装上或拆下钢导梁"/></div><div class="hint">轻与硬是两件事，可以分别改变。</div></div>
+      </div>
+      <input id="rMScale" type="hidden" value="0"/><span id="vMScale" hidden>自动</span>
+      <div class="tbox">
+        <div class="hint">动画便于看路径；包络用来找全过程极值。</div>
+        <div class="btns">
+          <button id="btnPlay" class="sec" type="button">▶ 播放</button>
+          <button id="btnSweep" class="pri" type="button">计算全过程包络</button>
+          <button id="btnReset" class="sec" type="button">回起点</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="stats">
+    <div class="stat"><div class="stat-l">当前阶段</div><div class="stat-v" id="sStage">--</div><div class="stat-n" id="sStageN"></div></div>
+    <div class="stat"><div class="stat-l">受力支点</div><div class="stat-v" id="sSupN">0</div><div class="stat-n" id="sSupD"></div></div>
+    <div class="stat"><div class="stat-l">最大正弯矩 M*</div><div class="stat-v" id="sMpos" style="color:var(--pos)">0.000</div><div class="stat-n">M*=M/(qL²)</div></div>
+    <div class="stat"><div class="stat-l">最大负弯矩 M*</div><div class="stat-v" id="sMneg" style="color:var(--neg)">0.000</div><div class="stat-n">M*=M/(qL²)</div></div>
+    <div class="stat"><div class="stat-l">支座是否要“向下拉”</div><div class="stat-v" id="sReaction">--</div><div class="stat-n" id="sReactionN">检查负反力</div></div>
+    <div class="stat"><div class="stat-l">导梁对负弯矩峰值</div><div class="stat-v" id="sImpr">--</div><div class="stat-n" id="sImprN">同一阶段对比</div></div>
+  </section>
+
+  <section class="viz-grid">
+    <div class="card viz">
+      <h2>盯住这一截：全过程弯矩历程</h2>
+      <p>横轴不是桥上的位置，而是时间顺序。曲线穿过零线，说明同一截面换过受力角色。</p>
+      <div class="cw"><div class="ft" id="tagHistory">先选择一截梁</div><svg id="svgHistory" viewBox="0 0 960 280" role="img" aria-label="所选截面的归一化弯矩历程"></svg></div>
+      <div class="fn">实线为无导梁，虚线为有导梁。不要只看峰值，也看它在哪个支承状态出现。</div>
+    </div>
+    <div class="card viz">
+      <h2>扫过整条路：正、负弯矩包络</h2>
+      <p>包络把许多施工照片叠在一起。它回答“哪里曾经最不利”，不回答“为什么”。</p>
+      <div class="cw"><div class="ft" id="tagEnvelope">尚未计算</div><svg id="svgEnvelope" viewBox="0 0 960 280" role="img" aria-label="顶推全过程的归一化正负弯矩包络"></svg></div>
+      <div class="fn" id="envSummary">先拖动观察单个阶段，再计算全过程包络。截面历程图是本页核心——它展示了顶推施工中同一截面反复经历正负弯矩交替的过程。</div>
+    </div>
+  </section>
+
+  <section class="insight" aria-labelledby="insight-title">
+    <div class="kicker">看见以后，再给它名字</div>
+    <h2 id="insight-title">成桥是一张照片，施工是一条路。</h2>
+    <p>同一截梁向前走，边界条件不断改变；自重在哪一种体系里进入，内力就在哪一种体系里留下痕迹。导梁也不是简单地“减小弯矩”：它用较轻、较柔的前端更早找到下一支点，同时可能改写支座反力和另一些阶段。真正不变的是平衡与变形协调，变化的是力从哪条路回到地面。</p>
+    <p>这不只属于桥梁。一个系统若是分阶段形成的——装配、张拉、升温、上线、交接——终局看起来相同，也不能保证沿途留下的状态相同。先问“它是怎样走到这里的”，常常比只看最后一张图更有用。</p>
+    <p class="terms">对应术语：施工阶段分析 · 路径依赖 · 弯矩历程 · 弯矩包络 · 支座反力</p>
+  </section>
+
+  <section class="model-permission" aria-label="模型的权限">
+    <div><strong>保留</strong><span>线弹性梁、分阶段支承、分布自重、导梁相对线重与刚度。</span></div>
+    <div><strong>舍弃</strong><span>预应力、收缩徐变、摩阻、接缝、横向偏心、局部应力与施工误差。</span></div>
+    <div><strong>可以回答</strong><span>内力正负如何轮换，哪一施工阶段更敏感，参数改变后的趋势。</span></div>
+    <div><strong>不可用于</strong><span>实际桥梁弯矩、顶推力、构件尺寸或施工安全结论。</span></div>
+  </section>
+  <p class="provenance">模型量采用 q=1、主梁 EI=1，并以跨径 L 归一化；页面数值为教学比较量，不是工程计算书。原型来自“html演示文档/pushing_demo(1).html”，本版重排界面、补充反力核查与模型权限。</p>
+</div>
+
+<script>
+"use strict";
+
+/* ===== 状态 ===== */
+const S={
+  nPier:5, span:40, noseRatio:0.65, noseW:0.25, noseEI:0.25,
+  withNose:false, posT:0.17, frontX:0,
+  playing:false, envelope:null,
+  trackLocal:-1,
+  trackHistory:null,
+  mScaleManual:0       // 0=自动, >0=手动纵轴范围
+};
+
+/* ===== DOM ===== */
+const $=id=>document.getElementById(id);
+const el={
+  rPierCount:$("rPierCount"),rSpan:$("rSpan"),rNoseLen:$("rNoseLen"),
+  rNoseW:$("rNoseW"),rNoseEI:$("rNoseEI"),rPos:$("rPos"),rTrack:$("rTrack"),cbNose:$("cbNose"),
+  rMScale:$("rMScale"),vMScale:$("vMScale"),
+  btnPlay:$("btnPlay"),btnSweep:$("btnSweep"),btnReset:$("btnReset"),
+  vPierCount:$("vPierCount"),vSpan:$("vSpan"),vNoseLen:$("vNoseLen"),
+  vNoseW:$("vNoseW"),vNoseEI:$("vNoseEI"),vPos:$("vPos"),vTrack:$("vTrack"),
+  sStage:$("sStage"),sStageN:$("sStageN"),sSupN:$("sSupN"),sSupD:$("sSupD"),
+  sMpos:$("sMpos"),sMneg:$("sMneg"),sReaction:$("sReaction"),sReactionN:$("sReactionN"),sImpr:$("sImpr"),sImprN:$("sImprN"),
+  svgStruct:$("svgStruct"),svgMoment:$("svgMoment"),
+  svgHistory:$("svgHistory"),svgEnvelope:$("svgEnvelope"),
+  tagMoment:$("tagMoment"),tagHistory:$("tagHistory"),
+  tagEnvelope:$("tagEnvelope"),teachText:$("teachText"),envSummary:$("envSummary"),
+  predictionText:$("predictionText"),predictionStatus:$("predictionStatus"),savePrediction:$("savePrediction")
+};
+
+/* ===== 工具 ===== */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=(v,d=2)=>Number.isFinite(v)?v.toFixed(d):"--";
+const normM=v=>v/(S.span*S.span);
+const EPS=1e-8;
+let dragging=false;
+
+/* ===== 几何 ===== */
+function geom(wn){
+  const withNose=wn!==undefined?wn:S.withNose;
+  // 桥墩位置：P1=0, P2=span, P3=2*span, ...
+  const piers=[];for(let i=0;i<S.nPier;i++)piers.push(i*S.span);
+  // 台座 = P1左侧的满跨支撑制梁场（从很远处到P1=0）
+  // 梁总长 = 跨径 × (墩数-1)
+  const bLen=(S.nPier-1)*S.span;
+  const nLen=withNose?S.noseRatio*S.span:0;
+  // frontX = 主梁前端(右端)的全局x坐标，这是顶推控制量
+  // 起始：frontX=0，主梁前端刚好在P1处（整根梁还在台座上）
+  // 结束：frontX=最后一个墩的x，主梁前端到达最后一个墩
+  const minFront=0;
+  const maxFront=piers[piers.length-1];
+  const frontX=clamp(S.frontX,minFront,maxFront);
+  // 梁后端(左端) = frontX - bLen，始终在台座上（P1左侧）
+  // 导梁前端 = frontX + nLen
+  return{piers,bLen,nLen,frontX,minFront,maxFront,
+    rearX:frontX-bLen, tipX:frontX+nLen,
+    vMin:-1.5*S.span, vMax:piers[piers.length-1]+1.5*S.span};
+}
+function syncFromT(){const g=geom(false);S.frontX=g.minFront+S.posT*(g.maxFront-g.minFront)}
+function syncToT(){const g=geom(false);S.posT=clamp((S.frontX-g.minFront)/(g.maxFront-g.minFront),0,1)}
+
+/* ===== 有限元求解器 ===== */
+function uniqueSorted(arr){
+  const s=[...arr].sort((a,b)=>a-b),o=[];
+  for(const v of s)if(!o.length||Math.abs(v-o[o.length-1])>1e-6)o.push(v);
+  return o;
+}
+
+function buildNodes(g){
+  // 有限元只建模从P1(x=0)到梁/导梁前端的悬出部分
+  // P1左侧在台座上完全支撑，弯矩=0
+  // 悬出长度 = frontX（主梁悬出）+ nLen（导梁）
+  const overhang=g.frontX+g.nLen; // 从P1到导梁前端的总长度
+  if(overhang<EPS)return{nodes:[],active:[],feLen:0,mainLenFe:0};
+
+  const feLen=overhang;
+  const mainLenFe=g.frontX; // 主梁在有限元内的长度
+
+  // 找P1右侧、在悬出范围内的桥墩（P1自身在feLocal=0处）
+  const active=[];
+  for(let i=0;i<g.piers.length;i++){
+    const px=g.piers[i];
+    if(px>=-EPS && px<=g.frontX+g.nLen+EPS){
+      active.push({x:px,kind:"pier",label:"P"+(i+1),feLocal:px});
+    }
+  }
+  if(active.length===0)return{nodes:[],active:[],feLen:0,mainLenFe:0};
+
+  const supLocals=active.map(p=>p.feLocal);
+  const anchors=[0,mainLenFe,feLen,...supLocals];
+  const keys=uniqueSorted(anchors.filter(v=>v>=-EPS&&v<=feLen+EPS));
+  const step=S.span/10;
+  const nodes=[];
+  for(let i=0;i<keys.length-1;i++){
+    const a=keys[i],b=keys[i+1];
+    nodes.push(a);
+    const div=Math.max(1,Math.ceil((b-a)/step));
+    for(let j=1;j<div;j++)nodes.push(a+(b-a)*j/div);
+  }
+  nodes.push(keys[keys.length-1]);
+  return{nodes:uniqueSorted(nodes),active,feLen,mainLenFe};
+}
+
+function gauss(A,b){
+  const n=A.length,M=A.map(r=>r.slice()),rhs=b.slice();
+  for(let c=0;c<n;c++){
+    let piv=c,mx=Math.abs(M[c][c]);
+    for(let r=c+1;r<n;r++){const v=Math.abs(M[r][c]);if(v>mx){mx=v;piv=r}}
+    if(mx<1e-12)return null;
+    if(piv!==c){[M[c],M[piv]]=[M[piv],M[c]];[rhs[c],rhs[piv]]=[rhs[piv],rhs[c]]}
+    const d=M[c][c];
+    for(let j=c;j<n;j++)M[c][j]/=d;rhs[c]/=d;
+    for(let r=0;r<n;r++){
+      if(r===c)continue;const f=M[r][c];if(Math.abs(f)<1e-14)continue;
+      for(let j=c;j<n;j++)M[r][j]-=f*M[c][j];rhs[r]-=f*rhs[c];
+    }
+  }
+  return rhs;
+}
+
+function solve(wn){
+  const g=geom(wn);
+  const bn=buildNodes(g);
+  const{nodes,active,feLen,mainLenFe}=bn;
+  if(active.length<1||nodes.length<2)return{ok:false,g,active};
+  const N=nodes.length, dof=N*2;
+  const K=Array.from({length:dof},()=>new Float64Array(dof));
+  const F=new Float64Array(dof);
+
+  for(let i=0;i<N-1;i++){
+    const x1=nodes[i],x2=nodes[i+1],L=x2-x1;
+    if(L<1e-8)continue;
+    const mid=(x1+x2)/2;
+    const inNose=(wn!==undefined?wn:S.withNose)&&mid>mainLenFe+1e-6;
+    const q=inNose?S.noseW:1;
+    const EI=inNose?S.noseEI:1;
+    const k0=EI/(L*L*L);
+    const ke=[[12*k0,6*L*k0,-12*k0,6*L*k0],
+              [6*L*k0,4*L*L*k0,-6*L*k0,2*L*L*k0],
+              [-12*k0,-6*L*k0,12*k0,-6*L*k0],
+              [6*L*k0,2*L*L*k0,-6*L*k0,4*L*L*k0]];
+    const fe=[-q*L/2,-q*L*L/12,-q*L/2,q*L*L/12];
+    const m=[2*i,2*i+1,2*(i+1),2*(i+1)+1];
+    for(let r=0;r<4;r++){F[m[r]]+=fe[r];for(let c=0;c<4;c++)K[m[r]][m[c]]+=ke[r][c]}
+  }
+
+  // 支座约束：仅约束竖向位移(偶数自由度)
+  // P1(feLocal=0)处额外约束转角=0（台座侧连续支撑，等效固定端）
+  const cons=new Set();
+  for(const s of active){
+    const idx=nodes.findIndex(x=>Math.abs(x-s.feLocal)<1e-6);
+    if(idx>=0)cons.add(2*idx);
+  }
+  // P1处(feLocal=0)：约束竖向位移+转角（台座满跨支撑=固定端）
+  const p1idx=nodes.findIndex(x=>Math.abs(x)<1e-6);
+  if(p1idx>=0){cons.add(2*p1idx);cons.add(2*p1idx+1);}
+
+  const free=[];
+  for(let i=0;i<dof;i++)if(!cons.has(i))free.push(i);
+  if(free.length===0)return{ok:false,g,active};
+  const Kf=free.map(r=>free.map(c=>K[r][c]));
+  const Ff=free.map(r=>F[r]);
+  const sol=gauss(Kf,Ff);
+  if(!sol)return{ok:false,g,active};
+  const d=new Float64Array(dof);
+  for(let i=0;i<free.length;i++)d[free[i]]=sol[i];
+
+  // 由 Kd-F 回算竖向支反力。正值表示支座向上托梁；负值意味着
+  // 这个理想约束正在“向下拉”梁，真实施工支承必须另行核查。
+  const reactions=active.map(s=>{
+    const idx=nodes.findIndex(x=>Math.abs(x-s.feLocal)<1e-6);
+    if(idx<0)return{...s,value:NaN};
+    const rdof=2*idx;
+    let value=-F[rdof];
+    for(let c=0;c<dof;c++)value+=K[rdof][c]*d[c];
+    return{...s,value};
+  });
+
+  // 采样弯矩——feX就是全局x坐标（因为有限元从P1=0开始）
+  const samples=[];
+  for(let i=0;i<N-1;i++){
+    const x1=nodes[i],x2=nodes[i+1],L=x2-x1;
+    if(L<1e-8)continue;
+    const mid=(x1+x2)/2;
+    const inNose=(wn!==undefined?wn:S.withNose)&&mid>mainLenFe+1e-6;
+    const EI=inNose?S.noseEI:1;
+    const steps=5;
+    for(let s=0;s<=steps;s++){
+      if(i>0&&s===0)continue;
+      const xi=s/steps, feX=x1+xi*L;
+      const cur=((-6+12*xi)/(L*L))*d[2*i]+((-4+6*xi)/L)*d[2*i+1]+
+                ((6-12*xi)/(L*L))*d[2*(i+1)]+((-2+6*xi)/L)*d[2*(i+1)+1];
+      samples.push({local:feX,global:feX,moment:EI*cur,isMain:feX<=mainLenFe+1e-6});
+    }
+  }
+  const mainS=samples.filter(s=>s.isMain);
+  return{ok:true,g,active,reactions,d,samples,mainS,mainLenFe,
+    maxP:Math.max(0,...samples.map(s=>s.moment)),
+    maxN:Math.min(0,...samples.map(s=>s.moment)),
+    mainNeg:Math.min(0,...mainS.map(s=>s.moment))};
+}
+
+/* 在采样点中插值 */
+function interpM(list,lx){
+  if(lx<=list[0].local)return list[0].moment;
+  if(lx>=list[list.length-1].local)return list[list.length-1].moment;
+  for(let i=0;i<list.length-1;i++){
+    const a=list[i],b=list[i+1];
+    if(lx>=a.local-EPS&&lx<=b.local+EPS){
+      const t=(b.local-a.local)<1e-8?0:(lx-a.local)/(b.local-a.local);
+      return a.moment+t*(b.moment-a.moment);
+    }
+  }
+  return 0;
+}
+
+/* ===== 截面历程计算 ===== */
+function computeHistory(){
+  if(S.trackLocal<0){S.trackHistory=null;return}
+  const g0=geom(false);
+  const steps=120;
+  const ts=[],ms=[],msNose=[];
+  const savedFront=S.frontX;
+  for(let i=0;i<=steps;i++){
+    const t=i/steps;
+    S.frontX=g0.minFront+t*(g0.maxFront-g0.minFront);
+    // 截面在有限元中的坐标 = frontX - trackLocal（距P1的距离）
+    const feX=S.frontX-S.trackLocal;
+    const r=solve(false);
+    const rn=solve(true);
+    ts.push(t);
+    // 只有当截面已经悬出台座(feX>=0)时才有弯矩
+    ms.push(r.ok&&feX>=-EPS?interpM(r.mainS,feX):0);
+    msNose.push(rn.ok&&feX>=-EPS?interpM(rn.mainS,feX):0);
+  }
+  S.frontX=savedFront;
+  S.trackHistory={ts,ms,msNose};
+}
+
+/* ===== 包络计算 ===== */
+function computeEnvelope(){
+  const g0=geom(false);
+  const nSta=160, nStep=100;
+  // 包络横轴 = 全局x坐标（从P1=0到最后一个墩）
+  const lastPier=g0.piers[g0.piers.length-1];
+  const stations=Array.from({length:nSta+1},(_,i)=>lastPier*i/nSta);
+  const envNo={pos:new Array(nSta+1).fill(-Infinity),neg:new Array(nSta+1).fill(Infinity)};
+  const envYes={pos:new Array(nSta+1).fill(-Infinity),neg:new Array(nSta+1).fill(Infinity)};
+  const savedFront=S.frontX;
+  for(let i=0;i<=nStep;i++){
+    S.frontX=g0.minFront+(g0.maxFront-g0.minFront)*i/nStep;
+    const rNo=solve(false), rYes=solve(true);
+    for(let j=0;j<=nSta;j++){
+      if(rNo.ok&&rNo.mainS.length){const m=interpM(rNo.mainS,stations[j]);if(m>envNo.pos[j])envNo.pos[j]=m;if(m<envNo.neg[j])envNo.neg[j]=m}
+      if(rYes.ok&&rYes.mainS.length){const m=interpM(rYes.mainS,stations[j]);if(m>envYes.pos[j])envYes.pos[j]=m;if(m<envYes.neg[j])envYes.neg[j]=m}
+    }
+  }
+  S.frontX=savedFront;
+  const clean=a=>a.map(v=>Number.isFinite(v)?v:0);
+  S.envelope={stations,lastPier,noNose:{pos:clean(envNo.pos),neg:clean(envNo.neg)},
+    withNose:{pos:clean(envYes.pos),neg:clean(envYes.neg)}};
+}
+
+/* ===== SVG 工具 ===== */
+const NS="http://www.w3.org/2000/svg";
+function mk(tag){return document.createElementNS(NS,tag)}
+function clr(svg){while(svg.firstChild)svg.removeChild(svg.firstChild)}
+function svgMeta(svg,titleText,descText){
+  const title=mk("title"),desc=mk("desc");
+  title.textContent=titleText;desc.textContent=descText;
+  svg.append(title,desc);
+}
+function wx(x,vMin,vMax,w,mx){return mx+(x-vMin)/(vMax-vMin)*(w-2*mx)}
+function pts2d(pts){return pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')}
+
+/* ===== 渲染：结构示意图 ===== */
+function renderStruct(res){
+  const svg=el.svgStruct; clr(svg);
+  svgMeta(svg,"当前顶推位置",`主梁前端位于 ${fmt(res.g.frontX,1)} 米，${res.active.length} 个支点进入模型。`);
+  const W=960,H=260,MX=40,BY=105,GY=210;
+  const g=res.g;
+
+  // 背景
+  const bg=mk("rect");bg.setAttribute("width",W);bg.setAttribute("height",H);
+  bg.setAttribute("fill","#fffdf9");svg.appendChild(bg);
+  // 地面线
+  const gl=mk("line");gl.setAttribute("x1",0);gl.setAttribute("x2",W);
+  gl.setAttribute("y1",GY);gl.setAttribute("y2",GY);
+  gl.setAttribute("stroke","rgba(29,42,54,.14)");gl.setAttribute("stroke-width",2);
+  svg.appendChild(gl);
+
+  // 所有支承：台座=P1左侧满跨支撑区域，桥墩固定
+  // 画台座区域（从视图左边到P1）
+  const p1sx=wx(0,g.vMin,g.vMax,W,MX);
+  const padRect=mk("rect");
+  padRect.setAttribute("x",0);padRect.setAttribute("y",BY+16);
+  padRect.setAttribute("width",p1sx);padRect.setAttribute("height",GY-BY-16);
+  padRect.setAttribute("fill","rgba(11,143,114,.08)");padRect.setAttribute("rx",4);
+  svg.appendChild(padRect);
+  const padLabel=mk("text");padLabel.setAttribute("x",Math.max(20,p1sx-40));
+  padLabel.setAttribute("y",GY+20);padLabel.setAttribute("font-size","11");
+  padLabel.setAttribute("fill","var(--active)");padLabel.textContent="制梁台座";
+  svg.appendChild(padLabel);
+
+  // 桥墩
+  for(let i=0;i<g.piers.length;i++){
+    const px=g.piers[i];
+    const sx=wx(px,g.vMin,g.vMax,W,MX);
+    const act=res.active.some(a=>Math.abs(a.x-px)<1e-6);
+    const tri=mk("polygon");
+    tri.setAttribute("points",`${sx-16},${GY} ${sx+16},${GY} ${sx+7},${BY+16} ${sx-7},${BY+16}`);
+    tri.setAttribute("fill",act?"rgba(11,143,114,.22)":"rgba(104,112,122,.16)");
+    tri.setAttribute("stroke",act?"var(--active)":"#68707a");
+    tri.setAttribute("stroke-width",1.6);svg.appendChild(tri);
+    const ci=mk("circle");ci.setAttribute("cx",sx);ci.setAttribute("cy",BY+7);
+    ci.setAttribute("r",act?6:4.5);ci.setAttribute("fill",act?"var(--active)":"#68707a");
+    svg.appendChild(ci);
+    const tx=mk("text");tx.setAttribute("x",sx);tx.setAttribute("y",GY+20);
+    tx.setAttribute("text-anchor","middle");tx.setAttribute("font-size","12");
+    tx.setAttribute("fill","#546471");tx.textContent="P"+(i+1);svg.appendChild(tx);
+  }
+
+  // 主梁：后端=rearX，前端=frontX
+  const bL=wx(g.rearX,g.vMin,g.vMax,W,MX);
+  const bR=wx(g.frontX,g.vMin,g.vMax,W,MX);
+  const br=mk("rect");br.setAttribute("x",bL);br.setAttribute("y",BY-12);
+  br.setAttribute("width",Math.max(1,bR-bL));br.setAttribute("height",24);
+  br.setAttribute("rx",10);br.setAttribute("fill","var(--beam)");
+  br.setAttribute("stroke","#1a3d55");br.setAttribute("stroke-width",1.6);
+  svg.appendChild(br);
+
+  // 导梁
+  if(S.withNose&&g.nLen>0){
+    const nR=wx(g.tipX,g.vMin,g.vMax,W,MX);
+    const nr=mk("rect");nr.setAttribute("x",bR-1);nr.setAttribute("y",BY-7);
+    nr.setAttribute("width",Math.max(1,nR-bR+1));nr.setAttribute("height",14);
+    nr.setAttribute("rx",7);nr.setAttribute("fill","var(--nose)");
+    nr.setAttribute("stroke","#8a4e10");nr.setAttribute("stroke-width",1.2);
+    svg.appendChild(nr);
+  }
+
+  // 追踪截面标记（trackLocal=距主梁前端的距离，全局坐标=frontX-trackLocal）
+  if(S.trackLocal>=0&&S.trackLocal<=g.bLen){
+    const gx=g.frontX-S.trackLocal;
+    const tx=wx(gx,g.vMin,g.vMax,W,MX);
+    const tl=mk("line");tl.setAttribute("x1",tx);tl.setAttribute("x2",tx);
+    tl.setAttribute("y1",BY-22);tl.setAttribute("y2",BY+22);
+    tl.setAttribute("stroke","var(--compare)");tl.setAttribute("stroke-width",2.5);
+    tl.setAttribute("stroke-dasharray","4 3");svg.appendChild(tl);
+    const tt=mk("text");tt.setAttribute("x",tx);tt.setAttribute("y",BY-28);
+    tt.setAttribute("text-anchor","middle");tt.setAttribute("font-size","11");
+    tt.setAttribute("fill","var(--compare)");tt.setAttribute("font-weight","700");
+    tt.textContent="追踪";svg.appendChild(tt);
+  }
+
+  // 标题
+  const t1=mk("text");t1.setAttribute("x",24);t1.setAttribute("y",28);
+  t1.setAttribute("font-size","13");t1.setAttribute("font-weight","700");
+  t1.setAttribute("fill","#243544");
+  t1.textContent=`主梁前端 ${fmt(g.frontX,1)} m`;svg.appendChild(t1);
+  const t2=mk("text");t2.setAttribute("x",24);t2.setAttribute("y",46);
+  t2.setAttribute("font-size","11");t2.setAttribute("fill","#617381");
+  t2.textContent=S.withNose?`导梁前端 ${fmt(g.tipX,1)} m`:"未设置导梁";
+  svg.appendChild(t2);
+
+  // 拖动+点击热区
+  const hit=mk("rect");hit.setAttribute("x",bL);hit.setAttribute("y",BY-24);
+  const tipSx=wx(S.withNose?g.tipX:g.frontX,g.vMin,g.vMax,W,MX);
+  hit.setAttribute("width",Math.max(12,tipSx-bL));
+  hit.setAttribute("height",48);hit.setAttribute("fill","rgba(0,0,0,0)");
+  hit.setAttribute("cursor","grab");svg.appendChild(hit);
+  attachDrag(hit,g);
+  attachClick(hit,g,W,MX);
+}
+
+/* ===== 渲染：当前弯矩图 ===== */
+// 全局固定纵轴范围，避免拖动时上下跳动
+let momentScaleFixed=0;
+
+function renderMoment(res){
+  const svg=el.svgMoment; clr(svg);
+  svgMeta(svg,"当前施工阶段弯矩图","蓝色在零线下表示正弯矩，红色在零线上表示负弯矩；数值以 qL² 归一化。 ");
+  const W=960,H=280,MX=40,AY=140;
+  const g=res.g;
+  if(!res.ok){
+    const t=mk("text");t.setAttribute("x",W/2);t.setAttribute("y",H/2);
+    t.setAttribute("text-anchor","middle");t.setAttribute("font-size","15");
+    t.setAttribute("fill","#7b8792");t.textContent="支承不足";svg.appendChild(t);return;
+  }
+  const bg=mk("rect");bg.setAttribute("width",W);bg.setAttribute("height",H);
+  bg.setAttribute("fill","#fffdfa");svg.appendChild(bg);
+
+  const vL=g.vMin, vR=g.vMax;
+  // P1位置 = piers[0] = 0
+  const p1x=g.piers[0];
+  // 只取global >= P1的采样点
+  const filtered=res.samples.filter(s=>s.global>=p1x-EPS);
+
+  const ax=mk("line");ax.setAttribute("x1",0);ax.setAttribute("x2",W);
+  ax.setAttribute("y1",AY);ax.setAttribute("y2",AY);
+  ax.setAttribute("stroke","rgba(29,42,54,.2)");ax.setAttribute("stroke-width",1.5);
+  svg.appendChild(ax);
+  const lp=mk("text");lp.setAttribute("x",14);lp.setAttribute("y",AY+60);
+  lp.setAttribute("font-size","11");lp.setAttribute("fill","var(--pos)");
+  lp.textContent="正弯矩 ↓";svg.appendChild(lp);
+  const ln=mk("text");ln.setAttribute("x",14);ln.setAttribute("y",AY-48);
+  ln.setAttribute("font-size","11");ln.setAttribute("fill","var(--neg)");
+  ln.textContent="负弯矩 ↑";svg.appendChild(ln);
+
+  // 纵轴范围：手动 > 0 时用手动值，否则自动（只增不减）
+  const curMax=Math.max(0.1,...filtered.map(s=>Math.abs(s.moment)));
+  if(S.mScaleManual>0){
+    momentScaleFixed=S.mScaleManual;
+  }else{
+    if(curMax>momentScaleFixed)momentScaleFixed=curMax;
+  }
+  const scY=90/momentScaleFixed;
+
+  const pts=filtered.map(s=>[wx(s.global,vL,vR,W,MX),AY+s.moment*scY]);
+  if(pts.length<2){el.tagMoment.textContent="P1右侧无数据";return;}
+
+  // 填色
+  const aP=[[pts[0][0],AY]];const aN=[[pts[0][0],AY]];
+  for(let i=0;i<pts.length;i++){
+    aP.push([pts[i][0],Math.max(AY,pts[i][1])]);
+    aN.push([pts[i][0],Math.min(AY,pts[i][1])]);
+  }
+  aP.push([pts[pts.length-1][0],AY]);aN.push([pts[pts.length-1][0],AY]);
+  const fp=mk("path");fp.setAttribute("d",pts2d(aP)+" Z");
+  fp.setAttribute("fill","rgba(47,126,216,.16)");svg.appendChild(fp);
+  const fn=mk("path");fn.setAttribute("d",pts2d(aN)+" Z");
+  fn.setAttribute("fill","rgba(209,73,91,.16)");svg.appendChild(fn);
+  const cv=mk("path");cv.setAttribute("d",pts2d(pts));
+  cv.setAttribute("fill","none");cv.setAttribute("stroke","#1a3d55");
+  cv.setAttribute("stroke-width",2.5);cv.setAttribute("stroke-linejoin","round");
+  svg.appendChild(cv);
+
+  // 支点虚线（只画P1及右侧的）
+  for(const s of res.active){
+    if(s.x<p1x-EPS)continue;
+    const sx=wx(s.x,vL,vR,W,MX);
+    const dl=mk("line");dl.setAttribute("x1",sx);dl.setAttribute("x2",sx);
+    dl.setAttribute("y1",20);dl.setAttribute("y2",H-20);
+    dl.setAttribute("stroke",s.kind==="pad"?"rgba(104,112,122,.22)":"rgba(11,143,114,.22)");
+    dl.setAttribute("stroke-dasharray","3 5");svg.appendChild(dl);
+  }
+
+  // 追踪截面标记（trackLocal=距主梁前端距离，有限元坐标=frontX-trackLocal）
+  if(S.trackLocal>=0&&S.trackLocal<=g.bLen){
+    const feX=g.frontX-S.trackLocal; // 截面在有限元中的坐标
+    const gx=feX; // 全局坐标=有限元坐标（有限元从P1=0开始）
+    if(gx>=p1x-EPS&&feX>=-EPS){
+      const sx=wx(gx,vL,vR,W,MX);
+      const m=(res.mainS&&res.mainS.length)?interpM(res.mainS,feX):0;
+      const sy=clamp(AY+m*scY,20,H-20);
+      const tl=mk("line");tl.setAttribute("x1",sx);tl.setAttribute("x2",sx);
+      tl.setAttribute("y1",20);tl.setAttribute("y2",H-20);
+      tl.setAttribute("stroke","var(--compare)");tl.setAttribute("stroke-width",1.8);
+      tl.setAttribute("stroke-dasharray","4 3");svg.appendChild(tl);
+      const ci=mk("circle");ci.setAttribute("cx",sx);ci.setAttribute("cy",sy);
+      ci.setAttribute("r",5);ci.setAttribute("fill","var(--compare)");svg.appendChild(ci);
+      const vt=mk("text");vt.setAttribute("x",sx+8);vt.setAttribute("y",sy-8);
+      vt.setAttribute("font-size","11");vt.setAttribute("fill","var(--compare)");
+      vt.setAttribute("font-weight","700");vt.textContent=`M* ${fmt(normM(m),3)}`;svg.appendChild(vt);
+    }
+  }
+  el.tagMoment.textContent=`当前弯矩 M*=M/(qL²) | 峰值 ${fmt(normM(curMax),3)}`;
+}
+
+/* ===== 渲染：截面弯矩历程 ===== */
+function renderHistory(){
+  const svg=el.svgHistory; clr(svg);
+  svgMeta(svg,"所选截面的全过程弯矩历程","比较无导梁实线与有导梁虚线，观察曲线是否穿越零线。 ");
+  const W=960,H=280,MX=50,MY=32,AY=H/2;
+  const bg=mk("rect");bg.setAttribute("width",W);bg.setAttribute("height",H);
+  bg.setAttribute("fill","#fffdfa");svg.appendChild(bg);
+
+  if(!S.trackHistory||S.trackLocal<0){
+    const t=mk("text");t.setAttribute("x",W/2);t.setAttribute("y",H/2);
+    t.setAttribute("text-anchor","middle");t.setAttribute("font-size","14");
+    t.setAttribute("fill","#7b8792");t.textContent="点击结构图中的梁体，选定一个追踪截面";
+    svg.appendChild(t);el.tagHistory.textContent="点击梁体选定截面";return;
+  }
+  const{ts,ms,msNose}=S.trackHistory;
+  const allV=[...ms,...msNose];
+  const maxAbs=Math.max(0.1,...allV.map(v=>Math.abs(v)));
+  const scY=(H/2-MY)/maxAbs;
+  const mapX=t=>MX+t*(W-2*MX);
+  const mapY=m=>AY+m*scY;
+
+  // 零线
+  const ax=mk("line");ax.setAttribute("x1",MX);ax.setAttribute("x2",W-MX);
+  ax.setAttribute("y1",AY);ax.setAttribute("y2",AY);
+  ax.setAttribute("stroke","rgba(29,42,54,.2)");ax.setAttribute("stroke-width",1.5);
+  svg.appendChild(ax);
+
+  // 正负填色（无导梁）
+  const pNo=ts.map((t,i)=>[mapX(t),mapY(ms[i])]);
+  const aP2=[[pNo[0][0],AY],...pNo.map(p=>[p[0],Math.max(AY,p[1])]),[pNo[pNo.length-1][0],AY]];
+  const aN2=[[pNo[0][0],AY],...pNo.map(p=>[p[0],Math.min(AY,p[1])]),[pNo[pNo.length-1][0],AY]];
+  const fP2=mk("path");fP2.setAttribute("d",pts2d(aP2)+" Z");
+  fP2.setAttribute("fill","rgba(47,126,216,.1)");svg.appendChild(fP2);
+  const fN2=mk("path");fN2.setAttribute("d",pts2d(aN2)+" Z");
+  fN2.setAttribute("fill","rgba(209,73,91,.1)");svg.appendChild(fN2);
+
+  // 无导梁曲线
+  const cNo=mk("path");cNo.setAttribute("d",pts2d(pNo));
+  cNo.setAttribute("fill","none");cNo.setAttribute("stroke","#1a3d55");
+  cNo.setAttribute("stroke-width",2.2);svg.appendChild(cNo);
+  // 有导梁曲线
+  const pYes=ts.map((t,i)=>[mapX(t),mapY(msNose[i])]);
+  const cYes=mk("path");cYes.setAttribute("d",pts2d(pYes));
+  cYes.setAttribute("fill","none");cYes.setAttribute("stroke","var(--active)");
+  cYes.setAttribute("stroke-width",2);cYes.setAttribute("stroke-dasharray","6 4");
+  svg.appendChild(cYes);
+
+  // 当前位置竖线
+  const cx=mapX(S.posT);
+  const cl=mk("line");cl.setAttribute("x1",cx);cl.setAttribute("x2",cx);
+  cl.setAttribute("y1",MY);cl.setAttribute("y2",H-MY);
+  cl.setAttribute("stroke","rgba(106,76,255,.35)");cl.setAttribute("stroke-width",1.5);
+  svg.appendChild(cl);
+
+  // 标注
+  const lb1=mk("text");lb1.setAttribute("x",MX);lb1.setAttribute("y",20);
+  lb1.setAttribute("font-size","12");lb1.setAttribute("font-weight","700");
+  lb1.setAttribute("fill","#243544");
+  lb1.textContent=`距前端 ${fmt(S.trackLocal,1)}m 处截面弯矩历程`;svg.appendChild(lb1);
+  const lb2=mk("text");lb2.setAttribute("x",W-MX);lb2.setAttribute("y",20);
+  lb2.setAttribute("text-anchor","end");lb2.setAttribute("font-size","11");
+  lb2.setAttribute("fill","#617381");
+  lb2.textContent="实线=无导梁  虚线=有导梁";svg.appendChild(lb2);
+  const xa=mk("text");xa.setAttribute("x",W/2);xa.setAttribute("y",H-6);
+  xa.setAttribute("text-anchor","middle");xa.setAttribute("font-size","11");
+  xa.setAttribute("fill","#617381");xa.textContent="顶推进度 →";svg.appendChild(xa);
+
+  el.tagHistory.textContent=`距前端 ${fmt(S.trackLocal,1)}m | 最大正 ${fmt(Math.max(0,...ms))} 最大负 ${fmt(Math.min(0,...ms))}`;
+}
+
+/* ===== 渲染：全过程包络 ===== */
+function renderEnvelope(){
+  const svg=el.svgEnvelope; clr(svg);
+  svgMeta(svg,"全过程弯矩包络","比较主梁各位置在全部施工阶段出现过的最大正弯矩和最小负弯矩。 ");
+  const W=960,H=280,MX=50,MY=32,AY=H/2;
+  const bg=mk("rect");bg.setAttribute("width",W);bg.setAttribute("height",H);
+  bg.setAttribute("fill","#fffdfa");svg.appendChild(bg);
+  const g0=geom(false);
+
+  // 墩位虚线
+  for(let i=0;i<S.nPier;i++){
+    const x=MX+(g0.piers[g0.piers.length-1]===0?0:(i*S.span/g0.piers[g0.piers.length-1])*(W-2*MX));
+    const dl=mk("line");dl.setAttribute("x1",x);dl.setAttribute("x2",x);
+    dl.setAttribute("y1",MY);dl.setAttribute("y2",H-MY);
+    dl.setAttribute("stroke","rgba(29,42,54,.07)");dl.setAttribute("stroke-dasharray","3 6");
+    svg.appendChild(dl);
+    const tx=mk("text");tx.setAttribute("x",x);tx.setAttribute("y",H-6);
+    tx.setAttribute("text-anchor","middle");tx.setAttribute("font-size","10");
+    tx.setAttribute("fill","#617381");tx.textContent=i===0?"起点":"P"+(i+1);
+    svg.appendChild(tx);
+  }
+
+  // 零线
+  const ax=mk("line");ax.setAttribute("x1",MX);ax.setAttribute("x2",W-MX);
+  ax.setAttribute("y1",AY);ax.setAttribute("y2",AY);
+  ax.setAttribute("stroke","rgba(29,42,54,.2)");ax.setAttribute("stroke-width",1.5);
+  svg.appendChild(ax);
+
+  if(!S.envelope){
+    const t=mk("text");t.setAttribute("x",W/2);t.setAttribute("y",H/2-10);
+    t.setAttribute("text-anchor","middle");t.setAttribute("font-size","14");
+    t.setAttribute("fill","#7b8792");t.textContent="点击「计算包络」后显示";
+    svg.appendChild(t);el.tagEnvelope.textContent="尚未计算";return;
+  }
+
+  const env=S.envelope;
+  const allV=[...env.noNose.pos,...env.noNose.neg,...env.withNose.pos,...env.withNose.neg];
+  const maxAbs=Math.max(0.15,...allV.map(v=>Math.abs(v)));
+  const scY=(H/2-MY)/maxAbs;
+  const mapX=local=>MX+(env.lastPier<1e-6?0:local/env.lastPier*(W-2*MX));
+  const mapY=m=>AY+m*scY;
+
+  function drawSet(key,posFill,negFill,posStroke,negStroke,w,dash){
+    const set=env[key];
+    const pP=env.stations.map((x,i)=>[mapX(x),mapY(set.pos[i])]);
+    const pN=env.stations.map((x,i)=>[mapX(x),mapY(set.neg[i])]);
+    // 填色
+    const aP=[[pP[0][0],AY],...pP,[pP[pP.length-1][0],AY]];
+    const aN=[[pN[0][0],AY],...pN,[pN[pN.length-1][0],AY]];
+    const fP=mk("path");fP.setAttribute("d",pts2d(aP)+" Z");fP.setAttribute("fill",posFill);svg.appendChild(fP);
+    const fN=mk("path");fN.setAttribute("d",pts2d(aN)+" Z");fN.setAttribute("fill",negFill);svg.appendChild(fN);
+    // 曲线
+    const cP=mk("path");cP.setAttribute("d",pts2d(pP));cP.setAttribute("fill","none");
+    cP.setAttribute("stroke",posStroke);cP.setAttribute("stroke-width",w);
+    if(dash)cP.setAttribute("stroke-dasharray",dash);svg.appendChild(cP);
+    const cN=mk("path");cN.setAttribute("d",pts2d(pN));cN.setAttribute("fill","none");
+    cN.setAttribute("stroke",negStroke);cN.setAttribute("stroke-width",w);
+    if(dash)cN.setAttribute("stroke-dasharray",dash);svg.appendChild(cN);
+  }
+
+  drawSet("noNose","rgba(47,126,216,.08)","rgba(209,73,91,.08)",
+    "rgba(47,126,216,.5)","rgba(209,73,91,.5)",2,"7 5");
+  drawSet("withNose","rgba(11,143,114,.08)","rgba(197,107,31,.08)",
+    "#0b8f72","#c56b1f",2.5,null);
+
+  // 图例
+  const legs=[{x:MX,c:"rgba(47,126,216,.5)",t:"无导梁",d:"7 5"},
+    {x:MX+130,c:"#0b8f72",t:"有导梁",d:null}];
+  for(const l of legs){
+    const ll=mk("line");ll.setAttribute("x1",l.x);ll.setAttribute("x2",l.x+36);
+    ll.setAttribute("y1",18);ll.setAttribute("y2",18);ll.setAttribute("stroke",l.c);
+    ll.setAttribute("stroke-width",2.5);if(l.d)ll.setAttribute("stroke-dasharray",l.d);
+    svg.appendChild(ll);
+    const lt=mk("text");lt.setAttribute("x",l.x+44);lt.setAttribute("y",22);
+    lt.setAttribute("font-size","11");lt.setAttribute("fill","#617381");
+    lt.textContent=l.t;svg.appendChild(lt);
+  }
+
+  // 统计
+  const noNeg=Math.min(...env.noNose.neg);
+  const wiNeg=Math.min(...env.withNose.neg);
+  const red=Math.abs(noNeg)>1e-8?((Math.abs(noNeg)-Math.abs(wiNeg))/Math.abs(noNeg)*100):0;
+  el.tagEnvelope.textContent=`包络已计算 | 负弯矩峰值降低 ${fmt(red,1)}%`;
+  el.envSummary.textContent=
+    `全过程扫描（M*=M/(qL²)）：无导梁最不利负弯矩 ${fmt(normM(noNeg),3)}，有导梁 ${fmt(normM(wiNeg),3)}，降低 ${fmt(red,1)}%。`+
+    `正弯矩峰值：无导梁 ${fmt(normM(Math.max(...env.noNose.pos)),3)}，有导梁 ${fmt(normM(Math.max(...env.withNose.pos)),3)}。`;
+}
+
+/* ===== 拖动梁体 ===== */
+function attachDrag(hit,g){
+  hit.onpointerdown=e=>{dragging=true;hit.setPointerCapture(e.pointerId);hit.style.cursor="grabbing"};
+  hit.onpointermove=e=>{
+    if(!dragging)return;
+    const rect=el.svgStruct.getBoundingClientRect();
+    const px=clamp(e.clientX-rect.left,0,rect.width);
+    const ratio=px/rect.width;
+    const modelX=g.vMin+ratio*(g.vMax-g.vMin);
+    const gf=geom(false);
+    // modelX近似为梁前端位置
+    S.frontX=clamp(modelX,gf.minFront,gf.maxFront);
+    syncToT(); render();
+  };
+  const up=e=>{dragging=false;hit.releasePointerCapture(e.pointerId);hit.style.cursor="grab"};
+  hit.onpointerup=up; hit.onpointercancel=up;
+}
+
+/* ===== 点击选截面 ===== */
+function attachClick(hit,g,W,MX){
+  hit.addEventListener("click",e=>{
+    if(dragging)return;
+    const rect=el.svgStruct.getBoundingClientRect();
+    const px=e.clientX-rect.left;
+    const ratio=px/rect.width;
+    const modelX=g.vMin+ratio*(g.vMax-g.vMin);
+    // trackLocal = 距主梁前端的距离（固定在梁上，随梁移动）
+    // 点击位置的全局坐标 modelX，主梁前端 = frontX，后端 = rearX
+    const distFromFront=g.frontX-modelX;
+    if(distFromFront>=0&&distFromFront<=g.bLen){
+      S.trackLocal=distFromFront;
+      el.rTrack.value=String(Math.round(clamp(distFromFront/g.bLen,0.05,.9)*1000));
+      computeHistory();
+      render();
+    }
+  });
+}
+
+/* ===== 阶段判断 ===== */
+function getStage(res){
+  if(!res.ok)return{t:"支承不足",n:"请继续推进梁体"};
+  const g=res.g;
+  const pierSup=res.active.filter(s=>s.kind==="pier");
+  const tipX=g.frontX+(S.withNose?g.nLen:0);
+  const lead=Math.max(...res.active.map(s=>s.x));
+  const overhang=tipX-lead;
+  if(pierSup.length===0)return{t:"起步阶段",n:"主梁尚未到达第一个桥墩"};
+  if(overhang>0.35*S.span)return{t:"最大悬臂",n:`前端悬臂 ${fmt(overhang,1)}m，负弯矩最敏感！`};
+  if(pierSup.length===1)return{t:"首跨进入",n:"主梁正在从台座过渡到桥墩体系"};
+  if(pierSup.length===2)return{t:"两跨连续",n:"内力在两个桥跨间重新分配"};
+  if(g.frontX>=g.piers[g.piers.length-1]-EPS)return{t:"接近贯通",n:"主梁即将全部就位"};
+  return{t:"多跨连续",n:`${pierSup.length}个桥墩参与受力，连续效应显著`};
+}
+
+/* ===== 更新状态卡片和教学文字 ===== */
+function updateStats(res){
+  const stage=getStage(res);
+  el.sStage.textContent=stage.t;
+  el.sStageN.textContent=stage.n;
+  el.sSupN.textContent=res.ok?String(res.active.length):"0";
+  el.sSupD.textContent=res.ok?`桥墩${res.active.filter(s=>s.kind==="pier").length}个`:"";
+  el.sMpos.textContent=res.ok?fmt(normM(res.maxP),3):"--";
+  el.sMneg.textContent=res.ok?fmt(normM(res.maxN),3):"--";
+
+  if(res.ok&&res.reactions&&res.reactions.length){
+    const minReaction=Math.min(...res.reactions.map(r=>r.value));
+    const minSupport=res.reactions.find(r=>r.value===minReaction);
+    const normalized=minReaction/S.span;
+    const needsTie=normalized<-1e-5;
+    el.sReaction.textContent=needsTie?"需要核查":"都在托梁";
+    el.sReaction.style.color=needsTie?"var(--neg)":"var(--active)";
+    el.sReactionN.textContent=`${minSupport?minSupport.label:"支点"} 最小 R/(qL)=${fmt(normalized,3)}`;
+  }else{
+    el.sReaction.textContent="--";
+    el.sReactionN.textContent="检查负反力";
+  }
+
+  // 导梁改善
+  if(res.ok){
+    const rNo=solve(false), rYes=solve(true);
+    if(rNo.ok&&rYes.ok){
+      const base=Math.abs(rNo.mainNeg), imp=Math.abs(rYes.mainNeg);
+      const red=base>1e-8?(base-imp)/base*100:0;
+      el.sImpr.textContent=`${fmt(red,1)}%`;
+      el.sImprN.textContent=`M*: ${fmt(normM(rNo.mainNeg),3)} → ${fmt(normM(rYes.mainNeg),3)}`;
+    }else{el.sImpr.textContent="--";el.sImprN.textContent="";}
+  }else{el.sImpr.textContent="--";}
+
+  // 教学文字
+  if(!res.ok){el.teachText.textContent="当前支承不足，请继续推进。";return;}
+  let txt=`${stage.t}：${stage.n}`;
+  if(S.trackLocal>=0){
+    const feX=res.g.frontX-S.trackLocal;
+    const m=(res.ok&&res.mainS&&res.mainS.length&&feX>=-EPS)?interpM(res.mainS,feX):0;
+    txt+=` | 距前端${fmt(S.trackLocal,1)}m处 当前 M*=${fmt(normM(m),3)}`;
+    if(S.trackHistory){
+      const maxP=Math.max(0,...S.trackHistory.ms);
+      const maxN=Math.min(0,...S.trackHistory.ms);
+      txt+=`，全程 M* 从 ${fmt(normM(maxN),3)} 到 ${fmt(normM(maxP),3)}`;
+    }
+  }
+  el.teachText.textContent=txt;
+}
+
+/* ===== 更新控件标签 ===== */
+function updateLabels(){
+  const g0=geom(false);
+  el.vPierCount.textContent=S.nPier;
+  el.vSpan.textContent=S.span+" m";
+  el.vNoseLen.textContent=fmt(S.noseRatio,2)+" 跨";
+  el.vNoseW.textContent=fmt(S.noseW,2)+" q";
+  el.vNoseEI.textContent=fmt(S.noseEI,2)+" EI";
+  el.vPos.textContent=fmt(S.frontX,1)+" m";
+  el.vTrack.textContent=S.trackLocal>=0?fmt(S.trackLocal,1)+" m":"尚未选择";
+  el.rPos.value=String(Math.round(S.posT*1000));
+  el.vMScale.textContent=S.mScaleManual>0?fmt(S.mScaleManual,1):"自动";
+}
+
+/* ===== 主渲染 ===== */
+function render(){
+  syncToT(); updateLabels();
+  const res=solve();
+  renderStruct(res);
+  renderMoment(res);
+  renderHistory();
+  renderEnvelope();
+  updateStats(res);
+}
+
+/* ===== 事件绑定 ===== */
+function bindEvents(){
+  const updateTrackedSection=()=>{
+    const g=geom(false);
+    S.trackLocal=(+el.rTrack.value/1000)*g.bLen;
+    computeHistory();
+  };
+  el.rPierCount.oninput=e=>{S.nPier=+e.target.value;syncFromT();S.envelope=null;if(S.trackLocal>=0)updateTrackedSection();momentScaleFixed=0;render()};
+  el.rSpan.oninput=e=>{S.span=+e.target.value;syncFromT();S.envelope=null;if(S.trackLocal>=0)updateTrackedSection();momentScaleFixed=0;render()};
+  el.rNoseLen.oninput=e=>{S.noseRatio=+e.target.value;S.envelope=null;render()};
+  el.rNoseW.oninput=e=>{S.noseW=+e.target.value;S.envelope=null;if(S.trackLocal>=0)computeHistory();render()};
+  el.rNoseEI.oninput=e=>{S.noseEI=+e.target.value;S.envelope=null;if(S.trackLocal>=0)computeHistory();render()};
+  el.rTrack.oninput=()=>{updateTrackedSection();render()};
+  el.rMScale.oninput=e=>{
+    const v=parseFloat(e.target.value)||0;
+    if(v<=0){S.mScaleManual=0;momentScaleFixed=0;}
+    else{S.mScaleManual=v;momentScaleFixed=v;}
+    render();
+  };
+  el.rPos.oninput=e=>{S.posT=+e.target.value/1000;syncFromT();render()};
+  el.cbNose.onchange=e=>{S.withNose=e.target.checked;render()};
+
+  el.btnReset.onclick=()=>{S.playing=false;el.btnPlay.textContent="▶ 播放";S.posT=0;momentScaleFixed=0;syncFromT();render()};
+  el.btnSweep.onclick=()=>{
+    el.tagEnvelope.textContent="计算中...";
+    requestAnimationFrame(()=>{
+      const saved=S.frontX;
+      computeEnvelope();
+      S.frontX=saved;syncToT();render();
+    });
+  };
+  el.btnPlay.onclick=()=>{
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+      S.posT=Math.min(1,S.posT+.05);
+      syncFromT();render();
+      el.btnPlay.textContent="向前一步";
+      return;
+    }
+    S.playing=!S.playing;
+    el.btnPlay.textContent=S.playing?"⏸ 暂停":"▶ 播放";
+  };
+}
+
+function bindPrediction(){
+  const key="bridge-book:launching-prediction:v1";
+  try{el.predictionText.value=localStorage.getItem(key)||""}catch(_){/* sandbox may disable storage */}
+  el.savePrediction.addEventListener("click",()=>{
+    const value=el.predictionText.value.trim();
+    if(!value){el.predictionStatus.textContent="先留一句不完整的判断也可以。";el.predictionText.focus();return}
+    try{localStorage.setItem(key,value)}catch(_){/* current session still keeps the text */}
+    el.predictionStatus.textContent="留下了。操作以后，再回来看看哪一个词需要改。";
+  });
+}
+
+function bindFrameResize(){
+  if(window.parent===window)return;
+  let raf=0;
+  const report=()=>{
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(()=>window.parent.postMessage({
+      source:"bridge-interaction-shell",type:"resize",
+      height:Math.ceil(document.documentElement.scrollHeight),layout:"flow"
+    },"*"));
+  };
+  new ResizeObserver(report).observe(document.documentElement);
+  addEventListener("load",report,{once:true});
+  report();
+}
+
+/* ===== 动画循环 ===== */
+function tick(){
+  if(S.playing){
+    S.posT+=0.003;
+    if(S.posT>=1){S.posT=1;S.playing=false;el.btnPlay.textContent="▶ 播放";}
+    syncFromT(); render();
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ===== 初始化 ===== */
+syncFromT();bindEvents();bindPrediction();render();tick();bindFrameResize();
+</script>
+</body>
+</html>

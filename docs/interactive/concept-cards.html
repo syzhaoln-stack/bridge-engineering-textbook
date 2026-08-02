@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>从桥上带走的问题卡</title>
+<style>
+:root{
+  --ink:#102a36;--ink-2:#244550;--muted:#667d85;--paper:#f7f9f9;--paper-2:#edf2f3;
+  --line:#cbd8dc;--cyan:#1f8fa8;--cyan-dark:#16677a;--amber:#e69b36;--coral:#c85c4a;
+  --green:#247a5a;--white:#fff;--shadow:0 18px 48px rgba(16,42,54,.12);
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:"Microsoft YaHei","Noto Sans SC",sans-serif}
+body{background-image:linear-gradient(90deg,rgba(31,143,168,.045) 1px,transparent 1px),linear-gradient(rgba(31,143,168,.045) 1px,transparent 1px);background-size:28px 28px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid rgba(31,143,168,.34);outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.shell{width:min(100% - 32px,980px);margin:0 auto;padding:clamp(22px,4vw,48px) 0 30px}
+.mast{max-width:720px;margin-bottom:20px}
+.eyebrow{color:var(--cyan-dark);font:700 11px/1.2 "Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.mast h1{font:600 clamp(30px,5vw,46px)/1.08 "STKaiti","KaiTi",serif;margin:7px 0 9px}
+.mast p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.75}
+.toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 190px auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);background:rgba(255,255,255,.88);box-shadow:0 8px 24px rgba(16,42,54,.06)}
+.toolbar label,.control{width:100%}
+.control,.mode-button{min-height:44px;border:1px solid var(--line);border-radius:7px;background:var(--white);color:var(--ink);padding:9px 12px}
+.mode-button{border-color:var(--cyan);color:var(--cyan-dark);font-weight:700;white-space:nowrap}
+.mode-button.is-active{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.deck{width:min(100%,760px);margin:18px auto 0}
+.deck-status{display:flex;align-items:center;gap:12px;margin:0 0 9px;color:var(--muted);font-size:12px}
+.progress{height:4px;flex:1;background:#dce6e8;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--amber));transition:width .22s ease}
+.flashcard,.finish,.empty{border:1px solid var(--line);background:rgba(255,255,255,.97);box-shadow:var(--shadow)}
+.flashcard{min-height:370px;padding:clamp(22px,4.5vw,42px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.flashcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--cyan)}
+.card-meta{display:flex;justify-content:space-between;gap:16px;align-items:center;color:var(--muted);font-size:12px}
+.principle{color:var(--cyan-dark);font-weight:800;letter-spacing:.04em}
+.card-question{max-width:650px;margin:clamp(38px,7vw,68px) 0 30px;font:600 clamp(24px,4.5vw,36px)/1.42 "STKaiti","KaiTi",serif;letter-spacing:.01em}
+.reveal{min-height:48px;align-self:flex-start;border:0;border-radius:7px;background:var(--ink);color:var(--white);padding:11px 24px;font-weight:700}
+.back-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:28px 0 14px}
+.answer-label{color:var(--amber);font-size:12px;font-weight:800;letter-spacing:.08em}
+.plain-button{min-height:44px;border:0;background:transparent;color:var(--cyan-dark);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
+.short-answer{margin:0 0 20px;color:var(--ink);font-size:clamp(17px,2.4vw,20px);line-height:1.78}
+.why{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.why summary{min-height:48px;display:flex;align-items:center;color:var(--cyan-dark);font-weight:800;cursor:pointer;list-style:none}
+.why summary::-webkit-details-marker{display:none}
+.why summary::after{content:"+";margin-left:auto;font-size:20px;font-weight:400}
+.why[open] summary::after{content:"−"}
+.detail-list{margin:0;padding:0 0 8px}
+.detail-row{display:grid;grid-template-columns:54px minmax(0,1fr);gap:14px;padding:11px 0;border-top:1px solid #e5ecee}
+.detail-row dt{color:var(--muted);font-size:12px;font-weight:700}
+.detail-row dd{margin:0;color:var(--ink-2);font-size:14px;line-height:1.65}
+.detail-row a{color:var(--cyan-dark);text-underline-offset:3px}
+.ratings{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.rating{min-height:48px;border:1px solid var(--line);border-radius:7px;background:var(--white);color:var(--ink);padding:10px 14px;font-weight:700}
+.rating--missed{border-color:#d9a49a;color:#8d3f33}
+.rating--clear{border-color:#91c5ae;color:#1c674b}
+.rating--missed:hover,.rating--missed.is-selected{background:#fff0ed;border-color:var(--coral)}
+.rating--clear:hover,.rating--clear.is-selected{background:#eaf7f0;border-color:var(--green)}
+.navigation{display:flex;justify-content:space-between;gap:12px;margin-top:12px}
+.nav-button{min-width:48px;min-height:44px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.82);color:var(--ink);font-size:20px}
+.finish,.empty{padding:clamp(30px,6vw,58px);text-align:center;min-height:300px;display:grid;place-content:center}
+.finish h2{font:600 30px/1.25 "STKaiti","KaiTi",serif;margin:0 0 8px}
+.finish p,.empty p{margin:0 0 22px;color:var(--muted);line-height:1.7}
+.finish-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.finish-actions button{min-height:46px;border:1px solid var(--line);border-radius:7px;background:var(--white);color:var(--ink);padding:10px 16px}
+.finish-actions .primary{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.utility{width:min(100%,760px);margin:14px auto 0;display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:12px}
+.utility button{min-height:44px;border:0;background:transparent;color:var(--muted);padding:8px 0;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:760px){
+  .toolbar{grid-template-columns:1fr 1fr}.toolbar .search-control{grid-column:1/-1}
+  .flashcard{min-height:350px}.card-question{margin-top:42px}
+}
+@media(max-width:470px){
+  .shell{width:min(100% - 20px,980px);padding-top:20px}.mast p{font-size:13px}.toolbar{grid-template-columns:1fr;padding:9px}.toolbar .search-control{grid-column:auto}
+  .flashcard{min-height:0;padding:22px 20px 24px}.card-question{margin:36px 0 26px;font-size:25px}.ratings{grid-template-columns:1fr}
+  .detail-row{grid-template-columns:1fr;gap:4px}.utility{display:block}.utility span{display:block;padding-top:8px}
+}
+@media(prefers-reduced-motion:reduce){.progress span{transition:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="mast">
+    <div class="eyebrow">一张卡，只问一件事</div>
+    <h1>从桥上带走的问题</h1>
+    <p>先挑一张你答不稳的。翻面前，先说说你会怎么猜；翻面后，看看自己漏了哪一步。</p>
+  </header>
+  <section class="toolbar" aria-label="选择练习范围">
+    <label class="search-control"><span class="sr-only">搜索判断卡</span><input id="search" class="control" type="search" placeholder="搜问题或原理"></label>
+    <label><span class="sr-only">选择全书部分</span><select id="part" class="control"><option value="all">全书</option><option value="1">1 把问题问清楚</option><option value="2">2 从力路长出体系</option><option value="3">3 让结构进入工程</option><option value="4">4 从现象到证据</option><option value="5">5 作出负责的设计</option></select></label>
+    <button id="missedMode" class="mode-button" type="button">只练没抓住</button>
+  </section>
+  <section class="deck" aria-label="桥梁问题卡练习">
+    <div class="deck-status"><div class="progress" role="progressbar" aria-label="本轮进度"><span id="progress"></span></div><span id="status" aria-live="polite"></span></div>
+    <div id="content"></div>
+  </section>
+  <footer class="utility"><span>进度只保存在这台设备。</span><button id="reset" type="button">清空本机记录</button></footer>
+</main>
+<script>
+const cards=[
+{id:'conflict',part:1,type:'洞察卡',title:'先画冲突，再叫它桥',q:'一条路被河、铁路和行人通道同时截断。在选桥型之前，你先画什么？',relation:'先画需要继续的路径和它们的冲突，桥是之后才出现的解法。这样能避免把一个熟悉桥型硬塞给问题。',boundary:'它只帮你问清“为什么跨”，不直接给出跨径、体系或构造。',transfer:'医院洁污流线、机场人车路线、软件中的请求通道，都可先画谁与谁争用同一资源。',source:'第 1 章《跨越》',href:'../chapters/01-crossing.html',tags:['跨越','定义','冲突'],links:['views','constraints']},
+{id:'views',part:1,type:'应用卡',title:'一张立面图看不完一座桥',q:'立面图里两根主缆重合成一根线。你还能判断索面和塔腿会不会挤车道吗？',relation:'不能。立面保留跨径、塔高和矢高；平面保留路线、桥宽与斜交；横断面才把车道、主梁、索面和塔腿的横向关系摊开。',boundary:'三视图也不是全部证据；复杂节点仍需大样、施工信息或三维模型。',transfer:'当一张数据看板给不出结论时，先问不是“我看得不够仔细”，而是当前视图是否根本没保留所需维度。',source:'第 1 章《跨越》',href:'../chapters/01-crossing.html',tags:['三视图','空间','证据'],links:['conflict','model-permission']},
+{id:'scale',part:1,type:'洞察卡',title:'小桥不能只是放大',q:'一座小模型每个尺寸都放大五倍，材料不换。它为什么不只是“更大的同一座桥”？',relation:'几何相似不保证力学相似。自重随体积增长，重量与跨度组合后，自重弯矩跑得比常见截面能力更快。',boundary:'具体幂次取决于缩放规则、截面形式和控制失效；卡片保留的是“先比增长速度”。',transfer:'动物、飞行器、数据中心和组织规模扩大时，都要找出哪一项代价比能力增长更快。',source:'第 2 章《尺度》',href:'../chapters/02-scale.html',tags:['尺度','增长率','数量级'],links:['wind-square','load-budget']},
+{id:'load-budget',part:1,type:'概念卡',title:'空桥已经背了东西',q:'桥比车重几百倍，能不能据此说这座桥一定安全？',relation:'不能。恒载占比、活载余量和构件承载能力相关，但不能互换。桥的自身重量也必须经过完整力路。',boundary:'荷载比例给数量感，不代替极限状态、疲劳、局部效应和可靠度检查。',transfer:'当软件系统的基础开销远大于新用户请求时，也不能只用两者比值判断还有多少容量。',source:'第 3 章《荷载》',href:'../chapters/03-loads.html',tags:['恒载','活载','数量感'],links:['scale','reaction']},
+{id:'moving-response',part:1,type:'技术卡',title:'最不利位置后面必须有个对象',q:'同一辆车，想让右支座最吃力，和想让跨中弯矩最大，应当停在同一处吗？',relation:'不一定。“最不利”不属于车，它属于某一个被观察的反力、剪力、弯矩或局部效应。影响线就是固定观察量，让荷载移动。',boundary:'线性影响线不能直接包办大位移、索松弛、接触和材料开裂后的荷载重分配。',transfer:'系统优化中先问“替谁守着”：延迟、成本、峰值流量或尾部风险的最坏方案不会相同。',source:'第 4 章《分配》',href:'../chapters/04-moving-load.html',tags:['移动荷载','影响线','目标'],links:['transverse','nonlinear']},
+{id:'transverse',part:1,type:'应用卡',title:'车靠右，左梁也会知道',q:'车轮压在最右车道，最左主梁的反力会不会立刻变成零？',relation:'通常不会。桥面板、横梁、横隔和箱梁扭转会把轮载在横桥向重新分配。最近的梁分得多，不等于远处完全没有。',boundary:'两梁杠杆法只是最小模型；多梁、异形板、斜交桥和闭口箱梁需梁格或板壳模型检查。',transfer:'任务靠近某个团队，也不代表其他团队毫无负担；接口和协作刚度决定怎样分摊。',source:'第 4 章《分配》',href:'../chapters/04-moving-load.html',tags:['横向分布','桥面板','扭转'],links:['moving-response','model-permission']},
+{id:'force-path',part:2,type:'洞察卡',title:'外形连上了，力不一定过得去',q:'在三维模型里，索穿过了主梁，但没有共节点或连接。它看起来是桥，算起来也是吗？',relation:'不是。几何接触不等于力学连接。荷载必须经过桥面、纵横梁、索或拱、支座、下部结构和基础，最后回到地基。',boundary:'画出路径仍不能证明每个接口有足够强度、刚度、疲劳和构造可行性。',transfer:'数据管道、组织交接和供应链里，都有“图上连着，实际不传东西”的假接口。',source:'第 5 章《力路》',href:'../chapters/05-force-path.html',tags:['力路','连接','平衡'],links:['reaction','composite']},
+{id:'reaction',part:2,type:'技术卡',title:'反力是力路落地的收据',q:'云图很平滑，但全部支座反力加起来对不上总荷载。你先信哪个？',relation:'先信整体平衡的质疑。反力是外力经过模型后是否真的到达边界的最便宜检查。',boundary:'反力对上只是必要条件，不是充分条件；两个错误可能恰好抵消。',transfer:'任何复杂分析都先找守恒量：质量、能量、钱、流量或总数。总账对不上，局部图再好看也要停。',source:'第 5 章《力路》',href:'../chapters/05-force-path.html',tags:['反力','平衡','验证'],links:['force-path','verification']},
+{id:'moment-stiffness',part:2,type:'概念卡',title:'梁加高，弯矩图未必缩小',q:'一根线性简支梁的梁高加倍，荷载与跨度不变。跨中弯矩会自动减半吗？',relation:'不会。静定梁的弯矩主要由荷载和平衡决定；梁高通过惯性矩强烈改变应力和挠度。',boundary:'超静定体系里，构件刚度会改变内力分配；开裂、预应力和几何非线性又会改变有效刚度。',transfer:'“输入效应”和“系统响应”要分开。加快服务器可以减少延迟，却不一定改变业务请求总量。',source:'第 6 章《受弯》',href:'../chapters/06-beam.html',tags:['弯矩','刚度','静定'],links:['tension-side','nonlinear']},
+{id:'tension-side',part:2,type:'应用卡',title:'钢筋不是永远放在下面',q:'简支梁跨中的钢筋在下缘。到了连续梁中支点，还能照抄吗？',relation:'不能。弯矩符号一换，受拉边就换。简支跨中常是下缘受拉，连续梁支点和悬臂根部常转到上缘。',boundary:'真实配筋还要处理剪力、扭矩、局部力、锚固、裂缝与构造，不是只追着一张弯矩图放钢筋。',transfer:'“过去的正确答案”往往暗含了位置和边界。换了部位或系统，先问符号与作用方向是否也换了。',source:'第 6 章《受弯》',href:'../chapters/06-beam.html',tags:['受拉边','钢筋','连续梁'],links:['moment-stiffness','shear']},
+{id:'shear',part:2,type:'概念卡',title:'弯矩图之外还有一张图',q:'跨中弯矩最大，是不是就应当把所有钢材都堆在跨中？',relation:'不是。梁在跨中常由弯曲控制，靠近支点时剪力通常更值得小心。一根梁沿长度有分工，不同区域的危险机制不同。',boundary:'“跨中弯、支点剪”是常用直觉，不是每种荷载、连续体系和局部构造下的规范答案。',transfer:'全链条里最显眼的峰值，不一定是唯一的脆弱点。查财务、供应链或信息系统时，要沿流程换机制看。',source:'第 6 章《受弯》',href:'../chapters/06-beam.html',tags:['剪力','箍筋','区域'],links:['tension-side','composite']},
+{id:'composite',part:2,type:'概念卡',title:'放在一起，还要能一起变形',q:'钢梁上面放一块混凝土板，两者就自动成为组合梁了吗？',relation:'不是。组合作用需要界面把水平剪力传过去，限制相对滑移，两种材料才能近似按同一截面变形。',boundary:'相容变形不等于完全不滑移；连接件刚度、疲劳和破坏会决定有多少组合效应。',transfer:'两个团队、两套软件或两种材料的优势不会因为“放在一起”就相加，接口必须真的传递必要信息和作用。',source:'第 6 章《受弯》',href:'../chapters/06-beam.html',tags:['组合梁','界面剪力','协调'],links:['force-path','shear']},
+{id:'arch',part:2,type:'概念卡',title:'有一条弧线，还不能叫拱',q:'把梁画成弧形，它就会自动只受压吗？',relation:'不会。拱要有能接住水平推力的拱脚，并让压力线尽量靠近拱轴。荷载不对称、拱脚沉降或线形不匹配时，弯曲会回来。',boundary:'“受压为主”不等于“没有弯矩”；真实拱桥还有拱上结构、活载、施工状态和材料非线性。',transfer:'形式像某个成功方案，不等于机制也存在。仿照任何商业模式时，先找它依赖的“拱脚”。',source:'第 7 章《受压》',href:'../chapters/07-arch.html',tags:['拱','水平推力','压力线'],links:['funicular','force-path']},
+{id:'anchorage',part:2,type:'概念卡',title:'悬索桥不能没有水平分力的去处',q:'主缆已经把桥面吊起来了，为什么还要那么大的锚碇？',relation:'主缆的竖向分力经桥塔进入基础，巨大水平分力则要由两端锚碇接住。没有锚碇，力路就在最后一步断了。',boundary:'自锚式悬索桥会把水平分力改由加劲梁闭合，因此施工次序也必须改变。',transfer:'只看见一个系统“托起了什么”不够，还要问被隐藏的水平作用、反作用或长期债务最后由谁接住。',source:'第 8 章《受拉》',href:'../chapters/08-suspension.html',tags:['悬索桥','锚碇','水平分力'],links:['force-path','cable-stayed']},
+{id:'cable-stayed',part:2,type:'概念卡',title:'斜拉索把支点举到空中',q:'斜拉索托住了主梁，它的水平分力去哪里了？',relation:'索的竖向分力给主梁一组弹性支承，水平分力则在主梁中累积成轴压；桥塔以受压为主，在不对称荷载下也会承受弯曲。',boundary:'索力不是用简单静力平衡一次定死；成桥状态与施工张拉顺序、索垂度、几何非线性和长期变形相关。',transfer:'把一个支持节点“移到空中”，常会把原问题转成另一种内部代价。分布式系统中新增缓存也可能把延迟变成一致性问题。',source:'第 9 章《拉压组合》',href:'../chapters/09-cable-stayed.html',tags:['斜拉桥','索力','轴压'],links:['anchorage','nonlinear']},
+{id:'funicular',part:2,type:'概念卡',title:'同一条抛物线，未必是同一件事',q:'一条索现在呈抛物线。换成集中荷载后，它还愿意保持原来的形状吗？',relation:'不一定。合理形状与荷载分布、边界和水平分力绑在一起。均布水平投影荷载下的拱/索可接近抛物线，换荷载就要重问。',boundary:'外形相同不代表内力相同；拱和索即使形状相似，一个以压为主，一个以拉为主。',transfer:'一条曲线、一个排名或一种组织形式只是结果外观；想迁移它，必须把它当时平衡的输入也带走。',source:'第 10 章《形与力》',href:'../chapters/10-parabola.html',tags:['合理形状','抛物线','荷载'],links:['arch','scale']},
+{id:'constraints',part:3,type:'洞察卡',title:'技术可行，只是拿到候选资格',q:'三百米跨径技术上可以做斜拉桥。这一句话能不能结束桥型比选？',relation:'不能。先用通航、设墩、地基、锚碇、限高和施工等硬约束淘汰不合格方案，剩下的才比全寿命代价和价值。',boundary:'跨径阈值只能给数量级，不是一票选型规范。桥位、环境和建造能力会改变候选集。',transfer:'选软件、设备、职业或医疗方案时，先写退出条件，然后才给剩下的方案打分。',source:'第 11 章《取舍》',href:'../chapters/11-system-choice.html',tags:['桥型比选','硬约束','全寿命'],links:['conflict','exit']},
+{id:'boundary',part:3,type:'概念卡',title:'允许动，就是在设计力',q:'同样升温 30℃，梁能自由伸长和两端锁死，肉眼看见的变形都可能不大。内力会一样吗？',relation:'不一样。边界释放会把温度变化主要转成位移；边界锁定则把它转成约束内力。支座的任务不是“越牢越好”。',boundary:'地震下“更柔”可减力却增加位移，还要有限位、耗能、有限行程和防落梁构造。',transfer:'热胀冷缩、组织自主权和软件接口里，都可先问：是允许变化，还是把变化锁成内力？',source:'第 12 章《边界》',href:'../chapters/12-supports.html',tags:['支座','温度','边界条件'],links:['construction','nonlinear']},
+{id:'construction',part:3,type:'洞察卡',title:'成桥没事，不证明它能平安长大',q:'最终合龙后的桥完全平衡，能不能倒推左右悬臂不对称的某一天也安全？',relation:'不能。施工的每一步都有自己的体系、荷载、边界和材料龄期。成桥状态不会替中间状态承担风险。',boundary:'将施工分步算入模型也不自动包含现场偏差、设备故障、临时连接松动和未记录的顺序变化。',transfer:'产品发布、企业重组和医疗治疗的终态可以很好，过渡期仍可能是最危险的部分。',source:'第 13 章《形成》',href:'../chapters/13-construction.html',tags:['施工','体系转换','临时状态'],links:['boundary','exit']},
+{id:'durability',part:3,type:'洞察卡',title:'一条裂缝之后，水会往哪里走',q:'两条裂缝宽度一样，一条十年没事，另一条却很快锈蚀。差别可能在哪里？',relation:'耐久性是裂缝、环境、传输、腐蚀、排水和维护组成的时间链。单一裂缝宽度不能包办整条链的判断。',boundary:'路径分析不替代环境等级、材料扩散参数、检测和寿命预测。',transfer:'安全事故、慢性疾病和技术债务都少有“一个数字决定全部”。沿时间画出劣化链，才能找到便宜的断点。',source:'第 14 章《时间》',href:'../chapters/14-durability.html',tags:['裂缝','耐久','时间链'],links:['failure','monitoring']},
+{id:'failure',part:3,type:'技术卡',title:'最醒目的痕迹，不自动等于原因',q:'倒塌照片里最大的裂口，是原因、结果，还是两者都不是？',relation:'照片只是观测。先分开初始事件、破坏扩展和最终形态，再让几个竞争性解释等待能够排除它们的证据。',boundary:'保留多个假设不是拒绝下结论；当时间线、材料、计算、监测和现场证据收敛时，就要及时更新概率。',transfer:'软件故障、医疗症状和舆情事件中，都不要把最醒目的现象直接当成根因。',source:'第 15 章《失效》',href:'../chapters/15-failures.html',tags:['事故','证据链','竞争假设'],links:['durability','verification']},
+{id:'wind-square',part:4,type:'概念卡',title:'风速加倍，平均风力不只加倍',q:'风速从 10 m/s 增到 20 m/s，平均风力的量级是两倍还是四倍？',relation:'在其他条件不变的常用准稳态估算中，平均气动力量级与风速平方成正比，因此约为四倍。',boundary:'结构动力响应不一定只按四倍增长；频率匹配、阻尼、涡激和自激反馈可使响应发生突变。',transfer:'看见一个输入加倍时，别默认输出也加倍。先问它们之间是线性、幂律，还是带有阈值和反馈。',source:'第 16 章《耦合》',href:'../chapters/16-wind.html',tags:['风速','平方关系','数量级'],links:['scale','wind-evidence']},
+{id:'wind-evidence',part:4,type:'应用卡',title:'一段桥在摇的视频，还不够给现象取名字',q:'视频只告诉你桥晃了二十秒。想分清抖振、涡振和颤振，还缺哪些证据？',relation:'至少还需风速时程、响应频率随风速的变化、竖弯/扭转振型和测点相位，以及能量输入或衰减信息。',boundary:'卡片帮你列需求，不用视频替风洞、监测或气动弹性分析下结论。',transfer:'一张销量图、一次异常心率或一段网络延迟曲线，都可先列“它直接证明什么”和“要区分机制还缺什么”。',source:'第 16 章《耦合》',href:'../chapters/16-wind.html',tags:['抖振','涡振','颤振'],links:['wind-square','monitoring']},
+{id:'nonlinear',part:4,type:'概念卡',title:'叠加原理有一道门',q:'一辆车的响应算完了，多辆车的结果是不是永远只要直接相加？',relation:'只有在当前问题可以近似看作线性时，才能用叠加。大位移、索几何、开裂、塑性、接触、支座摩擦和吊索松弛都可使前一份荷载改变后一份荷载所看见的系统。',boundary:'非线性不等于必须立刻使用最复杂模型。先判断哪个机制可能改变结论，再只加入那一层。',transfer:'团队规模、市场投放和医疗用药的效果也可能因阈值、饱和和反馈而不能直接叠加。',source:'第 4、9、16 章相关简化边界',href:'../chapters/04-moving-load.html',tags:['线性','非线性','叠加'],links:['moving-response','cable-stayed']},
+{id:'model-permission',part:4,type:'技术卡',title:'模型最好随身带一张许可证',q:'线梁、梁格、板壳和实体模型中，是不是实体模型永远“最高级”？',relation:'不是。模型要写清回答什么、保留哪个机制、参数从哪来、不能说明什么。对整体刚度问题，实体模型可能只是输入更贵、误差更难查。',boundary:'简单模型不是为了永远停在简单处；当局部机制会改变决策时，就要换一张许可证。',transfer:'地图、财务预测、流行病模型和 AI 解释也都应带问题、数据来源和适用边界。',source:'第 17 章《模型》',href:'../chapters/17-models.html',tags:['模型选择','简化','适用边界'],links:['views','verification']},
+{id:'monitoring',part:4,type:'概念卡',title:'监测把问题倒过来',q:'桥的一阶频率下降了 3%，能不能直接宣布某根梁开裂了？',relation:'不能。监测给响应，我们要反推参数或状态，这是一个反问题。温度、边界、质量、损伤和识别误差都可能给出相似频率变化。',boundary:'频率变化是线索，不是诊断。需要多测点、环境归一化、振型或局部数据和可校准模型缩小多解性。',transfer:'症状、经营指标和网络监控告诉你“发生了什么”，不自动告诉你“哪个原因造成了它”。',source:'第 17 章《模型》',href:'../chapters/17-models.html',tags:['监测','反问题','识别'],links:['wind-evidence','durability']},
+{id:'verification',part:4,type:'技术卡',title:'云图漂亮，还是要先查最便宜的事',q:'两个有限元软件给出一样的结果，能不能证明答案正确？',relation:'不能。先查变形方向和反力平衡，再回到可手算基准，做参数趋势与网格收敛，最后用不同试验、监测或独立模型对照。',boundary:'两个结果一样也可能共享同一个错误边界或单位。“平行计算”只在两条路径真的独立时才增加多少证据。',transfer:'AI 生成的文本也一样：回到原始材料、数量级、反例和改变输入后的趋势，不用“两个 AI 都这样说”作证据。',source:'第 18 章《证据》',href:'../chapters/18-fem-ai.html',tags:['有限元','验证','独立证据'],links:['reaction','model-permission']},
+{id:'ai-role',part:4,type:'应用卡',title:'工具让试错变便宜，不替你决定试什么',q:'MIDAS 和 AI 可以很快给出几百页结果。人省下来的时间最值得用在哪里？',relation:'先说出趋势与数量级，让程序扫参数，再把索力、弯矩、位移和工况放回桥的空间位置，专门找不符合预期的一片，决定下一次补算或补测什么。',boundary:'AI 适合整理、对齐、生成候选解释和辅助可视化；参数意义、适用边界、安全责任和下一个试验由人决定。',transfer:'在任何行业，自动化都应先替人拿走复制、格式转换和批量搜索，把人留给问题定义、异常解释和责任判断。',source:'第 18 章《证据》',href:'../chapters/18-fem-ai.html',tags:['AI','MIDAS','工程判断'],links:['verification','design-defense']},
+{id:'beauty',part:5,type:'洞察卡',title:'力学可读，会带来一种说服力',q:'一座桥看起来别扭，只是个人口味，还是眼睛也可能读到了不可信的受力比例？',relation:'两者都可能。塔、梁、拱、索的比例若让人看出力怎样走，会形成一种结构可读性。但效率不是美的充分条件。',boundary:'结构可读性不能把文化、场所、尺度感、细部和公共记忆都归结为一个力学指标。',transfer:'好的数据图、建筑、产品和论证都可以让内部逻辑被看见，但“透明”也不等于“美”的全部。',source:'第 19 章《价值》',href:'../chapters/19-beauty.html',tags:['美','结构可读性','比例'],links:['constraints','design-defense']},
+{id:'exit',part:5,type:'行动卡',title:'给偏爱安排一条退出条件',q:'你很喜欢当前桥型。哪一条新证据出现时，你愿意放弃它？',relation:'在看计算结果之前，写下一票否决条件：地基、净空、施工、维护、风险或全寿命代价到什么程度，方案就应退出。这是对抗方案偏爱的最小装置。',boundary:'退出条件不应写得永远不可能触发，也不应用一个微小指标自动淘汰经过多证据支持的方案。',transfer:'投资、研究、招聘和产品决策都先写“哪条证据会让我改变主意”。',source:'第 20 章《综合》',href:'../chapters/20-design-defense.html',tags:['退出条件','偏爱','证伪'],links:['constraints','design-defense']},
+{id:'design-defense',part:5,type:'行动卡',title:'把说明书拿走，看力学是否真成了自己的',q:'没有模板、没有计算书菜单，你能否用三句话说清这座桥为什么这样设计？',relation:'三句话分别回答：最难的约束是什么；主要荷载怎样回到地基；哪份证据曾让你修改方案。说不清的那一处，往往正是还没进入心智的部分。',boundary:'三句话只是检验概念骨架，不代替正式计算、构造、图纸和审查记录。',transfer:'把工具拿走后仍能说清问题、机制和改变判断的证据，才是可迁移的理解。',source:'第 20 章《综合》',href:'../chapters/20-design-defense.html',tags:['设计辩护','元认知','迁移'],links:['ai-role','exit']}
+];
+const partNames={1:'把问题问清楚',2:'从力路长出体系',3:'让结构进入工程',4:'从现象到证据',5:'作出负责的设计'};
+const principles={
+  conflict:'约束',views:'维度',scale:'尺度',
+  'load-budget':'数量级','moving-response':'目标',transverse:'分配',
+  'force-path':'力路',reaction:'平衡','moment-stiffness':'平衡与刚度',
+  'tension-side':'符号与位置',shear:'机制分工',composite:'变形协调',
+  arch:'压力路径',anchorage:'力路闭合','cable-stayed':'协调',
+  funicular:'形与力',constraints:'权衡',boundary:'边界',construction:'时间顺序',
+  durability:'时间链',failure:'证据与因果','wind-square':'尺度律',
+  'wind-evidence':'证据',nonlinear:'叠加的边界','model-permission':'模型边界',
+  monitoring:'反问题',verification:'独立证据','ai-role':'人机分工',
+  beauty:'可读性',exit:'可证伪性','design-defense':'迁移'
+};
+const $=selector=>document.querySelector(selector);
+const reviewKey='bridge-judgment-cards:v1';
+const deckKey='bridge-judgment-cards:deck:v2';
+let review={};
+let deck={};
+let flipped=false;
+
+try{review=JSON.parse(localStorage.getItem(reviewKey)||'{}')||{}}catch(_){review={}}
+try{deck=JSON.parse(localStorage.getItem(deckKey)||'{}')||{}}catch(_){deck={}}
+
+const clean=value=>String(value||'').replace(/\s+/g,' ').trim();
+const chars=value=>Array.from(clean(value));
+const escapeHtml=value=>clean(value).replace(/[&<>"']/g,char=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[char]));
+const ratingOf=id=>review[id]==='clear'?'clear':(['again','missed'].includes(review[id])?'missed':'');
+
+function trimAnswer(value,max=90,minBreak=35){
+  const source=chars(value);
+  if(source.length<=max)return source.join('');
+  const slice=source.slice(0,max);
+  for(let i=slice.length-1;i>=minBreak;i-=1){
+    if(['。','！','？','；'].includes(slice[i]))return slice.slice(0,i+1).join('');
+  }
+  for(let i=slice.length-1;i>=minBreak;i-=1){
+    if(slice[i]==='，')return `${slice.slice(0,i).join('')}…`;
+  }
+  return `${slice.slice(0,max-1).join('')}…`;
+}
+
+function shortAnswer(card){
+  const relation=clean(card.relation);
+  if(chars(relation).length>=35)return trimAnswer(relation);
+  return trimAnswer(`${relation}${relation.endsWith('。')?'':'。'}${clean(card.boundary)}`);
+}
+
+function persistReview(){
+  try{localStorage.setItem(reviewKey,JSON.stringify(review))}catch(_){}
+}
+
+function persistDeck(){
+  try{localStorage.setItem(deckKey,JSON.stringify(deck))}catch(_){}
+}
+
+function baseCards(){
+  const part=$('#part').value;
+  const query=clean($('#search').value).toLowerCase();
+  return cards.filter(card=>{
+    if(part!=='all'&&String(card.part)!==part)return false;
+    if(!query)return true;
+    const haystack=[card.q,card.title,card.relation,card.boundary,card.transfer,card.source,
+      ...(card.tags||[]),principles[card.id],partNames[card.part]].join(' ').toLowerCase();
+    return haystack.includes(query);
+  });
+}
+
+function queueCards(){
+  const byId=new Map(cards.map(card=>[card.id,card]));
+  return (deck.queueIds||[]).map(id=>byId.get(id)).filter(Boolean);
+}
+
+function startRound(mode='all',sourceCards=baseCards()){
+  const chosen=mode==='missed'?sourceCards.filter(card=>ratingOf(card.id)==='missed'):sourceCards;
+  deck={
+    ...deck,mode,part:$('#part').value,query:$('#search').value,
+    queueIds:chosen.map(card=>card.id),roundRated:[],currentId:chosen[0]?.id||'',finished:false
+  };
+  flipped=false;
+  persistDeck();
+  render();
+}
+
+function repeatCurrentQueue(){
+  const queue=queueCards();
+  deck.roundRated=[];
+  deck.currentId=queue[0]?.id||'';
+  deck.finished=false;
+  flipped=false;
+  persistDeck();
+  render();
+}
+
+function normalizeDeck(){
+  const validPart=['all','1','2','3','4','5'].includes(String(deck.part))?String(deck.part):'all';
+  $('#part').value=validPart;
+  $('#search').value=typeof deck.query==='string'?deck.query:'';
+  const baseIds=new Set(baseCards().map(card=>card.id));
+  const queueIds=Array.isArray(deck.queueIds)?deck.queueIds.filter((id,index,array)=>baseIds.has(id)&&array.indexOf(id)===index):[];
+  deck.mode=deck.mode==='missed'?'missed':'all';
+  deck.queueIds=queueIds;
+  deck.roundRated=Array.isArray(deck.roundRated)?deck.roundRated.filter(id=>queueIds.includes(id)):[];
+  deck.currentId=queueIds.includes(deck.currentId)?deck.currentId:(queueIds[0]||'');
+  deck.finished=Boolean(deck.finished&&queueIds.length);
+  if(!queueIds.length&&baseIds.size){
+    const initial=deck.mode==='missed'?baseCards().filter(card=>ratingOf(card.id)==='missed'):baseCards();
+    deck.queueIds=initial.map(card=>card.id);
+    deck.currentId=initial[0]?.id||'';
+    deck.roundRated=[];
+    deck.finished=false;
+  }
+  persistDeck();
+}
+
+function updateToolbar(){
+  const base=baseCards();
+  const missed=base.filter(card=>ratingOf(card.id)==='missed');
+  const button=$('#missedMode');
+  const reviewingMissed=deck.mode==='missed';
+  button.textContent=reviewingMissed?`回到全部 · ${base.length}`:`只练没抓住 · ${missed.length}`;
+  button.classList.toggle('is-active',reviewingMissed);
+  button.setAttribute('aria-pressed',String(reviewingMissed));
+  button.disabled=!reviewingMissed&&!missed.length;
+}
+
+function move(delta){
+  const queue=queueCards();
+  const position=Math.max(0,queue.findIndex(card=>card.id===deck.currentId));
+  const next=position+delta;
+  if(next<0||next>=queue.length)return;
+  deck.currentId=queue[next].id;
+  deck.finished=false;
+  flipped=false;
+  persistDeck();
+  render();
+}
+
+function rate(status){
+  const queue=queueCards();
+  const currentIndex=queue.findIndex(card=>card.id===deck.currentId);
+  if(currentIndex<0)return;
+  review[deck.currentId]=status;
+  persistReview();
+  const rated=new Set(deck.roundRated||[]);
+  rated.add(deck.currentId);
+  deck.roundRated=[...rated];
+  let next=null;
+  for(let offset=1;offset<=queue.length;offset+=1){
+    const candidate=queue[(currentIndex+offset)%queue.length];
+    if(candidate&&!rated.has(candidate.id)){next=candidate;break}
+  }
+  if(next){
+    deck.currentId=next.id;
+    flipped=false;
+  }else{
+    deck.finished=true;
+  }
+  persistDeck();
+  render();
+}
+
+function detailRow(label,body){
+  return `<div class="detail-row"><dt>${escapeHtml(label)}</dt><dd>${body}</dd></div>`;
+}
+
+function cardMarkup(card,position,total){
+  const principle=principles[card.id]||card.tags?.[0]||'结构关系';
+  const currentRating=ratingOf(card.id);
+  const meta=`<div class="card-meta"><span class="principle">${escapeHtml(principle)}</span><span>${position+1} / ${total}</span></div>`;
+  if(!flipped){
+    return `<article class="flashcard" data-side="front">${meta}<p class="card-question">${escapeHtml(card.q)}</p><button id="reveal" class="reveal" type="button" aria-keyshortcuts="Space">看答案</button></article>`;
+  }
+  const details=[
+    detailRow('为什么会这样',escapeHtml(card.relation)),
+    detailRow('什么时候不能这样用',escapeHtml(card.boundary)),
+    detailRow('换个地方',escapeHtml(card.transfer)),
+    detailRow('相关章节',`<a href="${escapeHtml(card.href)}" target="_blank" rel="noopener">${escapeHtml(card.source)}</a>`)
+  ].join('');
+  return `<article class="flashcard" data-side="back">${meta}<div class="back-head"><span class="answer-label">一句话答案</span><button id="showQuestion" class="plain-button" type="button">再看问题</button></div><p class="short-answer">${escapeHtml(shortAnswer(card))}</p><details class="why"><summary>为什么？</summary><dl class="detail-list">${details}</dl></details><div class="ratings" role="group" aria-label="这张卡的理解程度"><button class="rating rating--missed ${currentRating==='missed'?'is-selected':''}" data-rating="missed" type="button" aria-pressed="${currentRating==='missed'}">还没抓住</button><button class="rating rating--clear ${currentRating==='clear'?'is-selected':''}" data-rating="clear" type="button" aria-pressed="${currentRating==='clear'}">我能说清楚</button></div></article>`;
+}
+
+function bindCard(position,total){
+  $('#reveal')?.addEventListener('click',()=>{
+    flipped=true;render();
+    requestAnimationFrame(()=>document.querySelector('.rating')?.focus());
+  });
+  $('#showQuestion')?.addEventListener('click',()=>{flipped=false;render();$('#reveal')?.focus()});
+  document.querySelectorAll('[data-rating]').forEach(button=>button.addEventListener('click',()=>rate(button.dataset.rating)));
+  $('#previous')?.addEventListener('click',()=>move(-1));
+  $('#next')?.addEventListener('click',()=>move(1));
+  $('#previous')&&( $('#previous').disabled=position===0 );
+  $('#next')&&( $('#next').disabled=position===total-1 );
+}
+
+function renderFinish(queue){
+  const clearCount=queue.filter(card=>ratingOf(card.id)==='clear').length;
+  const missedCount=queue.filter(card=>ratingOf(card.id)==='missed').length;
+  const baseMissed=baseCards().filter(card=>ratingOf(card.id)==='missed').length;
+  $('#content').innerHTML=`<div class="finish"><h2>这一轮结束了</h2><p>能说清楚 ${clearCount} · 还没抓住 ${missedCount}</p><div class="finish-actions">${baseMissed?`<button id="retryMissed" class="primary" type="button">只重练没抓住 · ${baseMissed}</button>`:''}<button id="repeatQueue" type="button">这组全部再来</button>${deck.mode==='missed'?'<button id="backAll" type="button">回到全部</button>':''}</div></div>`;
+  $('#retryMissed')?.addEventListener('click',()=>startRound('missed'));
+  $('#repeatQueue')?.addEventListener('click',repeatCurrentQueue);
+  $('#backAll')?.addEventListener('click',()=>startRound('all'));
+}
+
+function renderEmpty(){
+  const base=baseCards();
+  const message=base.length?'这一组里，暂时没有“还没抓住”的卡。':'没有找到相符的卡。';
+  $('#content').innerHTML=`<div class="empty"><div><p>${message}</p><button id="emptyBack" class="mode-button" type="button">${base.length?'回到全部':'清除搜索'}</button></div></div>`;
+  $('#emptyBack').addEventListener('click',()=>{
+    if(!base.length){$('#search').value='';deck.query=''}
+    startRound('all');
+  });
+}
+
+function render(){
+  updateToolbar();
+  const queue=queueCards();
+  const ratedCount=queue.filter(card=>(deck.roundRated||[]).includes(card.id)).length;
+  const progress=queue.length?ratedCount/queue.length*100:0;
+  $('#progress').style.width=`${progress}%`;
+  $('.progress').setAttribute('aria-valuemin','0');
+  $('.progress').setAttribute('aria-valuemax',String(queue.length));
+  $('.progress').setAttribute('aria-valuenow',String(ratedCount));
+  $('#status').textContent=`${ratedCount} / ${queue.length}`;
+  if(!queue.length){renderEmpty();return}
+  if(deck.finished){renderFinish(queue);return}
+  let position=queue.findIndex(card=>card.id===deck.currentId);
+  if(position<0){position=0;deck.currentId=queue[0].id}
+  $('#content').innerHTML=`${cardMarkup(queue[position],position,queue.length)}<nav class="navigation" aria-label="问题卡导航"><button id="previous" class="nav-button" type="button" aria-label="上一张">←</button><button id="next" class="nav-button" type="button" aria-label="下一张">→</button></nav>`;
+  bindCard(position,queue.length);
+  persistDeck();
+}
+
+function controlsChanged(){
+  deck.part=$('#part').value;
+  deck.query=$('#search').value;
+  startRound('all');
+}
+
+$('#search').addEventListener('input',controlsChanged);
+$('#part').addEventListener('change',controlsChanged);
+$('#missedMode').addEventListener('click',()=>startRound(deck.mode==='missed'?'all':'missed'));
+$('#reset').addEventListener('click',()=>{
+  if(!confirm('清空这台设备上的练习记录？此操作不能撤销。'))return;
+  review={};deck={};flipped=false;
+  try{localStorage.removeItem(reviewKey);localStorage.removeItem(deckKey)}catch(_){}
+  $('#part').value='all';$('#search').value='';
+  startRound('all');
+});
+addEventListener('keydown',event=>{
+  if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
+  if(event.target.closest('input,select,button,summary,a'))return;
+  if(event.key==='ArrowLeft'){event.preventDefault();move(-1)}
+  if(event.key==='ArrowRight'){event.preventDefault();move(1)}
+  if((event.key===' '||event.key==='Enter')&&!flipped){event.preventDefault();flipped=true;render()}
+});
+normalizeDeck();
+render();
+</script>
+</body>
+</html>

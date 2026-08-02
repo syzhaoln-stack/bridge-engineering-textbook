@@ -1,0 +1,26 @@
+# 桥造计划：先搭一座，再追问它为什么站得住
+
+先不看答案。任选一关，搭一版自己愿意让车开过去的桥。试车以后只记两件事：第一处明显变形在哪里；为了修它，你把力移到了哪里。
+
+::: {.content-visible when-format="html"}
+<div class="external-workbench">
+  <iframe src="https://syzhaoln-stack.github.io/spancraft-bridge-game/" title="SpanCraft 桥梁建造游戏" height="820" loading="lazy" allow="fullscreen"></iframe>
+  <p class="interactive-caption">这里的游戏模型用于建立结构直觉，不代替真实桥梁设计与安全验算。如果嵌入页受到浏览器限制，可以<a href="https://syzhaoln-stack.github.io/spancraft-bridge-game/" target="_blank" rel="noopener">单独打开 SpanCraft</a>；项目源码见 <a href="https://github.com/syzhaoln-stack/spancraft-bridge-game" target="_blank" rel="noopener">GitHub</a>。</p>
+</div>
+:::
+
+::: {.content-visible when-format="epub"}
+网页版可直接运行 SpanCraft。也可以访问 <https://syzhaoln-stack.github.io/spancraft-bridge-game/>。
+:::
+
+四关不是四份需要背下来的构造：
+
+- 桁架关让拉、压和三角形稳定显出来；
+- 系杆拱关让水平推力和系杆闭合起来；
+- 斜拉桥关让主跨索、边跨背索与桥塔互相平衡；
+- 悬索桥关让主缆、吊杆、塔和边锚形成完整力路。
+
+完成一关以后，把自己最满意的构件暂时删掉。若桥仍能工作，追问它原来是不是没有真正参与；若桥立即失效，追问有没有别的构件能形成替代力路。
+
+> 模型边界：游戏中的实时物理负责反馈和比较，不等同于完成的有限元、稳定、疲劳、动力或规范验算。
+

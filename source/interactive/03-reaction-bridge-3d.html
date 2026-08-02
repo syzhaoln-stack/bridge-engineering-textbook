@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>简支梁桥：重量怎样落到支座</title>
+<style>
+  :root{--paper:#f7f9f9;--ink:#102a36;--muted:#60737b;--line:#d6e1e3;--cyan:#1f8fa8;--amber:#e69b36;--coral:#c85c4a;--panel:#fff}
+  *{box-sizing:border-box}html,body{margin:0;min-width:0;font-family:"Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
+  body{padding:12px}.lab-shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,.75fr);gap:12px;align-items:start}.learning-slot,.learning-result{grid-column:1/-1}.scene-panel,.controls,.model-note{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(16,42,54,.08)}
+  .scene-panel{min-width:0;overflow:hidden}.scene-head{padding:14px 16px 11px;border-bottom:1px solid var(--line)}.eyebrow{font-size:10px;color:#397080;letter-spacing:.12em;font-weight:700}.scene-head h1{font-size:19px;line-height:1.35;margin:4px 0}.scene-head p{font-size:12px;color:var(--muted);line-height:1.58;margin:4px 0}.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}button{min-height:44px;background:#eef3f4;border:1px solid #c7d5d8;border-radius:8px;color:var(--ink);padding:8px 10px;cursor:pointer;font-size:11px}button.active{border-color:var(--cyan);background:#dff1f4}button:focus-visible,input:focus-visible{outline:3px solid rgba(31,143,168,.28);outline-offset:2px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-top:8px}.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+  #scene{position:relative;width:100%;height:550px;overflow:hidden;background:#91afc3}#scene canvas{display:block;width:100%!important;height:100%!important}.label{position:absolute;z-index:4;transform:translate(-50%,-50%);padding:3px 6px;border-radius:5px;background:rgba(9,17,24,.84);border:1px solid rgba(255,255,255,.18);font-size:11px;white-space:nowrap;pointer-events:none}.note{position:absolute;z-index:5;left:50%;bottom:10px;transform:translateX(-50%);font-size:10px;color:#e6eff2;background:rgba(12,21,29,.82);border:1px solid rgba(255,255,255,.15);padding:6px 9px;border-radius:6px;white-space:nowrap}#loading{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#0e1720;color:#dce7ed}
+  .controls{padding:15px;background:#fbfcfc}.controls h2{font-size:15px;margin:0 0 4px}.controls>p{font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 10px}.slider-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.slider{padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff}.slider label{display:flex;justify-content:space-between;gap:8px;color:#4f626a;font-size:10px}.slider output{color:var(--cyan);font-weight:700}.slider input{width:100%;accent-color:var(--cyan);margin:6px 0 0}.readouts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.readout{background:#eef3f4;border:1px solid var(--line);border-radius:8px;padding:8px}.readout span{display:block;color:var(--muted);font-size:9px}.readout b{font-size:13px;font-variant-numeric:tabular-nums}.balance{grid-column:1/-1}.ok{color:#167b61}
+  .model-note{grid-column:1/-1;padding:14px 16px}.equation{font-size:11px;line-height:1.65;color:#52676f}.equation b{color:#9b6219}.model-note p{font-size:12px;line-height:1.65;color:#435b64;margin:0 0 7px}.model-note p:last-child{margin-bottom:0}.terms{color:#397080!important;font-weight:650}
+  @media(max-width:860px){body{padding:8px}.lab-shell{grid-template-columns:1fr}.scene-panel,.controls{grid-column:1}.controls{position:static}.slider-grid{grid-template-columns:repeat(3,1fr)}#scene{height:470px}}
+  @media(max-width:560px){.scene-head{padding:12px}.scene-head h1{font-size:17px}.scene-head p{font-size:11px}.slider-grid{grid-template-columns:1fr 1fr}#scene{height:390px}.note{display:none}.readouts{grid-template-columns:1fr 1fr}.balance{grid-column:1/-1}.label{font-size:9px}.model-note{padding:12px}.legend{gap:8px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="lab-shell">
+  <section class="learning-slot" data-learning-cycle-mount></section>
+  <section class="scene-panel" aria-labelledby="scene-title">
+    <header class="scene-head">
+      <div class="eyebrow">三维平衡实验 · 03</div><h1 id="scene-title">重量怎样落到两端支座</h1>
+      <p>桥面板自重按均布荷载处理，车辆按一个集中力处理。拖动车辆位置，看两端反力怎样换班。</p>
+      <div class="toolbar"><button id="toggleForce" class="active" type="button">显示力箭头</button><button id="toggleLabel" class="active" type="button">显示数值</button><button id="resetView" type="button">重置视角</button></div>
+      <div class="legend"><span><i class="swatch" style="background:#e86f5f"></i>向下荷载</span><span><i class="swatch" style="background:#72d0ff"></i>支座反力</span><span><i class="swatch" style="background:#697f93"></i>桥面与主梁</span></div>
+    </header>
+    <div id="scene"><div id="loading">正在加载三维桥梁……</div><div class="note">左键旋转 · 滚轮缩放 · 右键平移</div></div>
+  </section>
+  <aside class="controls" aria-labelledby="control-title">
+    <h2 id="control-title">改变一件事，再看反力</h2>
+    <p>先只动“车辆位置”。等你能说清两端怎样换班，再改变跨度和自重。</p>
+    <div class="slider-grid">
+      <div class="slider"><label for="in-span">跨度 L <output id="o-span"></output></label><input id="in-span" data-key="span" type="range" min="15" max="80" step="1" value="30"></div>
+      <div class="slider"><label for="in-width">桥面宽 b <output id="o-width"></output></label><input id="in-width" data-key="width" type="range" min="6" max="20" step="1" value="10"></div>
+      <div class="slider"><label for="in-thickness">等效板厚 t <output id="o-thickness"></output></label><input id="in-thickness" data-key="thickness" type="range" min="0.15" max="0.8" step="0.05" value="0.25"></div>
+      <div class="slider"><label for="in-gamma">材料重度 γ <output id="o-gamma"></output></label><input id="in-gamma" data-key="gamma" type="range" min="18" max="28" step="1" value="25"></div>
+      <div class="slider"><label for="in-mass">车辆质量 m <output id="o-mass"></output></label><input id="in-mass" data-key="mass" type="range" min="5" max="80" step="1" value="30"></div>
+      <div class="slider"><label for="in-pos">车辆位置 x/L <output id="o-pos"></output></label><input id="in-pos" data-key="pos" type="range" min="5" max="95" step="1" value="50"></div>
+    </div>
+    <div class="readouts">
+      <div class="readout"><span>桥面板自重 G</span><b id="r-g"></b></div><div class="readout"><span>车辆重力 P</span><b id="r-p"></b></div>
+      <div class="readout"><span>左反力 R<sub>A</sub></span><b id="r-ra"></b></div><div class="readout"><span>右反力 R<sub>B</sub></span><b id="r-rb"></b></div>
+      <div class="readout balance"><span>平衡残差 R<sub>A</sub>+R<sub>B</sub>−G−P</span><b class="ok" id="r-res"></b></div>
+    </div>
+  </aside>
+  <section class="learning-result" data-learning-result-mount></section>
+  <section class="model-note">
+    <p>车辆还没走到右半跨，右支座已经有了反力；因为支座反力维护的是整座梁的平衡，不是“车压到谁，谁才工作”。车向右走时，左右反力一减一增，但两者的和始终等于总向下荷载。</p>
+    <p class="terms">对应术语：静力平衡 · 力矩平衡 · 支座反力 · 影响线。</p>
+    <div class="equation"><b>模型边界：</b>q=γbt，G=qL；R<sub>A</sub>=G/2+P(1−x/L)，R<sub>B</sub>=G/2+Px/L。这里只保留线弹性、准静态的整体平衡；箭头长度归一化，不用于工程设计，也不代表赵州桥。</div>
+  </section>
+</main>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three'; import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+function V(mx,my,mz){return new THREE.Vector3(mx,mz,-my)}
+function addBox(group,mx,my,mz,sx,sy,sz,color,opts={}){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sz,sy),new THREE.MeshStandardMaterial({color,roughness:.62,metalness:.05,...opts}));m.position.copy(V(mx,my,mz));m.castShadow=true;m.receiveShadow=true;group.add(m);return m}
+function addCylinderBetween(group,a,b,radius,color,opts={}){const dir=new THREE.Vector3().subVectors(b,a),len=dir.length();const m=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,len,14),new THREE.MeshStandardMaterial({color,roughness:.48,metalness:.06,...opts}));m.position.copy(new THREE.Vector3().addVectors(a,b).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());m.castShadow=true;group.add(m);return m}
+function addSphere(group,mx,my,mz,radius,color){const m=new THREE.Mesh(new THREE.SphereGeometry(radius,18,12),new THREE.MeshStandardMaterial({color,roughness:.35}));m.position.copy(V(mx,my,mz));group.add(m);return m}
+function clearGroup(g){while(g.children.length){const c=g.children[0];if(c.children?.length)clearGroup(c);if(c.geometry)c.geometry.dispose();if(c.material){if(Array.isArray(c.material))c.material.forEach(m=>m.dispose());else c.material.dispose()}g.remove(c)}}
+function makeArrow(group,from,to,color){const d=new THREE.Vector3().subVectors(to,from),len=d.length();const a=new THREE.ArrowHelper(d.clone().normalize(),from,len,color,Math.min(.8,len*.22),Math.min(.38,len*.11));group.add(a);return a}
+const COL={deck:0x697f93,top:0x8797a4,beam:0x9aa7b2,pier:0x756f69,bearing:0xf8e2a0,load:0xe86f5f,reaction:0x72d0ff,vehicle:0xf0b24a,ground:0x243a32,river:0x315f7e};
+const P={span:30,width:10,thickness:.25,gamma:25,mass:30,pos:50}; let labelsVisible=true,forcesVisible=true;
+const container=document.getElementById('scene'),scene=new THREE.Scene();scene.background=new THREE.Color(0x91afc3);scene.fog=new THREE.Fog(0x91afc3,95,230);
+function sceneSize(){return{w:Math.max(1,container.clientWidth),h:Math.max(1,container.clientHeight)}}
+const initialSize=sceneSize(),camera=new THREE.PerspectiveCamera(44,initialSize.w/initialSize.h,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(initialSize.w,initialSize.h,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;container.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.05;scene.add(new THREE.HemisphereLight(0xddeeff,0x53624b,1.4));const sun=new THREE.DirectionalLight(0xffffff,1.5);sun.position.set(45,55,38);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);const fill=new THREE.DirectionalLight(0xcad7ff,.45);fill.position.set(-30,25,-35);scene.add(fill);
+const envGroup=new THREE.Group(),bridgeGroup=new THREE.Group(),forceGroup=new THREE.Group();scene.add(envGroup,bridgeGroup,forceGroup);const labelData=[];
+function addLabel(text,mx,my,mz,color='#eef5fa'){const el=document.createElement('div');el.className='label';el.textContent=text;el.style.color=color;container.appendChild(el);labelData.push({el,position:V(mx,my,mz)})}
+function clearLabels(){labelData.forEach(x=>x.el.remove());labelData.length=0}function updateLabels(){const{w,h}=sceneSize();labelData.forEach(x=>{if(!labelsVisible){x.el.style.display='none';return}const p=x.position.clone().project(camera),visible=p.z>-1&&p.z<1&&Math.abs(p.x)<.98&&Math.abs(p.y)<.98;x.el.style.display=visible?'block':'none';if(!visible)return;const half=Math.min(x.el.offsetWidth/2,w/2-5),px=(p.x*.5+.5)*w;x.el.style.left=`${Math.max(half+4,Math.min(w-half-4,px))}px`;x.el.style.top=`${Math.max(8,Math.min(h-8,(-p.y*.5+.5)*h))}px`})}
+function calc(){const q=P.gamma*P.width*P.thickness,G=q*P.span,load=P.mass*9.81,x=P.span*P.pos/100,RA=G/2+load*(1-x/P.span),RB=G/2+load*x/P.span;return{q,G,load,x,RA,RB,res:RA+RB-G-load}}
+function fmt(n,d=0){return n.toLocaleString('zh-CN',{maximumFractionDigits:d,minimumFractionDigits:d})}
+function buildEnvironment(){clearGroup(envGroup);const ground=new THREE.Mesh(new THREE.PlaneGeometry(P.span*2.5,Math.max(P.width*5,60)),new THREE.MeshStandardMaterial({color:COL.ground,roughness:.92}));ground.rotation.x=-Math.PI/2;ground.position.set(P.span/2,-.05,0);ground.receiveShadow=true;envGroup.add(ground);const river=new THREE.Mesh(new THREE.PlaneGeometry(P.span*1.25,Math.max(P.width*2.2,24)),new THREE.MeshStandardMaterial({color:COL.river,transparent:true,opacity:.78,roughness:.28}));river.rotation.x=-Math.PI/2;river.position.set(P.span/2,.01,0);envGroup.add(river)}
+function buildBridge(){clearGroup(bridgeGroup);clearGroup(forceGroup);clearLabels();buildEnvironment();const z=8,deckZ=z+P.thickness/2;addBox(bridgeGroup,P.span/2,0,deckZ,P.span,P.width,P.thickness,COL.top);const gh=Math.max(.75,P.span/22);[-P.width*.36,P.width*.36].forEach(y=>addBox(bridgeGroup,P.span/2,y,z-gh/2,P.span,.45,gh,COL.deck));for(let x=0;x<=P.span+.01;x+=Math.max(3,P.span/8))addBox(bridgeGroup,Math.min(x,P.span),0,z-.38,.32,P.width*.82,.45,COL.beam);[0,P.span].forEach(x=>{addBox(bridgeGroup,x,0,3.55,1.15,P.width*.74,7.1,COL.pier);addBox(bridgeGroup,x,0,7.28,1.7,P.width*.86,.36,COL.pier);addBox(bridgeGroup,x,0,7.58,.78,P.width*.7,.24,COL.bearing)});const c=calc();const vx=c.x;addBox(bridgeGroup,vx,0,z+P.thickness+1.0,2.5,2.1,1.25,COL.vehicle);[-.72,.72].forEach(dx=>[-1,1].forEach(side=>addCylinderBetween(bridgeGroup,V(vx+dx,side*.72-.2,z+P.thickness+.28),V(vx+dx,side*.72+.2,z+P.thickness+.28),.3,0x18212a)));addLabel('车辆 '+fmt(P.mass)+' t',vx,0,z+3,'#ffd17c');buildForces(c);updateReadouts(c)}
+function buildForces(c){clearGroup(forceGroup);const z=8+P.thickness;const maxR=Math.max(c.RA,c.RB,1);for(let i=1;i<=7;i++){const x=P.span*i/8;makeArrow(forceGroup,V(x,0,z+4.2),V(x,0,z+.45),COL.load)}makeArrow(forceGroup,V(c.x,0,z+7),V(c.x,0,z+1.2),COL.load);[[0,c.RA,'RA'],[P.span,c.RB,'RB']].forEach(([x,r,name])=>{const len=3.5+5.5*r/maxR;makeArrow(forceGroup,V(x,0,.4),V(x,0,.4+len),COL.reaction);addSphere(forceGroup,x,0,.4,.17,COL.reaction);addLabel(`${name} ${fmt(r)} kN`,x,0,.4+len+1,'#9ee9ff')});forceGroup.visible=forcesVisible}
+function updateReadouts(c){document.getElementById('r-g').textContent=fmt(c.G)+' kN';document.getElementById('r-p').textContent=fmt(c.load)+' kN';document.getElementById('r-ra').textContent=fmt(c.RA)+' kN';document.getElementById('r-rb').textContent=fmt(c.RB)+' kN';document.getElementById('r-res').textContent=(Math.abs(c.res)<1e-8?'0.000':'≈ '+c.res.toExponential(1))+' kN'}
+function resetView(){camera.position.set(P.span*.92,Math.max(26,P.span*.48),Math.max(30,P.width*3.2));controls.target.copy(V(P.span/2,0,5));controls.update()}
+document.querySelectorAll('input[data-key]').forEach(input=>{const key=input.dataset.key,out=document.getElementById('o-'+key);function show(){const units={span:' m',width:' m',thickness:' m',gamma:' kN/m³',mass:' t',pos:'%'};out.textContent=input.value+units[key]}show();input.addEventListener('input',()=>{P[key]=+input.value;show();buildBridge()})});
+document.getElementById('toggleForce').onclick=function(){forcesVisible=!forcesVisible;forceGroup.visible=forcesVisible;this.classList.toggle('active',forcesVisible)};document.getElementById('toggleLabel').onclick=function(){labelsVisible=!labelsVisible;this.classList.toggle('active',labelsVisible)};document.getElementById('resetView').onclick=resetView;
+function resizeScene(){const{w,h}=sceneSize();camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
+new ResizeObserver(resizeScene).observe(container);buildBridge();resetView();resizeScene();document.getElementById('loading').style.display='none';(function animate(){requestAnimationFrame(animate);controls.update();updateLabels();renderer.render(scene,camera)})();
+</script>
+<script src="./learning-cycle.js"></script>
+</body>
+</html>

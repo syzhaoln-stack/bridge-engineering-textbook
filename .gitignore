@@ -1,0 +1,9 @@
+source/.quarto/
+source/.playwright-cli/
+.playwright-cli/
+source/manim/media/
+**/__pycache__/
+*.py[cod]
+*.log
+Thumbs.db
+.DS_Store

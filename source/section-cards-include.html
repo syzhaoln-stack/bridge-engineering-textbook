@@ -1,0 +1,13 @@
+<script>
+(() => {
+  if (!/\/chapters\/[^/]+\.html$/i.test(location.pathname)) return;
+  const data = document.createElement('script');
+  data.src = '../interactive/section-card-data.js';
+  data.onload = () => {
+    const app = document.createElement('script');
+    app.src = '../interactive/section-cards.js';
+    document.body.appendChild(app);
+  };
+  document.body.appendChild(data);
+})();
+</script>

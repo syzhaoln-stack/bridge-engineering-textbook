@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="569.307719pt" height="364.250625pt" viewBox="0 0 569.307719 364.250625" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-08-02T11:36:12.867915</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.5, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 364.250625 
+L 569.307719 364.250625 
+L 569.307719 0 
+L 0 0 
+z
+" style="fill: #fffdf8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 33.531719 283.058625 
+L 560.667719 283.058625 
+L 560.667719 34.630625 
+L 33.531719 34.630625 
+z
+" style="fill: #fffdf8"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="75.815355" y="294.552375" transform="rotate(-0 75.815355 294.552375)">0.50</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="146.288082" y="294.552375" transform="rotate(-0 146.288082 294.552375)">0.75</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="216.76081" y="294.552375" transform="rotate(-0 216.76081 294.552375)">1.00</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="287.233537" y="294.552375" transform="rotate(-0 287.233537 294.552375)">1.25</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5"/>
+     <g id="text_5">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="357.706264" y="294.552375" transform="rotate(-0 357.706264 294.552375)">1.50</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6"/>
+     <g id="text_6">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="428.178991" y="294.552375" transform="rotate(-0 428.178991 294.552375)">1.75</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7"/>
+     <g id="text_7">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="498.651719" y="294.552375" transform="rotate(-0 498.651719 294.552375)">2.00</text>
+     </g>
+    </g>
+    <g id="text_8">
+     <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="297.099719" y="309.831437" transform="rotate(-0 297.099719 309.831437)">风速倍率 V / V0</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_8">
+      <path d="M 33.531719 283.058625 
+L 560.667719 283.058625 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d6e1e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_9"/>
+     <g id="text_9">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: end; fill: #16324f" x="30.031719" y="287.0555" transform="rotate(-0 30.031719 287.0555)">0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_10">
+      <path d="M 33.531719 231.836357 
+L 560.667719 231.836357 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d6e1e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_11"/>
+     <g id="text_10">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: end; fill: #16324f" x="30.031719" y="235.833232" transform="rotate(-0 30.031719 235.833232)">1</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_12">
+      <path d="M 33.531719 180.614089 
+L 560.667719 180.614089 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d6e1e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_13"/>
+     <g id="text_11">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: end; fill: #16324f" x="30.031719" y="184.610964" transform="rotate(-0 30.031719 184.610964)">2</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_14">
+      <path d="M 33.531719 129.391821 
+L 560.667719 129.391821 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d6e1e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_15"/>
+     <g id="text_12">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: end; fill: #16324f" x="30.031719" y="133.388696" transform="rotate(-0 30.031719 133.388696)">3</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_16">
+      <path d="M 33.531719 78.169553 
+L 560.667719 78.169553 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d6e1e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_17"/>
+     <g id="text_13">
+      <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: end; fill: #16324f" x="30.031719" y="82.166428" transform="rotate(-0 30.031719 82.166428)">4</text>
+     </g>
+    </g>
+    <g id="text_14">
+     <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #16324f" x="17.433125" y="158.844625" transform="rotate(-90 17.433125 158.844625)">风力倍率 F / F0</text>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 33.531719 283.058625 
+L 33.531719 34.630625 
+" style="fill: none; stroke: #587084; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 33.531719 283.058625 
+L 560.667719 283.058625 
+" style="fill: none; stroke: #587084; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_18">
+    <path d="M 47.626264 274.863062 
+L 75.815355 270.253058 
+L 104.004446 264.618609 
+L 132.193537 257.959714 
+L 160.382628 250.276373 
+L 188.571719 241.568588 
+L 216.76081 231.836357 
+L 244.949901 221.079681 
+L 273.138991 209.298559 
+L 301.328082 196.492992 
+L 329.517173 182.66298 
+L 357.706264 167.808522 
+L 385.895355 151.929619 
+L 414.084446 135.02627 
+L 442.273537 117.098477 
+L 470.462628 98.146237 
+L 498.651719 78.169553 
+" clip-path="url(#pd92eb42269)" style="fill: none; stroke: #d95d39; stroke-width: 2.8; stroke-linecap: square"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 359.798543 66.411425 
+Q 428.227209 72.205985 496.655874 78.000544 
+" style="fill: none; stroke: #d95d39; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #d95d39" x="267.501173" y="65.363986" transform="rotate(-0 267.501173 65.363986)">F / F0 = (V / V0)²</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 421.826485 107.810012 
+Q 459.307155 93.349343 496.787825 78.888674 
+" style="fill: none; stroke: #16324f; stroke-linecap: round"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 9.5px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #16324f" x="377.438628" y="118.122922" transform="rotate(-0 377.438628 118.122922)">2V0 → 4F0</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #16324f" x="33.531719" y="20.630625" transform="rotate(-0 33.531719 20.630625)">风速翻倍时，风力为什么不是翻倍而是四倍？</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m80ba9d9d7c" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #16324f"/>
+    </defs>
+    <g clip-path="url(#pd92eb42269)">
+     <use xlink:href="#m80ba9d9d7c" x="216.76081" y="231.836357" style="fill: #16324f; stroke: #16324f"/>
+     <use xlink:href="#m80ba9d9d7c" x="498.651719" y="78.169553" style="fill: #16324f; stroke: #16324f"/>
+    </g>
+   </g>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 8.5px; font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', 'SimHei', 'Arial Unicode MS', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #587084" x="12.711719" y="353.440469" transform="rotate(-0 12.711719 353.440469)">适用前提：空气密度 ρ、阻力系数 C_d 和迎风面积 A 固定，F = ½ρC_dAV²。无量纲教学示意。</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd92eb42269">
+   <rect x="33.531719" y="34.630625" width="527.136" height="248.428"/>
+  </clipPath>
+ </defs>
+</svg>

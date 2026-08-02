@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>一层钢筋，究竟放上面还是下面</title>
+  <style>
+    :root{--bg:#071015;--panel:#0d1a21;--line:#29404b;--ink:#e2edf1;--muted:#91a4ae;--cyan:#48d4cf;--amber:#ffc05d;--red:#ff6f6b;--blue:#6ca7ff}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,#17303a,#071015 48%);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit}.shell{max-width:1420px;margin:auto;padding:18px}
+    header{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,480px);gap:18px;align-items:end;margin-bottom:14px}.eyebrow{font-size:12px;letter-spacing:.15em;color:var(--cyan)}h1{font-size:clamp(26px,3.2vw,43px);line-height:1.08;margin:4px 0 8px}header p{margin:0;color:var(--muted)}.question{border-left:3px solid var(--amber);padding:10px 14px;background:#ffc05d10}.question b{color:var(--amber);display:block}.question span{font-size:13px}
+    .grid{display:grid;grid-template-columns:300px minmax(0,1fr) 360px;gap:14px}.card{border:1px solid var(--line);background:#0b1820ed;border-radius:16px;box-shadow:0 20px 50px #0007}.controls{padding:15px;align-self:start}.controls h2,.card h2{font-size:15px;margin:0 0 9px}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:15px}.button-row button,.toggle{background:#10232d;color:#cbd9df;border:1px solid #36515e;border-radius:10px;padding:9px;cursor:pointer}.button-row button.active,.toggle.active{border-color:var(--cyan);background:#12383c;color:#fff}.step{border-top:1px solid #263e49;padding-top:12px;margin-top:12px}.step b{display:block;color:var(--amber)}.step p{font-size:13px;color:#becbd1;margin:4px 0 8px}.note{font-size:12px;color:var(--muted)}
+    .beam{padding:12px;min-height:590px}.head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.badge{font-size:11px;letter-spacing:.1em;color:var(--cyan);border:1px solid #2f5a60;border-radius:999px;padding:3px 8px}canvas{width:100%;display:block;border-radius:10px;background:linear-gradient(#0a161c,#071015)}#beamCanvas{height:500px}
+    .section{padding:12px;min-height:590px}.section canvas{height:390px;cursor:ns-resize}.status{border:1px solid #3a505a;border-radius:11px;padding:10px;margin-top:10px}.status.good{border-color:#2d756f;background:#0c2725}.status.bad{border-color:#8e3d3b;background:#2a1516}.status b{display:block}.term{grid-column:1/-1;padding:14px 17px}.term-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px}.term-grid div{border-top:1px solid #2b434e;padding-top:9px}.term strong{color:var(--cyan)}.formula{font-family:Cambria Math,serif;color:#fff;font-size:17px}.transfer{color:#cbd6dc}.transfer b{color:var(--amber)}
+    @media(max-width:1100px){header,.grid{grid-template-columns:1fr}.term{grid-column:auto}.term-grid{grid-template-columns:1fr}.controls{order:1}.beam{order:2}.section{order:3}.term{order:4}}
+  </style>
+</head>
+<body><main class="shell">
+  <header><div><div class="eyebrow">材料行为实验 · 先看哪里在拉</div><h1>钢筋不是“放进混凝土里”就算完成</h1><p>先让支承和荷载告诉我们弯矩符号，再判断哪一边受拉。最后才谈钢筋应该靠近哪一边。</p></div><div class="question"><b>先判断一次</b><span>简支梁跨中，钢筋放下边似乎很自然。若把同一截面搬到连续梁中支点或悬臂根部，它还应该待在下边吗？</span></div></header>
+  <div class="grid">
+    <aside class="card controls">
+      <h2>① 先换受力场景</h2>
+      <div class="button-row" id="schemes"><button data-v="simple" class="active">简支梁跨中</button><button data-v="continuous">连续梁支点</button><button data-v="cantilever">悬臂梁根部</button><button data-v="simple-support">简支梁近支点</button></div>
+      <h2>② 选择截面轮廓</h2>
+      <div class="button-row" id="sections"><button data-v="rect" class="active">实心矩形</button><button data-v="tee">T 形</button><button data-v="ibox">工字形</button><button data-v="box">箱形</button></div>
+      <h2>③ 选择观察层级</h2>
+      <div class="button-row" id="layers"><button data-v="elastic" class="active">未开裂弹性预判</button><button data-v="cracked">开裂后 RC 示意</button></div>
+      <button id="prestress" class="toggle">只显示钢束方向（不参与计算）</button>
+      <div class="step"><b>只做一个动作</b><p>在右侧截面里，上下拖动红色钢筋。不要先背“正筋、负筋”；先让它去找受拉的一边。</p></div>
+      <div class="step"><b>然后追问</b><p>截面轮廓会改变中性轴和抗弯效率；但本工具只计算 T 形与对称轮廓的毛截面中性轴，不比较各轮廓的惯性矩或承载力。</p></div>
+      <p class="note">“未开裂弹性”与“开裂后 RC”是两个不同层级。后者只提示拉区混凝土退出与钢筋接力，不求开裂中性轴、应力或承载力；锚固、斜裂缝、疲劳和极限状态也不在本模型内。</p>
+    </aside>
+    <section class="card beam"><div class="head"><h2>整根梁：弯矩先决定哪边受拉</h2><span class="badge">受压蓝 · 受拉红</span></div><canvas id="beamCanvas"></canvas></section>
+    <section class="card section"><div class="head"><h2>同一位置的截面</h2><span class="badge" id="sectionBadge">毛截面弹性预判</span></div><canvas id="sectionCanvas"></canvas><div id="status" class="status"><b>还没放到最有用的位置</b><span>拖动红色钢筋，看提示怎样变化。</span></div></section>
+    <section class="card term"><div class="term-grid"><div id="relation"><strong>看见的关系</strong><br>支承与荷载先给出弯矩符号；弯矩符号再决定哪一边受拉。配筋位置不能脱离体系与部位单独记。</div><div id="terminology"><strong>对应的力学关系</strong><br><span class="formula">σ<sub>x</sub> = −My / I</span>；这是均质、未开裂、线弹性毛截面的应力预判。</div><div class="transfer"><b>把问题带走</b><br>若桥面板在横向和纵向同时弯曲，一根钢筋还能只按“一根梁”来放吗？下一步应看板的两个主受力方向。</div></div></section>
+  </div>
+</main>
+<script>
+(()=>{
+ const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)],beam=$('#beamCanvas'),sec=$('#sectionCanvas');let scheme='simple',shape='rect',layer='elastic',steel=.72,pre=false,drag=false;
+ function fit(c){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(c.width!==Math.round(r.width*d)||c.height!==Math.round(r.height*d)){c.width=Math.round(r.width*d);c.height=Math.round(r.height*d)}const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return{x,w:r.width,h:r.height}}
+ const C={ink:'#dfeaf0',muted:'#91a4ae',red:'#ff6f6b',blue:'#6ca7ff',cyan:'#48d4cf',amber:'#ffc05d'};
+ function line(x,a,b,c=C.ink,w=1,d=[]){x.save();x.strokeStyle=c;x.lineWidth=w;x.setLineDash(d);x.beginPath();x.moveTo(...a);x.lineTo(...b);x.stroke();x.restore()}function text(x,s,p,c=C.muted,align='center',size=12){x.save();x.fillStyle=c;x.font=`${size}px system-ui`;x.textAlign=align;x.fillText(s,...p);x.restore()}
+ function continuousMoment(t){const u=2*(t<=.5?t:1-t);return 3*u-4*u*u}
+ function continuousDeflection(t){const u=2*(t<=.5?t:1-t),g=u/48-u**3/16+u**4/24;return g/.0054161216}
+ function momentValue(t){if(scheme==='cantilever')return-((1-t)**2);if(scheme==='continuous')return continuousMoment(t);return 4*t*(1-t)}
+ function deflectionValue(t){if(scheme==='cantilever')return t*t*(6-4*t+t*t)/3;if(scheme==='continuous')return continuousDeflection(t);return t*(1-2*t*t+t*t*t)/.3125}
+ function sampleRatio(){return scheme==='simple'?.5:scheme==='simple-support'?.14:scheme==='cantilever'?.08:.5}
+ function tensionBottom(){return momentValue(sampleRatio())>0}
+ function drawMomentSegments(ctx,pts){for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],same=a.m*b.m>=0;if(same){line(ctx,[a.x,a.y],[b.x,b.y],(a.m+b.m)/2>=0?C.red:C.blue,3)}else{const r=Math.abs(a.m)/(Math.abs(a.m)+Math.abs(b.m)),q=[a.x+(b.x-a.x)*r,a.y+(b.y-a.y)*r];line(ctx,[a.x,a.y],q,a.m>=0?C.red:C.blue,3);line(ctx,q,[b.x,b.y],b.m>=0?C.red:C.blue,3)}}}
+ function drawBeam(){const {x,w,h}=fit(beam);x.clearRect(0,0,w,h);const left=75,right=w-55,y=185,L=right-left;
+  // supports and beam
+  line(x,[left,y],[right,y],C.ink,10);if(scheme==='cantilever'){x.fillStyle='#6f838d';x.fillRect(left-12,y-45,16,90);for(let yy=y-42;yy<y+45;yy+=9)line(x,[left-22,yy+8],[left-8,yy],'#40545e',1)}else{tri(x,left,y+9);tri(x,right,y+9);if(scheme==='continuous')tri(x,w/2,y+9)}
+  // loads
+  x.strokeStyle=C.amber;x.fillStyle=C.amber;for(let i=0;i<6;i++){let xx=left+L*(.12+i*.15);line(x,[xx,y-82],[xx,y-17],C.amber,2);arrow(x,xx,y-17)}
+  // deflected shape and moment diagram
+  let pts=[],mpts=[];for(let i=0;i<=100;i++){const t=i/100,xx=left+L*t,def=(scheme==='continuous'?32:scheme==='cantilever'?48:44)*deflectionValue(t),m=momentValue(t);pts.push([xx,y+def]);mpts.push({x:xx,y:y+78+m*68,m})}path(x,pts,C.cyan,3);line(x,[left,y+78],[right,y+78],'#38505b',1);drawMomentSegments(x,mpts);
+  text(x,'荷载',[left+10,y-100],C.amber,'left',12);text(x,'变形（放大）',[right,y+48],C.cyan,'right');text(x,'弯矩图',[left,y+164],C.muted,'left');
+  const sampleT=sampleRatio(),sample=left+L*sampleT;line(x,[sample,y-28],[sample,y+160],C.amber,2,[5,5]);text(x,'右侧截面取在这里',[sample,y-38],C.amber);
+  const top=tensionBottom()?C.blue:C.red,bottom=tensionBottom()?C.red:C.blue;x.fillStyle=top+'44';x.fillRect(sample-28,y-5,56,5);x.fillStyle=bottom+'55';x.fillRect(sample-28,y,56,5);text(x,tensionBottom()?'上压、下拉':'上拉、下压',[sample,y+188],C.ink);
+  if(pre){let py=tensionBottom()?y+25:y-25;line(x,[left+15,py],[right-15,py],C.amber,3);text(x,'仅标出钢束方向；本图没有重算弯矩或应力',[w/2,py+(tensionBottom()?28:-13)],C.amber)}
+  function tri(xc,yy){x.beginPath();x.moveTo(xc,yy);x.lineTo(xc-13,yy+23);x.lineTo(xc+13,yy+23);x.closePath();x.strokeStyle='#9fb0b8';x.stroke()}
+  function arrow(ctx,xx,yy){ctx.beginPath();ctx.moveTo(xx,yy);ctx.lineTo(xx-5,yy-9);ctx.lineTo(xx+5,yy-9);ctx.closePath();ctx.fill()}
+  function path(ctx,p,c,wid){ctx.strokeStyle=c;ctx.lineWidth=wid;ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));ctx.stroke()}
+ }
+ function sectionPath(x,cx,cy,b,h){x.beginPath();if(shape==='rect'){x.rect(cx-b/2,cy-h/2,b,h)}else if(shape==='tee'){x.moveTo(cx-b/2,cy-h/2);x.lineTo(cx+b/2,cy-h/2);x.lineTo(cx+b/2,cy-h/2+32);x.lineTo(cx+34,cy-h/2+32);x.lineTo(cx+34,cy+h/2);x.lineTo(cx-34,cy+h/2);x.lineTo(cx-34,cy-h/2+32);x.lineTo(cx-b/2,cy-h/2+32);x.closePath()}else if(shape==='ibox'){x.moveTo(cx-b/2,cy-h/2);x.lineTo(cx+b/2,cy-h/2);x.lineTo(cx+b/2,cy-h/2+26);x.lineTo(cx+28,cy-h/2+26);x.lineTo(cx+28,cy+h/2-26);x.lineTo(cx+b/2,cy+h/2-26);x.lineTo(cx+b/2,cy+h/2);x.lineTo(cx-b/2,cy+h/2);x.lineTo(cx-b/2,cy+h/2-26);x.lineTo(cx-28,cy+h/2-26);x.lineTo(cx-28,cy-h/2+26);x.lineTo(cx-b/2,cy-h/2+26);x.closePath()}else{x.rect(cx-b/2,cy-h/2,b,h);x.moveTo(cx-b/2+38,cy-h/2+32);x.lineTo(cx+b/2-38,cy-h/2+32);x.lineTo(cx+b/2-38,cy+h/2-32);x.lineTo(cx-b/2+38,cy+h/2-32);x.closePath()}}
+ function grossNeutralRatio(b=210){if(shape!=='tee')return .5;const h=245,tf=32,bw=68,af=b*tf,aw=bw*(h-tf);return(af*tf/2+aw*(tf+(h-tf)/2))/(af+aw)/h}
+ function drawSection(){const {x,w,h}=fit(sec);x.clearRect(0,0,w,h);const cx=w*.5,cy=h*.47,b=Math.min(210,w*.62),hh=245,top=cy-hh/2,bot=cy+hh/2,na=top+grossNeutralRatio(b)*hh;
+  x.save();sectionPath(x,cx,cy,b,hh);x.fillStyle='#203640';x.strokeStyle='#c4d3da';x.lineWidth=2;x.fill('evenodd');x.stroke();x.restore();line(x,[cx-b*.68,na],[cx+b*.68,na],'#8ba0aa',1,[6,5]);text(x,layer==='elastic'?'毛截面中性轴':'毛截面轴（仅参照）',[cx+b*.58,na-8],C.muted,'right');
+  const tb=tensionBottom(),compY=tb?top:bot,tensY=tb?bot:top;if(layer==='elastic'){x.fillStyle=C.blue+'aa';x.beginPath();x.moveTo(cx-b*.65,na);x.lineTo(cx,compY);x.lineTo(cx+b*.65,na);x.fill();x.fillStyle=C.red+'99';x.beginPath();x.moveTo(cx-b*.65,na);x.lineTo(cx,tensY);x.lineTo(cx+b*.65,na);x.fill();text(x,'压', [cx, tb?top+20:bot-12], '#d9e6ff', 'center',14);text(x,'拉',[cx,tb?bot-12:top+20],'#ffe1df','center',14)}else{x.fillStyle=C.blue+'77';x.fillRect(cx-b*.43,tb?top:na,b*.86,Math.max(12,tb?Math.min(58,na-top):Math.min(58,bot-na)));text(x,'受压区（示意）',[cx,tb?top+22:bot-13],'#d9e6ff');text(x,'开裂后中性轴未求解',[cx,na-8],C.amber)}
+  const sy=top+steel*hh;line(x,[cx-b*.35,sy],[cx+b*.35,sy],C.red,6);for(let i=-3;i<=3;i++){x.fillStyle='#ffbbb8';x.beginPath();x.arc(cx+i*b*.095,sy,5,0,Math.PI*2);x.fill()}text(x,'唯一一层钢筋',[cx,sy-12],C.red);
+  const target=tb ? .78 : .22,good=Math.abs(steel-target)<.16;if(layer==='cracked'){x.strokeStyle=C.red;x.lineWidth=2;for(let i=-2;i<=2;i++){let xx=cx+i*27,base=tensY+(tb?-3:3);x.beginPath();x.moveTo(xx,base);x.lineTo(xx+5,base+(tb?-18:18));x.lineTo(xx-2,base+(tb?-31:31));x.stroke()}}
+  if(pre){let py=top+(tb ? .72 : .28)*hh;line(x,[cx-b*.35,py],[cx+b*.35,py],C.amber,4);text(x,'预应力束',[cx+b*.38,py+4],C.amber,'left')}
+  const st=$('#status'),where=scheme==='continuous'?'连续梁中支点':scheme==='cantilever'?'悬臂根部':scheme==='simple-support'?'简支梁近支点':'简支梁跨中';st.className='status '+(good?'good':'bad');st.innerHTML=good?`<b>这层钢筋靠近主要受拉边</b><span>${where}：${tb?'下缘':'上缘'}受拉。${layer==='elastic'?'当前只是毛截面的弹性预判；切到“开裂后 RC”再看材料分工。':'开裂后由钢筋接过主要拉力，但本工具没有求开裂中性轴和应力。'}</span>`:`<b>钢筋离主要受拉边太远</b><span>${layer==='elastic'?'先根据弯矩符号找到受拉边；这一步不等同于配筋验算。':'拉区混凝土开裂后，钢筋若离受拉边太远，接力与内力臂都不理想。'}</span>`;
+ }
+ function updateTerms(){$('#sectionBadge').textContent=layer==='elastic'?'毛截面弹性预判':'开裂后材料分工示意';$('#relation').innerHTML=layer==='elastic'?'<strong>看见的关系</strong><br>支承与荷载先给出弯矩符号；弯矩符号再决定哪一边受拉。配筋位置不能脱离体系与部位单独记。':'<strong>看见的关系</strong><br>受拉混凝土开裂后，钢筋接过主要拉力；受压混凝土与受拉钢筋形成内力偶。图中的裂缝不是裂缝宽度计算。';$('#terminology').innerHTML=layer==='elastic'?`<strong>对应的力学关系</strong><br><span class="formula">σ<sub>x</sub> = −My / I</span>；均质、未开裂、线弹性毛截面。${pre?'钢束只作位置提示，未叠加 P/A ± Pe/W。':''}`:'<strong>对应的力学关系</strong><br>开裂截面须由变形协调与内力平衡求中性轴和钢筋、混凝土应力；本工具没有完成这一步。'}
+ function render(){drawBeam();drawSection();updateTerms()}all('#schemes button').forEach(b=>b.onclick=()=>{scheme=b.dataset.v;all('#schemes button').forEach(q=>q.classList.toggle('active',q===b));render()});all('#sections button').forEach(b=>b.onclick=()=>{shape=b.dataset.v;all('#sections button').forEach(q=>q.classList.toggle('active',q===b));render()});all('#layers button').forEach(b=>b.onclick=()=>{layer=b.dataset.v;all('#layers button').forEach(q=>q.classList.toggle('active',q===b));render()});$('#prestress').onclick=e=>{pre=!pre;e.currentTarget.classList.toggle('active',pre);render()};
+ sec.addEventListener('pointerdown',e=>{drag=true;sec.setPointerCapture(e.pointerId);move(e)});sec.addEventListener('pointermove',e=>drag&&move(e));sec.addEventListener('pointerup',()=>drag=false);function move(e){const r=sec.getBoundingClientRect(),cy=r.height*.47,hh=245;steel=Math.max(.06,Math.min(.94,(e.clientY-r.top-(cy-hh/2))/hh));render()}
+ function selfTest(){const old=scheme;scheme='simple';console.assert(Math.abs(momentValue(0))<1e-12&&Math.abs(momentValue(.5)-1)<1e-12&&Math.abs(momentValue(1))<1e-12,'simple UDL moment boundaries');console.assert(Math.abs(deflectionValue(0))<1e-12&&Math.abs(deflectionValue(1))<1e-12&&Math.abs(deflectionValue(.5)-1)<1e-12,'simple UDL deflection boundaries');scheme='continuous';console.assert(Math.abs(momentValue(0))<1e-12&&Math.abs(momentValue(.5)+1)<1e-12&&Math.abs(momentValue(1))<1e-12,'continuous UDL moment boundaries');console.assert(Math.abs(deflectionValue(0))<1e-12&&Math.abs(deflectionValue(.5))<1e-12&&Math.abs(deflectionValue(1))<1e-12,'continuous deflection support boundaries');scheme='cantilever';console.assert(Math.abs(momentValue(0)+1)<1e-12&&Math.abs(momentValue(1))<1e-12&&Math.abs(deflectionValue(0))<1e-12&&Math.abs(deflectionValue(1)-1)<1e-12,'cantilever UDL boundaries');scheme=old;const oldShape=shape;shape='tee';console.assert(grossNeutralRatio()>.3&&grossNeutralRatio()<.5,'T gross centroid');shape=oldShape}
+ window.materialBehaviorLab={momentValue,deflectionValue,continuousMoment,continuousDeflection,grossNeutralRatio};selfTest();addEventListener('resize',render);render();
+})();
+</script></body></html>

@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第 9 章　拉压组合：斜拉桥怎样把支点举到空中 – 我所理解的桥梁工程</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/10-parabola.html" rel="next">
+<link href="../chapters/08-suspension.html" rel="prev">
+<link href="../assets/bridge-favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-3d6ce0a2722d90818cd232bd440f7b1f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../interactive/learning-cycle.css">
+<link rel="stylesheet" href="../interaction-host.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/05-force-path.html">第二部分｜从力路长出结构体系</a></li><li class="breadcrumb-item"><a href="../chapters/09-cable-stayed.html"><span class="chapter-title">第 9 章　拉压组合：斜拉桥怎样把支点举到空中</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="展开或折叠侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">我所理解的桥梁工程</a> 
+        <div class="sidebar-tools-main">
+    <a href="../我所理解的桥梁工程.epub" title="Download ePub" class="quarto-navigation-tool px-1" aria-label="Download ePub"><i class="bi bi-journal"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="切换阅读器模式">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">《我所理解的桥梁工程》</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/00-reading-tools.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">读桥之前，先认识几张图</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">第一部分｜把问题问清楚</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-crossing.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 1 章　跨越：一座桥，先别急着叫它桥</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-scale.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 2 章　尺度：一张图纸，为什么不能画所有的桥</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-loads.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 3 章　荷载：一座空桥，已经背了多少东西</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-moving-load.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 4 章　分配：车停在哪里，取决于你在看什么</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">第二部分｜从力路长出结构体系</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-force-path.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 5 章　力路：一辆车的重量，最后交给了谁</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06-beam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 6 章　受弯：一根梁怎样跨得更远</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/07-arch.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 7 章　受压：有一条弧线，还不能叫拱</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/08-suspension.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 8 章　受拉：悬索桥为什么离不开锚碇</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/09-cable-stayed.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 9 章　拉压组合：斜拉桥怎样把支点举到空中</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/10-parabola.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 10 章　形与力：同一条抛物线，为什么不是同一件事</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">第三部分｜让结构进入真实工程</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/11-system-choice.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 11 章　取舍：技术可行，为什么还不一定合适</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/12-supports.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 12 章　边界：支座为什么既要托住，又要放行</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/13-construction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 13 章　形成：桥不是一下子长成的</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/14-durability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 14 章　时间：一条裂缝以后，水会往哪里走</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/15-failures.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 15 章　失效：一张倒塌照片，不能替事故结案</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">第四部分｜从复杂现象到可信证据</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/16-wind.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 16 章　耦合：风为什么不是一个固定箭头</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/17-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 17 章　模型：保留了什么，又舍弃了什么</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/18-fem-ai.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 18 章　证据：有限元和 AI 的结果，为什么还要怀疑</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">第五部分｜作出愿意负责的设计</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/19-beauty.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 19 章　价值：一座桥为什么会被认为是美的</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/20-design-defense.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 20 章　综合：设计一座你愿意为它辩护的桥</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">案例工作台</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/rc-bending-worked-example.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">案例：把一根钢筋混凝土梁真正配出来</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/spancraft-bridge-game.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">桥造计划：先搭一座，再追问它为什么站得住</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/projection-master.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">工图投影大师：同一座桥，换一个方向再判断</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">索引与工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="展开或折叠此栏">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../gallery.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">先动手看看</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/concept-index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概念索引</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目录</h2>
+   
+  <ul>
+  <li><a href="#把十八根索拉成一样桥面会自己顺下来吗" id="toc-把十八根索拉成一样桥面会自己顺下来吗" class="nav-link active" data-scroll-target="#把十八根索拉成一样桥面会自己顺下来吗">把十八根索拉成一样，桥面会自己顺下来吗</a></li>
+  <li><a href="#空中的支点" id="toc-空中的支点" class="nav-link" data-scroll-target="#空中的支点">空中的支点</a></li>
+  <li><a href="#拉索一根根加上去压力也在累积" id="toc-拉索一根根加上去压力也在累积" class="nav-link" data-scroll-target="#拉索一根根加上去压力也在累积">拉索一根根加上去，压力也在累积</a></li>
+  <li><a href="#第一版倒了问题才出现" id="toc-第一版倒了问题才出现" class="nav-link" data-scroll-target="#第一版倒了问题才出现">第一版倒了，问题才出现</a></li>
+  <li><a href="#少一根背索或者多一座塔" id="toc-少一根背索或者多一座塔" class="nav-link" data-scroll-target="#少一根背索或者多一座塔">少一根背索，或者多一座塔</a></li>
+  <li><a href="#边跨不是主跨的陪衬" id="toc-边跨不是主跨的陪衬" class="nav-link" data-scroll-target="#边跨不是主跨的陪衬">边跨不是主跨的陪衬</a>
+  <ul class="collapse">
+  <li><a href="#留给自己的一个动作" id="toc-留给自己的一个动作" class="nav-link" data-scroll-target="#留给自己的一个动作">留给自己的一个动作</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/05-force-path.html">第二部分｜从力路长出结构体系</a></li><li class="breadcrumb-item"><a href="../chapters/09-cable-stayed.html"><span class="chapter-title">第 9 章　拉压组合：斜拉桥怎样把支点举到空中</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第 9 章　拉压组合：斜拉桥怎样把支点举到空中</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="chapter-question" data-term="索角">
+<p>斜拉索还是那些索。如果把桥塔削矮一截，为什么索力和主梁里的压力都会跟着变？</p>
+</div>
+<p>四种主要桥型里，我个人会选斜拉桥。我毕业设计做的就是斜拉桥，它的构造和传力比较直接，我觉得有意思。</p>
+<p>这个偏好可以说出来，但不能因为我喜欢，就跳过它的困难。</p>
+<p>先问：只让桥塔一侧的桥面更重，桥塔会先向哪边偏？</p>
+<div class="manim-film">
+<video controls="" preload="metadata" data-poster="../assets/videos/manim/09-cable-stayed-balance.jpg"> <source src="../assets/videos/manim/09-cable-stayed-balance.mp4" type="video/mp4"> </video>
+<div class="manim-actions">
+<a href="../assets/code/manim/bridge_mechanics_series.py" download="">下载动画源码</a><a href="../assets/code/manim/mechanics_scenes.md" download="">下载分镜说明</a><a href="../assets/code/manim/README.md" download="">下载运行说明</a>
+</div>
+</div>
+<div class="interactive-block">
+<iframe src="../interactive/long-span-load-path.html?type=cable" title="斜拉桥桥面板、纵横梁、锚固横梁、斜拉索、桥塔与基础三维传力路径" height="790" loading="lazy">
+</iframe>
+<p class="interactive-caption">
+先看一侧变重时塔怎样失去平衡，再切到“追一股力”：从轮载沿板、横梁、主梁、指定斜拉索、桥塔一直追到基础，同时看见索的水平分力怎样形成主梁轴压；N₀ 是明确标出的教学参考值。<a href="../interactive/long-span-load-path.html?type=cable" target="_blank">全屏打开斜拉桥模型</a>。
+</p>
+</div>
+<p>两侧索力不再相等会形成<strong>索力差</strong>和塔的弯矩；动画只显示单一不平衡变化，真实响应还取决于边跨、塔梁连接、构件刚度和调索状态。</p>
+<section id="把十八根索拉成一样桥面会自己顺下来吗" class="level2">
+<h2 class="anchored" data-anchor-id="把十八根索拉成一样桥面会自己顺下来吗">把十八根索拉成一样，桥面会自己顺下来吗</h2>
+<p>先做一个有点蛮横的实验：把所有初始索力调成同一个数。索还是那些索，桥也没有少一根杆件，主梁弯矩却未必肯安静下来。再把“调索程度”慢慢推向教学目标，看哪几根索先需要改、主梁上方的弯矩线怎样跟着变化。</p>
+<div class="interactive-block interactive-block--wide" data-layout="flow">
+<iframe src="../interactive/09-stay-force-moment-lab.html" title="斜拉桥索角、初始索力、索力增量与主梁弯矩三维实验" height="1040" loading="lazy" data-layout="flow">
+</iframe>
+<p class="interactive-caption">
+索力柱直接立在各桥面锚点旁：灰柱是按分担范围和索角得到的教学目标，黄柱是当前总索力；主梁弯矩图悬在梁上方。先把调索程度拉到零，再恢复到百分之百；随后比较边跨／主跨、塔高／主跨，以及辐射式、扇形和竖琴式布索。表格可展开查看每根索的 N₀、ΔN、N 和水平分量 N cosθ。模型是线弹性教学模型，不是实际成桥索力优化。若画面过窄，可<a href="../interactive/09-stay-force-moment-lab.html" target="_blank">全屏打开索力与弯矩实验</a>。
+</p>
+</div>
+<p>这个实验先把两件容易混在一起的事拆开：索的<strong>角度</strong>决定同一竖向分量要付出多大拉力；索的<strong>实际拉力分布</strong>还要接住各自分担的桥面、初始调索、梁塔刚度和荷载位置。因此，索越平，在“承担同一份竖向作用”这个前提下确实越费力；但不能只凭照片里的斜率，就断定整座桥哪根索力最大。</p>
+</section>
+<section id="空中的支点" class="level2">
+<h2 class="anchored" data-anchor-id="空中的支点">空中的支点</h2>
+<p>一根斜拉索把主梁某一点拉向桥塔。从竖向看，它像给主梁增加了一个支点，使主梁的有效受弯跨度变短；从水平方向看，索力又把压力送进主梁。</p>
+<p>设一根索的索力为 (T)，与水平线夹角为 ()。它对梁提供的竖向分力是</p>
+<p><span class="math display">
+T_v=T\sin\theta,
+</span></p>
+<p>同时带来水平分力</p>
+<p><span class="math display">
+T_h=T\cos\theta.
+</span></p>
+<p>索越平，要获得同样的竖向支承，所需索力越大，水平分力也越大。于是塔高、索角、梁内轴压、索长和造价互相牵着。</p>
+<p>课堂上有个学生做过一个很聪明的设计：用热气球把桥面吊起来。我说，这个想法其实已经摸到索体系的本质了——桥面被一股”向上的神秘力量”托举，至于那是什么，可以是热气球，可以是塔加拉索。斜拉桥就是给梁安排许多个空中的支点。</p>
+<div class="real-bridge-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../assets/real-bridges/sutong-cable-stayed.jpg" class="img-fluid figure-img" alt="苏通大桥两座高塔与扇形布置的斜拉索共同支承主梁"></p>
+<figcaption>苏通长江公路大桥的桥塔、斜拉索与主梁</figcaption>
+</figure>
+</div>
+<p>先别数索。任选一根斜拉索，把它对主梁的作用拆成向上的分力和沿桥向塔的分力。照片把“空中支点”拍得很清楚，却不会直接告诉你哪根索力最大。照片：Glabb，CC BY-SA 3.0，未修改、仅缩放。</p>
+</div>
+</section>
+<section id="拉索一根根加上去压力也在累积" class="level2">
+<h2 class="anchored" data-anchor-id="拉索一根根加上去压力也在累积">拉索一根根加上去，压力也在累积</h2>
+<p>课堂上我问过：“悬索桥能到两千米，斜拉桥为什么不能？”这是它的核心问题。</p>
+<p>把拉索从跨中向塔一根根加上去，每根索的水平分力都沿主梁向塔传递。越靠近塔，主梁中累积的轴向压力越大。跨度继续增长，这个压力会形成一个死循环：跨度越大，需要更多有效面积和更好的稳定条件抵抗轴力；截面增加又带来自重，自重再推高索力和轴力。空心箱形当然可以拿掉靠近中间的低效材料，还能把材料放到外围换取弯扭刚度和回转半径；可有效面积、局部稳定、加劲与连接不能一起挖掉。斜拉桥的跨径限制还包括索垂度、风、施工和疲劳，但主梁累积轴压是其中很重要的一条根。</p>
+<p>同一个压力在不同尺度下也有两副面孔。对较小跨径的混凝土主梁，适量轴压可以像一份”免费的预应力”，帮助控制拉应力和裂缝；走到大跨度、细长主梁，它又可能成为稳定负担。课堂上讲过这个反向视角：主梁里的压力不一定是坏事，跨径不大时正好当预应力用。不能只给它贴”好”或”坏”的标签。</p>
+</section>
+<section id="第一版倒了问题才出现" class="level2">
+<h2 class="anchored" data-anchor-id="第一版倒了问题才出现">第一版倒了，问题才出现</h2>
+<p>游戏里第一次搭斜拉桥，最常见的失败是塔站不住。我自己也在建模软件里复刻过阿拉米罗桥——那种没有背索的后倾独塔桥。第一版模型没有把后倾塔的自重、施工阶段和真实塔梁体系完整放进去，塔一直往主跨方向倒；我只好临时给桥面补重量，才看见它勉强平衡。这个“补重量”是模型暴露缺项的过程，不是实桥靠铺装压住桥塔的工作原理。实桥后倾塔的自重与倾斜几何，本来就是平衡主跨拉索效应的重要部分。亲眼看着错误模型倒一次，比看十张正确构造图都清楚。</p>
+<p>塔底有没有足够约束？索是不是连到了一个不能抵抗不平衡弯矩的位置？左右荷载是否平衡？索角是不是太小？桥塔、主梁和锚固有没有形成完整体系？如果一开始就给出一张正确构造图，学生可以照着搭出来，却未必知道那根构件为什么不能少。倒一次以后补上去，构造会变得有理由。</p>
+<p>竖琴式、扇形和辐射形没有简单的总冠军。竖琴式整齐，塔上锚点分散；辐射式索角较有利，塔顶锚固集中；扇形常在两者之间取舍。布索还要看施工、索间距、锚固空间、疲劳、维护和景观。</p>
+</section>
+<section id="少一根背索或者多一座塔" class="level2">
+<h2 class="anchored" data-anchor-id="少一根背索或者多一座塔">少一根背索，或者多一座塔</h2>
+<p>课上讲过两类看起来很“高级”的斜拉桥。第一类是独塔向后倾，主跨一侧有拉索，后面却没有一排背索；第二类是多塔多跨，中间塔左右都有主跨，却没有普通边塔那种明确的边跨背向约束。名字不必先背，它们问的都是同一件事：原来的约束少了，谁来接班？</p>
+<div class="interactive-block interactive-block--wide" data-layout="flow">
+<iframe src="../interactive/09-special-system-balance.html" title="无背索独塔力矩平衡与多塔斜拉桥中塔刚度实验" height="1030" loading="lazy" sandbox="allow-scripts" data-layout="flow">
+</iframe>
+<p class="interactive-caption">
+第一个页签把主跨索群合成一根力，绕塔底比较主跨倾覆力矩、后倾桥塔自重和基础余下的力矩；第二个页签拿掉左右对称，比较什么都不加、稳定索、抗弯塔形和辅助墩。多塔页中的刚度是教学参数，只用于比较“约束加在哪里”，不用于给真实方案排名。若画面过窄，可<a href="../interactive/09-special-system-balance.html" target="_blank">全屏打开特殊斜拉体系实验</a>。
+</p>
+</div>
+<p>无背索不是少算了一根索，而是把原来由背索完成的力矩平衡，分给后倾桥塔的自重、塔梁体系和基础。多塔桥也不是塔越多越硬：左右荷载对称时，中塔两侧的水平分量可以互相抵消；一旦一侧更重，缺少背向约束的中塔就容易产生较大纵向位移。课堂里比较过，提高塔梁刚度当然有作用，却可能费料而控制有限；稳定索、交叉索、改变塔形或辅助墩，是直接改变力路与约束的办法。单纯增加塔高，并不能自动补上这份刚度。</p>
+<p>这件事可以带到桥外面。两个电机同步、两个人抬一张桌子、两条生产线共同供货，对称时许多问题会互相抵消，系统看起来很安静。判断它是不是真稳，不能只看对称工况；故意让一边少一点、慢一点或重一点，剩下的差额由谁接住，才会把真正的约束和薄弱处照出来。</p>
+</section>
+<section id="边跨不是主跨的陪衬" class="level2">
+<h2 class="anchored" data-anchor-id="边跨不是主跨的陪衬">边跨不是主跨的陪衬</h2>
+<p>主跨拉索把塔向主跨方向拉，边跨拉索和边跨结构要帮助平衡。若边跨太长、太柔，塔顶位移和主梁内力会增加；若边跨太短，锚固与局部受力又可能很集中。</p>
+<p>还有一个容易被忽略的点：同样一座斜拉桥，施工顺序不同，主梁最后锁进去的内力可能不同。课上用过“先做边跨还是先做主跨”来说明这个问题，但不能把它记成一条放之四海而皆准的正负号规则。临时支承、合龙方式、张拉次序、温度和体系转换都会一起决定最终状态。自锚、地锚或混合锚固说的是力最后由桥体还是地基平衡，也要先说明具体桥型；施工顺序会影响它怎样建立，却不是名称本身的定义。成桥图上看不出来的东西，施工过程会替它写下来。</p>
+<div class="chapter-method">
+<p><strong>局部的角度一变，整个系统就要重新分账。</strong> 吊车的绳角、飞机的推力方向、机器人的连杆位姿都不能只看那一根杆件；分力会把一个小改动送到全系统。</p>
+</div>
+<section id="留给自己的一个动作" class="level3">
+<h3 class="anchored" data-anchor-id="留给自己的一个动作">留给自己的一个动作</h3>
+<p>在同一座单塔斜拉桥上，把塔高降低百分之二十，主跨、荷载和各锚点需要的竖向支承份额暂时不变。先判断索角、索力、水平分量和主梁轴压怎样变，再用一根索的分力关系检查。最后单独写一句：还缺哪些全桥条件，才有资格判断塔弯矩。</p>
+<hr>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script>
+(() => {
+  if (!/\/chapters\/[^/]+\.html$/i.test(location.pathname)) return;
+  const data = document.createElement('script');
+  data.src = '../interactive/section-card-data.js';
+  data.onload = () => {
+    const app = document.createElement('script');
+    app.src = '../interactive/section-cards.js';
+    document.body.appendChild(app);
+  };
+  document.body.appendChild(data);
+})();
+</script>
+<script>
+(() => {
+  if (window.__bridgeInteractionHostLoader) return;
+  window.__bridgeInteractionHostLoader = true;
+  const script = document.createElement('script');
+  script.src = /\/(?:chapters|appendices)\/[^/]+\.html$/i.test(location.pathname)
+    ? '../interaction-host.js'
+    : 'interaction-host.js';
+  document.body.appendChild(script);
+})();
+</script>
+<script>
+document.querySelectorAll("video[data-poster]").forEach((video) => {
+  video.poster = video.dataset.poster;
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/08-suspension.html" class="pagination-link" aria-label="第 8 章　受拉：悬索桥为什么离不开锚碇">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第 8 章　受拉：悬索桥为什么离不开锚碇</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/10-parabola.html" class="pagination-link" aria-label="第 10 章　形与力：同一条抛物线，为什么不是同一件事">
+        <span class="nav-page-text"><span class="chapter-title">第 10 章　形与力：同一条抛物线，为什么不是同一件事</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>《我所理解的桥梁工程》</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>从力学出发，重新理解桥梁</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

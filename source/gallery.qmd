@@ -1,0 +1,146 @@
+# 先动手看看 {.unnumbered}
+
+从一个暂时答不准的问题开始。点开一项，转一转、拖一拖，再回来看看自己的第一反应有没有变。
+
+:::: {.content-visible unless-format="epub"}
+<div class="experience-grid">
+
+<a class="experience-card experience-card--wide" href="interactive/04-where-to-park.html" target="_blank">
+  <img src="assets/videos/manim/03-influence-line.jpg" alt="一辆车在简支梁上移动，响应曲线随位置变化">
+  <span class="experience-card__body">
+    <span class="experience-card__term">影响线</span>
+    <strong>一辆车到底停在哪儿，才会让你正在看的位置最难受？</strong>
+    <span>拖动车辆，不背固定答案。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/03-resistance-load-reliability-lab.html" target="_blank">
+  <img src="assets/videos/manim/02-reliability-one-to-joint.jpg" alt="荷载与抗力概率分布相遇形成失效区">
+  <span class="experience-card__body">
+    <span class="experience-card__term">可靠度</span>
+    <strong>桥不是“绝对安全”，那工程师究竟在控制什么？</strong>
+    <span>转动三维分布，找到失效的那一侧。</span>
+  </span>
+</a>
+
+<a class="experience-card experience-card--wide" href="interactive/03-load-combination-waterfall.html" target="_blank">
+  <img src="assets/gallery/03-load-combination-waterfall.png" alt="永久作用与可变作用逐项累积到承载上限的瀑布图">
+  <span class="experience-card__body">
+    <span class="experience-card__term">荷载组合</span>
+    <strong>车最多、风最大、温差也最大——真会在同一刻赶到吗？</strong>
+    <span>让每一项把弯矩推向上限，看清谁主导、谁伴随。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/fundamentals-lab.html?mode=scale" target="_blank">
+  <img src="assets/data-figures/01-scale-selfweight-capacity.png" alt="尺寸增大时自重与承载能力增长速度不同">
+  <span class="experience-card__body">
+    <span class="experience-card__term">尺度效应</span>
+    <strong>把一座桥等比例放大十倍，它还会像原来一样工作吗？</strong>
+    <span>改一个尺度，看两条增长规律分开。</span>
+  </span>
+</a>
+
+<a class="experience-card experience-card--wide" href="interactive/bridge-three-views.html" target="_blank">
+  <img src="assets/gallery/bridge-three-views.png" alt="桥梁三维模型与立面、平面、横断面三视图">
+  <span class="experience-card__body">
+    <span class="experience-card__term">三视图</span>
+    <strong>一座三维的桥，为什么要拆成三张“看起来不完整”的图？</strong>
+    <span>在立面、平面和横断面里找同一个尺寸。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/arch-bridge-hybrid-fem.html" target="_blank">
+  <img src="assets/gallery/arch-force-path.png" alt="拱桥三维模型、有限元网格和传力路径">
+  <span class="experience-card__body">
+    <span class="experience-card__term">压力线</span>
+    <strong>拱看起来没有断，为什么一条看不见的线跑出去就危险了？</strong>
+    <span>改变荷载，把压力线推回拱圈里。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/08-cable-geometric-stiffness.html" target="_blank">
+  <img src="assets/gallery/08-cable-geometric-stiffness.png" alt="同跨径同垂度的两根悬索在不同初张力下承受同一车辆">
+  <span class="experience-card__body">
+    <span class="experience-card__term">几何刚度</span>
+    <strong>同一辆车，为什么原来拉得更紧的主缆反而动得更少？</strong>
+    <span>拆开索长变化与索形变化，再让它们重新耦合。</span>
+  </span>
+</a>
+
+<a class="experience-card experience-card--wide" href="interactive/09-stay-force-moment-lab.html" target="_blank">
+  <img src="assets/gallery/09-stay-force-moment.png" alt="斜拉桥三维模型上逐索显示目标索力、当前索力和主梁弯矩图">
+  <span class="experience-card__body">
+    <span class="experience-card__term">初始调索</span>
+    <strong>把十八根索拉成一样，主梁会自己顺下来吗？</strong>
+    <span>索力柱立在锚点旁，弯矩图就悬在主梁上。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/09-special-system-balance.html" target="_blank">
+  <img src="assets/gallery/09-special-system-balance.png" alt="多塔斜拉桥中塔在不对称荷载下比较稳定索、塔形和辅助墩">
+  <span class="experience-card__body">
+    <span class="experience-card__term">体系约束</span>
+    <strong>中塔两边一样重时很安静，为什么只重一边就突然变软？</strong>
+    <span>给缺失的约束找接班人，不靠记桥型。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/material-behavior-lab.html" target="_blank">
+  <img src="assets/gallery/material-behavior.png" alt="钢筋混凝土梁截面中混凝土受压、钢筋受拉">
+  <span class="experience-card__body">
+    <span class="experience-card__term">材料分工</span>
+    <strong>混凝土怕拉，为什么钢筋不放在截面正中间？</strong>
+    <span>移动钢筋，看看内力臂和裂缝怎样变化。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/wind-phenomena-lab.html" target="_blank">
+  <img src="assets/gallery/wind-phenomena.png" alt="桥梁断面绕流与风致振动交互画面">
+  <span class="experience-card__body">
+    <span class="experience-card__term">风致振动</span>
+    <strong>风还没有最大，桥为什么会突然越晃越明显？</strong>
+    <span>调风、调阻尼，也调桥自己的节奏。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/modeling-lab.html?mode=fem" target="_blank">
+  <img src="assets/videos/manim/14-fem-discretization.jpg" alt="一根梁逐步离散成更多有限元单元">
+  <span class="experience-card__body">
+    <span class="experience-card__term">有限元</span>
+    <strong>网格切得越细，答案就一定越可信吗？</strong>
+    <span>从一根梁开始，亲手做一次收敛检查。</span>
+  </span>
+</a>
+
+<a class="experience-card" href="interactive/11-bridge-pareto-front.html" target="_blank">
+  <img src="assets/gallery/11-bridge-pareto-front.png" alt="桥型经济跨度带与成本性能帕累托前沿联动图">
+  <span class="experience-card__body">
+    <span class="experience-card__term">多目标取舍</span>
+    <strong>同样跨 600 米，最便宜的方案为什么还不一定最合适？</strong>
+    <span>先固定跨度，再删掉同时更贵、表现也更差的方案。</span>
+  </span>
+</a>
+
+</div>
+::::
+
+::: {.content-visible when-format="epub"}
+这一页在网页版可以直接操作。EPUB 里先保留十三个问题，读到相应章节时，再到同一发布文件夹的网页版动手试：
+
+1. 影响线：一辆车到底停在哪里，才会让正在看的位置最难受？
+2. 可靠度：桥不是“绝对安全”，工程师究竟在控制什么？
+3. 荷载组合：车最多、风最大、温差也最大，真会在同一刻赶到吗？
+4. 尺度效应：把一座桥等比例放大十倍，它还会像原来一样工作吗？
+5. 三视图：一座三维的桥，为什么要拆成三张“看起来不完整”的图？
+6. 压力线：拱没有断，为什么一条看不见的线跑出去就危险了？
+7. 几何刚度：同一辆车，为什么原来拉得更紧的主缆反而动得更少？
+8. 初始调索：把十八根索拉成一样，主梁会自己顺下来吗？
+9. 体系约束：中塔两边一样重时很安静，为什么只重一边就突然变软？
+10. 材料分工：混凝土怕拉，为什么钢筋不放在截面正中间？
+11. 风致振动：风还没有最大，桥为什么会突然越晃越明显？
+12. 有限元：网格切得越细，答案就一定越可信吗？
+13. 多目标取舍：同样跨 600 米，最便宜的方案为什么还不一定最合适？
+:::
+
+这些小实验不替你作判断。它们只是把原本藏在公式和计算书里的变化摆到眼前：先猜，再动手，再说清楚自己为什么改了主意。

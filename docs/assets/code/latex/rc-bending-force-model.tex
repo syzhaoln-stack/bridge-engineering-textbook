@@ -1,0 +1,25 @@
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{ctex}
+\usetikzlibrary{arrows.meta}
+\definecolor{ink}{HTML}{17313B}
+\definecolor{cyan}{HTML}{197F96}
+\definecolor{orange}{HTML}{D88B24}
+\definecolor{concrete}{HTML}{D9DEE0}
+\definecolor{steel}{HTML}{B74435}
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm,>=Latex,font=\small]
+  \draw[fill=concrete,draw=ink,line width=.8pt] (0,0) rectangle (3.2,6.4);
+  \fill[cyan!25] (0,5.1) rectangle (3.2,6.4);
+  \draw[dashed,ink!60] (-.25,5.1)--(3.45,5.1);
+  \node[anchor=west,ink] at (3.45,5.1) {$x$};
+  \foreach \xx in {0.8,1.6,2.4}{\fill[steel] (\xx,.55) circle (.13);}
+  \draw[<->,ink!70] (-.45,.55)--node[left]{$h_0$}(-.45,6.4);
+  \draw[very thick,cyan,->] (1.6,5.75)--(4.65,5.75);
+  \node[anchor=west,cyan] at (4.75,5.75) {$C=f_{cd}bx$};
+  \draw[very thick,steel,->] (1.6,.55)--(4.65,.55);
+  \node[anchor=west,steel] at (4.75,.55) {$T=f_{sd}A_s$};
+  \draw[<->,orange,line width=1pt] (5.85,.55)--node[right,align=left]{$z=h_0-x/2$\\内力臂}(5.85,5.75);
+  \draw[very thick,orange,-{Latex[length=3mm]}] (8.25,2.0) arc[start angle=-80,end angle=220,radius=1.0];
+  \node[align=center,ink] at (8.25,3.45) {$M_{Rd}=Cz$\\抵抗外弯矩};
+\end{tikzpicture}
+\end{document}

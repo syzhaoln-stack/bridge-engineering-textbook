@@ -1,0 +1,1203 @@
+<!doctype html>
+<!--
+  Offline teaching rebuild, 2026-08-02.
+  Source concept: Desktop demo “抗力与荷载联合概率分布可视化（含蒙特卡洛模拟）.html”.
+  Source SHA-256: 9325EB6DB916C5F0DE49569F5B0F543BB9C25B3B688B1A97A9550D1CC3DE522A.
+  The original file remains untouched; probability formulas and sampling were independently corrected here.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>当荷载偶尔越过抗力：可靠度小实验</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f8f8;
+      --surface: #ffffff;
+      --ink: #102a36;
+      --muted: #61747d;
+      --line: #cfdbde;
+      --line-strong: #9fb3b9;
+      --cyan: #197f96;
+      --cyan-soft: #dceff2;
+      --amber: #d88b24;
+      --amber-soft: #fff0d6;
+      --coral: #bb5146;
+      --coral-soft: #f8dfdc;
+      --shadow: 0 18px 50px rgba(16, 42, 54, .09);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body {
+      margin: 0;
+      min-width: 0;
+      overflow-x: clip;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(25, 127, 150, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(25, 127, 150, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 24px 24px;
+    }
+
+    button, input, select { font: inherit; }
+    button, input[type="radio"], input[type="range"], select { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(25, 127, 150, .32);
+      outline-offset: 3px;
+    }
+
+    .lab-shell {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: clamp(18px, 3.5vw, 42px) clamp(14px, 3vw, 34px) 34px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .14em;
+    }
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: clamp(25px, 4.2vw, 40px);
+      font-weight: 600;
+      line-height: 1.22;
+      letter-spacing: .01em;
+    }
+    .lead {
+      max-width: 720px;
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .offline-mark {
+      align-self: start;
+      border: 1px solid var(--line-strong);
+      padding: 7px 10px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .7);
+      font-size: 11px;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .lab-zone {
+      position: relative;
+      padding: 28px 0 30px 58px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-zone::before {
+      content: attr(data-zone);
+      position: absolute;
+      top: 28px;
+      left: 0;
+      z-index: 1;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      color: var(--cyan);
+      background: var(--paper);
+      font: 700 13px/1 system-ui, sans-serif;
+    }
+    .lab-zone:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 61px;
+      bottom: -1px;
+      left: 16px;
+      width: 1px;
+      background: linear-gradient(var(--cyan), var(--line));
+    }
+    .zone-kicker {
+      margin: 0 0 4px;
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: clamp(20px, 3vw, 27px);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .zone-intro {
+      max-width: 820px;
+      margin: 0 0 17px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    .prediction-write { max-width: 860px; }
+    .prediction-write label { display: block; margin-bottom: 6px; color: var(--ink); font-size: 13px; font-weight: 700; }
+    .prediction-write textarea { display: block; width: 100%; min-height: 64px; resize: vertical; border: 1px solid var(--line-strong); padding: 10px 12px; background: rgba(255,255,255,.9); color: var(--ink); font: inherit; font-size: 13px; line-height: 1.6; }
+    .prediction-write textarea:focus-visible { outline: 3px solid rgba(25,133,150,.22); outline-offset: 2px; border-color: var(--cyan); }
+    .prediction-action { display: flex; align-items: center; gap: 13px; margin-top: 13px; flex-wrap: wrap; }
+    .primary, .secondary, .preset {
+      min-height: 44px;
+      border: 1px solid var(--cyan);
+      padding: 9px 14px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 700;
+    }
+    .primary[disabled] { cursor: not-allowed; opacity: .42; }
+    .secondary, .preset {
+      border-color: var(--line-strong);
+      background: var(--surface);
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .preset:hover, .secondary:hover { border-color: var(--cyan); background: var(--cyan-soft); }
+    .prediction-note { color: var(--muted); font-size: 12px; }
+    .prediction-note[data-ready="true"] { color: var(--cyan); font-weight: 700; }
+
+    .surface-panel { margin-bottom: 14px; }
+    .advanced-views {
+      margin: 14px 0 0;
+      border: 1px solid var(--line-strong);
+      background: rgba(255,255,255,.72);
+    }
+    .advanced-views > summary {
+      min-height: 52px;
+      padding: 14px 16px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .advanced-views > summary span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 400; }
+    .advanced-views[open] > summary { border-bottom: 1px solid var(--line); }
+    .advanced-views__body { padding: 14px; }
+    .surface-stage {
+      position: relative;
+      min-height: 300px;
+      border-top: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 50% 35%, rgba(25,127,150,.08), transparent 38%),
+        linear-gradient(#fbfdfd, #eef4f5);
+    }
+    .surface-stage canvas {
+      display: block;
+      width: 100%;
+      height: clamp(300px, 48vw, 520px);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+    .surface-stage canvas.is-dragging { cursor: grabbing; }
+    .surface-hud {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: calc(100% - 20px);
+      border: 1px solid rgba(97,116,125,.28);
+      padding: 5px 6px 5px 10px;
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 5px 18px rgba(16,42,54,.08);
+      backdrop-filter: blur(8px);
+      color: var(--muted);
+      font-size: 11px;
+      pointer-events: none;
+    }
+    .surface-hud button {
+      min-height: 44px;
+      border: 1px solid var(--line-strong);
+      padding: 6px 10px;
+      background: var(--surface);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      pointer-events: auto;
+    }
+    .surface-hud button:hover { border-color: var(--cyan); background: var(--cyan-soft); }
+    .scene-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .plot-panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .plot-head { padding: 14px 16px 0; }
+    .plot-head h3 { margin: 0; font-size: 14px; }
+    .plot-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .plot-note {
+      display: flex;
+      min-height: 38px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding: 8px 13px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; }
+    .legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 5px; }
+    .legend .safe::before { border-radius: 50%; background: var(--cyan); }
+    .legend .fail::before { background: var(--coral); transform: rotate(45deg); }
+
+    .control-toolbar { display: flex; gap: 8px; margin: 0 0 17px; flex-wrap: wrap; }
+    .preset { min-height: 44px; padding: 7px 11px; font-size: 12px; }
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .control {
+      min-width: 0;
+      border-top: 2px solid var(--line);
+      padding: 11px 10px 9px;
+      background: rgba(255, 255, 255, .74);
+    }
+    .control label, .control .label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    output { color: var(--cyan); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    input[type="range"] { width: 100%; height: 28px; margin: 6px 0 0; accent-color: var(--cyan); }
+    .range-hints { display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; }
+    select, input[type="number"] {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 0;
+      padding: 7px 9px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .seed-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: end; }
+    .seed-row button { min-height: 44px; margin-top: 7px; padding-inline: 10px; }
+    .advanced {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+    }
+    .advanced summary { min-height: 44px; padding: 12px 14px; cursor: pointer; color: var(--ink); font-size: 12px; font-weight: 700; }
+    .advanced-inner { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 18px; border-top: 1px solid var(--line); padding: 13px 14px; }
+    .advanced p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .principle {
+      border-left: 5px solid var(--amber);
+      padding: 15px 18px;
+      background: var(--amber-soft);
+    }
+    .principle b { display: block; margin-bottom: 6px; font: 600 21px/1.4 "STKaiti", "KaiTi", serif; }
+    .principle p { margin: 0; font-size: 13px; line-height: 1.75; }
+    .prediction-return { margin-top: 8px !important; color: #725324; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+    .metric { min-width: 0; padding: 13px 14px; background: var(--surface); }
+    .metric span { display: block; min-height: 2.8em; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .metric strong { display: block; margin-top: 4px; color: var(--ink); font-size: clamp(17px, 2.4vw, 24px); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .metric.theory { box-shadow: inset 0 3px var(--cyan); }
+    .metric.sample { box-shadow: inset 0 3px var(--coral); }
+    .sample-explain { margin: 11px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .sample-explain strong { color: var(--ink); }
+    .formula-panel {
+      margin-top: 18px;
+      border-top: 1px solid var(--line-strong);
+      padding-top: 16px;
+    }
+    .formula-panel h3 { margin: 0 0 9px; font-size: 14px; }
+    .formula-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 20px;
+      max-width: 100%;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: var(--cyan-soft);
+      font: 600 13px/1.65 "Cambria Math", "Times New Roman", serif;
+    }
+    .formula-line span {
+      white-space: nowrap;
+    }
+    .formula-panel p { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .permission {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0;
+      margin: 18px 0 0;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+    .permission dt, .permission dd { margin: 0; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    .permission dt { color: var(--cyan); font-weight: 700; white-space: nowrap; }
+    .permission dd { color: var(--muted); }
+    .permission dt:nth-last-of-type(1), .permission dd:last-child { border-bottom: 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 860px) {
+      .masthead { grid-template-columns: 1fr; gap: 13px; }
+      .offline-mark { justify-self: start; }
+      .scene-grid { grid-template-columns: 1fr; }
+      .control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .lab-shell { padding: 15px 12px 24px; }
+      .lab-zone { padding: 23px 0 25px 42px; }
+      .lab-zone::before { top: 23px; width: 28px; height: 28px; font-size: 11px; }
+      .lab-zone:not(:last-child)::after { top: 50px; left: 13px; }
+      .control-grid, .advanced-inner { grid-template-columns: 1fr; }
+      .plot-head { padding: 12px 12px 0; }
+      .surface-stage { min-height: 270px; }
+      .surface-stage canvas { height: 270px; }
+      .plot-note { align-items: flex-start; flex-direction: column; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric span { min-height: 0; }
+      .permission { grid-template-columns: 1fr; }
+      .permission dt { border-bottom: 0; padding-bottom: 2px; }
+      .permission dd { padding-top: 2px; }
+      .permission dt:nth-last-of-type(1) { border-bottom: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="lab-shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">荷载与可靠度 · 小实验</p>
+        <h1>平均抗力明明更大，为什么还会被荷载越过去？</h1>
+        <p class="lead">这里不急着算某一座桥。先看一件更朴素的事：抗力和荷载都在波动时，真正要紧的不是两座“山峰”谁高，而是哪一部分落到了错误的一边。</p>
+      </div>
+      <div class="offline-mark">完全离线 · 固定随机种子</div>
+    </header>
+
+    <section class="lab-zone lab-question" data-zone="Q" data-learning-cycle-mount>
+      <p class="zone-kicker">先留一个判断</p>
+      <h2>平均值都不变，只把波动放大一倍，哪一座更容易出问题？</h2>
+      <p class="zone-intro">两座桥的平均抗力都是 10，平均荷载都是 6。甲的波动较小（0.75、0.60），乙的波动是甲的两倍（1.50、1.20）。这里的“出问题”只指某一次出现荷载大于抗力。</p>
+      <div class="prediction-write">
+        <label for="predictionText">哪一座更容易出问题？请顺手写下你盯住了什么。</label>
+        <textarea id="predictionText" maxlength="120" placeholder="一句话就够。比如：我猜……，因为两座山……"></textarea>
+      </div>
+      <div class="prediction-action">
+        <button class="primary" id="commitPrediction" type="button" disabled>留下这句判断</button>
+        <span class="prediction-note" id="predictionNote">先写也行，直接看图和调参数也行；不要让记录动作挡住理解。</span>
+      </div>
+    </section>
+
+    <section class="lab-zone lab-scene" data-zone="S" data-lab-scene>
+      <p class="zone-kicker">让证据出现</p>
+      <h2>先看一维，再把两个变量放到同一次事件里</h2>
+      <article class="plot-panel surface-panel">
+        <div class="plot-head">
+          <h3>从混凝土试块和车流量开始：两个都会散开</h3>
+          <p>青色是抗力，红色是荷载。抗力向左偏、荷载向右偏，才是最需要警惕的方向。C50 的 95% 保证率描述材料强度标准值；它不等于整座桥的可靠度。</p>
+        </div>
+        <svg id="marginalPlot" viewBox="0 0 900 360" role="img" aria-labelledby="marginalTitle marginalDesc">
+          <title id="marginalTitle">抗力和荷载的一维概率密度分布</title>
+          <desc id="marginalDesc">抗力分布的标准值位于均值左侧，右侧面积为百分之九十五；荷载与抗力的尾部相遇时可能失效。</desc>
+        </svg>
+        <div class="plot-note">
+          <div class="legend"><span class="safe">抗力 R</span><span class="fail">荷载 S</span></div>
+          <span>一维曲线的面积为 1；特征值右侧的青色面积为 95%</span>
+        </div>
+      </article>
+      <details class="advanced-views" id="advancedViews">
+        <summary>看懂一维以后，再把同一次事件展开<span>打开二维点云、可旋转联合密度曲面和 R−S 差值图</span></summary>
+        <div class="advanced-views__body">
+      <article class="plot-panel surface-panel">
+        <div class="plot-head">
+          <h3>联合概率密度的地形</h3>
+          <p>峰顶说明最常见的组合；红色一侧不是“另一座山”，而是同一座概率山越过 R = S 边界的薄尾部。</p>
+        </div>
+        <div class="surface-stage">
+          <canvas id="surfacePlot" role="img" tabindex="0" aria-label="可旋转的抗力与荷载联合概率密度三维地形图。拖动旋转，滚轮或加减键缩放，方向键微调视角；青色是 R 大于等于 S 的安全侧，红色是 R 小于 S 的失效侧。"></canvas>
+          <div class="surface-hud"><span>拖动旋转 · 滚轮缩放 · 双击复位</span><button id="resetSurfaceView" type="button">复位视角</button></div>
+        </div>
+        <div class="plot-note">
+          <div class="legend"><span class="safe">R ≥ S：安全侧</span><span class="fail">R &lt; S：失效侧</span></div>
+          <span>同一分布，从立体地形、平面等高线和差值三个方向看</span>
+        </div>
+      </article>
+      <div class="scene-grid" id="sceneGrid">
+        <article class="plot-panel">
+          <div class="plot-head">
+            <h3>俯视等高线与这一批随机点</h3>
+            <p>横轴是荷载，纵轴是抗力；椭圆是同一座概率山的等高线，斜线下方表示荷载已经越过抗力。</p>
+          </div>
+          <svg id="jointPlot" viewBox="0 0 600 420" role="img" aria-labelledby="jointTitle jointDesc">
+            <title id="jointTitle">抗力与荷载随机样本散点图</title>
+            <desc id="jointDesc">安全样本位于抗力大于等于荷载的一侧，失效样本位于抗力小于荷载的一侧。</desc>
+          </svg>
+          <div class="plot-note">
+            <div class="legend"><span class="safe">抗力没有被越过</span><span class="fail">荷载越过抗力</span></div>
+            <span id="shownPoints">—</span>
+          </div>
+        </article>
+        <article class="plot-panel">
+          <div class="plot-head">
+            <h3>把两者相减以后</h3>
+            <p>横轴是“抗力 − 荷载”。零的左边就是刚才斜线下方的那些情形。</p>
+          </div>
+          <svg id="gapPlot" viewBox="0 0 600 420" role="img" aria-labelledby="gapTitle gapDesc">
+            <title id="gapTitle">抗力减荷载的概率密度图</title>
+            <desc id="gapDesc">零左侧的阴影面积是理论失效概率，零右侧是抗力大于等于荷载的区域。</desc>
+          </svg>
+          <div class="plot-note"><span>斜线下方的点，与零左边的面积，是同一件事的两种画法。</span></div>
+        </article>
+      </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="lab-zone lab-controls" data-zone="C" data-lab-controls>
+      <p class="zone-kicker">只改一个条件，再比较</p>
+      <h2>先别追着红点数，试着改写它们出现的条件</h2>
+      <p class="zone-intro">建议先点“波动减半”，再点“回到初始”。两个平均值没有动，留意零左边的面积怎样变。固定种子让两次比较尽量使用同一批随机底数。</p>
+      <div id="controlsWrap">
+        <div class="control-toolbar" aria-label="参数情形">
+          <button class="preset" type="button" data-preset="stable">波动减半</button>
+          <button class="preset" type="button" data-preset="default">回到初始</button>
+          <button class="preset" type="button" data-preset="close">把两个平均值拉近</button>
+          <button class="preset" type="button" data-preset="together">让两者同涨同落</button>
+        </div>
+        <fieldset id="parameterFields">
+          <legend class="sr-only">抗力、荷载和抽样参数</legend>
+          <div class="control-grid">
+            <div class="control">
+              <label for="meanR"><span>抗力的平均水平 μ<sub>R</sub></span><output id="meanROut">10.0</output></label>
+              <input id="meanR" type="range" min="5" max="15" step="0.1" value="10">
+              <div class="range-hints"><span>5</span><span>15</span></div>
+            </div>
+            <div class="control">
+              <label for="stdR"><span>抗力的波动 σ<sub>R</sub></span><output id="stdROut">1.50</output></label>
+              <input id="stdR" type="range" min="0.2" max="3" step="0.05" value="1.5">
+              <div class="range-hints"><span>0.20</span><span>3.00</span></div>
+            </div>
+            <div class="control">
+              <label for="meanS"><span>荷载的平均水平 μ<sub>S</sub></span><output id="meanSOut">6.0</output></label>
+              <input id="meanS" type="range" min="5" max="15" step="0.1" value="6">
+              <div class="range-hints"><span>5</span><span>15</span></div>
+            </div>
+            <div class="control">
+              <label for="stdS"><span>荷载的波动 σ<sub>S</sub></span><output id="stdSOut">1.20</output></label>
+              <input id="stdS" type="range" min="0.2" max="3" step="0.05" value="1.2">
+              <div class="range-hints"><span>0.20</span><span>3.00</span></div>
+            </div>
+            <div class="control">
+              <label for="sampleN">这批随机情形的数量</label>
+              <select id="sampleN">
+                <option value="500">500</option>
+                <option value="1000" selected>1,000</option>
+                <option value="5000">5,000</option>
+                <option value="20000">20,000</option>
+              </select>
+            </div>
+            <div class="control">
+              <label for="seed">随机种子</label>
+              <div class="seed-row">
+                <input id="seed" type="number" min="1" max="999999" step="1" value="240325" inputmode="numeric">
+                <button class="secondary" id="nextSeed" type="button">换一批</button>
+              </div>
+            </div>
+          </div>
+          <details class="advanced">
+            <summary>进阶：抗力和荷载会不会一起波动？</summary>
+            <div class="advanced-inner">
+              <div class="control">
+                <label for="rho"><span>相关系数 ρ</span><output id="rhoOut">0.00</output></label>
+                <input id="rho" type="range" min="-0.8" max="0.8" step="0.05" value="0">
+                <div class="range-hints"><span>−0.80</span><span>彼此独立 0</span><span>+0.80</span></div>
+              </div>
+              <p>ρ = 0 是本页的基本情形：两个波动彼此独立。ρ &gt; 0 表示两者较常同涨同落，ρ &lt; 0 表示一涨一落较常同时出现。相关性改变的是两者之差的波动，不能只凭“正相关更危险”或“负相关更安全”下结论。</p>
+            </div>
+          </details>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="lab-zone lab-explanation" data-zone="E" data-learning-result-mount>
+      <p class="zone-kicker">把图里的变化收回来</p>
+      <h2>先说不变的关系，再给它一个名字</h2>
+      <div class="principle">
+        <b>平均值之间留出的距离，要和波动的宽度一起看。</b>
+        <p>“平均抗力大于平均荷载”只说了两个中心的位置；它没有消掉尾部。波动越宽，越多情形可能越过边界。真正需要数的是边界错误一侧的概率质量，而不是只盯着两个峰顶。</p>
+        <p>把抗力—荷载换成库存—需求、算力—流量或排水能力—暴雨，这个问法仍然成立；只是分布、相关性和越界后果必须重新取证，不能把这张图原样搬过去。</p>
+        <p class="prediction-return" id="predictionReturn">先看三幅图怎样说同一件事；如果愿意，再回到上面留一句自己的判断。</p>
+      </div>
+
+      <div class="metrics" aria-live="polite">
+        <div class="metric theory"><span>分布给出的理论 β</span><strong id="betaValue">—</strong></div>
+        <div class="metric theory"><span>分布给出的理论失效概率</span><strong id="pfValue">—</strong></div>
+        <div class="metric sample"><span>这一批样本中的失效次数</span><strong id="sampleValue">—</strong></div>
+        <div class="metric sample"><span>样本比例的 Wilson 95% 区间</span><strong id="ciValue">—</strong></div>
+      </div>
+      <p class="sample-explain" id="sampleExplain">理论值描述给定分布；样本值只描述这一批有限抽样。样本数很少时，即使理论概率不为零，也可能一次都没有抽到。</p>
+
+      <div class="formula-panel">
+        <h3>把刚才看到的写成公式</h3>
+        <div class="formula-line"><span>Z = R − S</span><span>σ<sub>Z</sub> = √(σ<sub>R</sub>² + σ<sub>S</sub>² − 2ρσ<sub>R</sub>σ<sub>S</sub>)</span><span>β = (μ<sub>R</sub> − μ<sub>S</sub>) / σ<sub>Z</sub></span><span>P<sub>f</sub> = Φ(−β)</span></div>
+        <p id="formulaNote">初始情形取 ρ = 0，R 与 S 相互独立，所以 σ<sub>Z</sub> = √(σ<sub>R</sub>² + σ<sub>S</sub>²)。“可靠指标 β”就是均值差里能放下多少个“差值的标准差”；P<sub>f</sub> 是 Z &lt; 0 的理论概率。</p>
+      </div>
+
+      <dl class="permission" aria-label="模型权限">
+        <dt>保留</dt><dd>正态抗力 R、正态荷载 S、二者相关性以及 R &lt; S 这一极限状态。</dd>
+        <dt>舍弃</dt><dd>非正态尾部、随时间和空间变化、多个失效模式以及失效后果。</dd>
+        <dt>可以回答</dt><dd>均值、波动、相关性和样本数怎样改变理论概率与抽样不确定性。</dd>
+        <dt>不可用于</dt><dd>给真实桥梁定可靠等级、代替规范验算，或据此作工程安全决定。</dd>
+      </dl>
+      <p class="sr-only" id="liveSummary" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+      const defaultSurfaceView = { yaw: Math.PI / 4, pitch: .62, zoom: 1 };
+      const state = {
+        started: true,
+        prediction: "",
+        framePending: false,
+        surfacePending: false,
+        surfaceView: { ...defaultSurfaceView },
+        surfaceDrag: null
+      };
+      const parameterIds = ["meanR", "stdR", "meanS", "stdS", "rho", "sampleN", "seed"];
+
+      function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+      function fmt(value, digits = 2) {
+        if (Math.abs(value) < Math.pow(10, -digits) / 2) value = 0;
+        return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+      }
+      function probabilityText(p) {
+        const percent = p * 100;
+        if (p === 0) return "0%";
+        if (percent < 0.0001) return percent.toExponential(2) + "%";
+        if (percent < 0.01) return fmt(percent, 4) + "%";
+        if (percent < 1) return fmt(percent, 3) + "%";
+        return fmt(percent, 2) + "%";
+      }
+      function erf(x) {
+        const sign = x < 0 ? -1 : 1;
+        const a = Math.abs(x);
+        const t = 1 / (1 + 0.3275911 * a);
+        const y = 1 - (((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t) * Math.exp(-a * a);
+        return sign * y;
+      }
+      function normalCDF(x) {
+        if (x === 0) return 0.5;
+        if (x <= -8) return 0;
+        if (x >= 8) return 1;
+        return 0.5 * (1 + erf(x / Math.SQRT2));
+      }
+      function normalPDF(x, mean, sd) {
+        const z = (x - mean) / sd;
+        return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+      }
+      function mulberry32(seed) {
+        let a = seed >>> 0;
+        return function() {
+          a |= 0;
+          a = a + 0x6D2B79F5 | 0;
+          let t = Math.imul(a ^ a >>> 15, 1 | a);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+      function normalPair(random) {
+        const u1 = Math.max(random(), Number.EPSILON);
+        const u2 = random();
+        const radius = Math.sqrt(-2 * Math.log(u1));
+        const angle = 2 * Math.PI * u2;
+        return [radius * Math.cos(angle), radius * Math.sin(angle)];
+      }
+      function wilsonInterval(successes, n) {
+        const z = 1.959963984540054;
+        const p = successes / n;
+        const z2 = z * z;
+        const denominator = 1 + z2 / n;
+        const center = (p + z2 / (2 * n)) / denominator;
+        const half = z * Math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / denominator;
+        const low = clamp(center - half, 0, 1);
+        return [low < 1e-15 ? 0 : low, clamp(center + half, 0, 1)];
+      }
+      function params() {
+        return {
+          meanR: +$("meanR").value,
+          stdR: +$("stdR").value,
+          meanS: +$("meanS").value,
+          stdS: +$("stdS").value,
+          rho: +$("rho").value,
+          n: +$("sampleN").value,
+          seed: clamp(Math.round(+$("seed").value || 1), 1, 999999)
+        };
+      }
+      function theory(p) {
+        const meanZ = p.meanR - p.meanS;
+        const varianceZ = p.stdR * p.stdR + p.stdS * p.stdS - 2 * p.rho * p.stdR * p.stdS;
+        const stdZ = Math.sqrt(Math.max(varianceZ, Number.EPSILON));
+        const beta = meanZ / stdZ;
+        const pf = normalCDF(-beta);
+        return { meanZ, stdZ, beta, pf };
+      }
+      function sample(p) {
+        const random = mulberry32(p.seed);
+        const root = Math.sqrt(Math.max(0, 1 - p.rho * p.rho));
+        const limit = Math.min(p.n, 1200);
+        const shown = [];
+        let failures = 0;
+        for (let i = 0; i < p.n; i++) {
+          const [z1, z2] = normalPair(random);
+          const r = p.meanR + p.stdR * z1;
+          const s = p.meanS + p.stdS * (p.rho * z1 + root * z2);
+          const failed = r < s;
+          if (failed) failures++;
+          if (i < limit) shown.push({ r, s, failed });
+        }
+        return { failures, shown, ci: wilsonInterval(failures, p.n) };
+      }
+
+      function jointDensity(p, s, r) {
+        const oneMinus = Math.max(1 - p.rho * p.rho, Number.EPSILON);
+        const zs = (s - p.meanS) / p.stdS;
+        const zr = (r - p.meanR) / p.stdR;
+        const exponent = -(zs * zs - 2 * p.rho * zs * zr + zr * zr) / (2 * oneMinus);
+        return Math.exp(exponent) / (2 * Math.PI * p.stdS * p.stdR * Math.sqrt(oneMinus));
+      }
+
+      function renderMarginals(p) {
+        const svg = $("marginalPlot");
+        const width = 900, height = 360;
+        const margin = { left: 58, right: 32, top: 38, bottom: 55 };
+        const plotW = width - margin.left - margin.right;
+        const plotH = height - margin.top - margin.bottom;
+        const lower = Math.min(p.meanR - 4.2 * p.stdR, p.meanS - 4.2 * p.stdS);
+        const upper = Math.max(p.meanR + 4.2 * p.stdR, p.meanS + 4.2 * p.stdS);
+        const peak = Math.max(normalPDF(p.meanR, p.meanR, p.stdR), normalPDF(p.meanS, p.meanS, p.stdS)) * 1.12;
+        const x = value => margin.left + (value - lower) / (upper - lower) * plotW;
+        const y = value => margin.top + plotH - value / peak * plotH;
+        const baseY = margin.top + plotH;
+        const makePath = (mean, sd, start = lower, end = upper, close = false) => {
+          const parts = [];
+          const count = 180;
+          for (let i = 0; i <= count; i++) {
+            const value = start + (end - start) * i / count;
+            parts.push(`${i ? "L" : "M"}${x(value).toFixed(2)},${y(normalPDF(value, mean, sd)).toFixed(2)}`);
+          }
+          if (close) parts.push(`L${x(end).toFixed(2)},${baseY} L${x(start).toFixed(2)},${baseY} Z`);
+          return parts.join(" ");
+        };
+        const rk = p.meanR - 1.64485362695147 * p.stdR;
+        const ticks = Array.from({ length: 6 }, (_, i) => lower + (upper - lower) * i / 5);
+        svg.innerHTML = `
+          <defs>
+            <linearGradient id="r95Fill" x1="0" x2="1"><stop offset="0" stop-color="#82c8d0" stop-opacity=".24"/><stop offset="1" stop-color="#197f96" stop-opacity=".08"/></linearGradient>
+            <pattern id="r5Hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="8" stroke="#bb5146" stroke-opacity=".42" stroke-width="2"/></pattern>
+            <marker id="arrowCoral" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#bb5146"/></marker>
+            <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#197f96"/></marker>
+          </defs>
+          <style>
+            .m-grid{stroke:#e0e7e9;stroke-width:1}.m-axis{stroke:#61747d;stroke-width:1.3}.m-tick{fill:#61747d;font:11px system-ui,sans-serif}.m-label{fill:#102a36;font:600 12px system-ui,sans-serif}.m-r{fill:none;stroke:#197f96;stroke-width:4}.m-s{fill:none;stroke:#bb5146;stroke-width:4}.m-rk{stroke:#d88b24;stroke-width:2;stroke-dasharray:7 5}.m-mean{stroke:#61747d;stroke-width:1.3;stroke-dasharray:3 5}.m-note{font:600 12px system-ui,sans-serif}.m-small{fill:#61747d;font:11px system-ui,sans-serif}
+          </style>
+          ${ticks.map(t => `<line x1="${x(t)}" y1="${margin.top}" x2="${x(t)}" y2="${baseY}" class="m-grid"/><text x="${x(t)}" y="${baseY + 20}" text-anchor="middle" class="m-tick">${fmt(t, 1)}</text>`).join("")}
+          <line x1="${margin.left}" y1="${baseY}" x2="${width - margin.right}" y2="${baseY}" class="m-axis"/>
+          <path d="${makePath(p.meanR, p.stdR, rk, upper, true)}" fill="url(#r95Fill)"/>
+          <path d="${makePath(p.meanR, p.stdR, lower, rk, true)}" fill="url(#r5Hatch)"/>
+          <path d="${makePath(p.meanR, p.stdR)}" class="m-r"/>
+          <path d="${makePath(p.meanS, p.stdS)}" class="m-s"/>
+          <line x1="${x(rk)}" y1="${y(normalPDF(rk, p.meanR, p.stdR))}" x2="${x(rk)}" y2="${baseY}" class="m-rk"/>
+          <line x1="${x(p.meanR)}" y1="${y(normalPDF(p.meanR, p.meanR, p.stdR))}" x2="${x(p.meanR)}" y2="${baseY}" class="m-mean"/>
+          <line x1="${x(p.meanS)}" y1="${y(normalPDF(p.meanS, p.meanS, p.stdS))}" x2="${x(p.meanS)}" y2="${baseY}" class="m-mean"/>
+          <text x="${x(p.meanR) + 10}" y="${margin.top + 30}" fill="#197f96" class="m-note">抗力 R</text>
+          <text x="${x(p.meanS) - 10}" y="${margin.top + 58}" text-anchor="end" fill="#bb5146" class="m-note">荷载 S</text>
+          <text x="${x(rk) - 7}" y="${baseY - 10}" text-anchor="end" fill="#d88b24" class="m-note">Rₖ = μᵣ − 1.645σᵣ</text>
+          <text x="${x((rk + upper) / 2)}" y="${baseY - 34}" text-anchor="middle" fill="#197f96" class="m-note">95%</text>
+          <line x1="${x(p.meanR)}" y1="${margin.top + 78}" x2="${x(p.meanR - p.stdR)}" y2="${margin.top + 78}" stroke="#197f96" stroke-width="2" marker-end="url(#arrowCyan)"/>
+          <text x="${x(p.meanR - p.stdR / 2)}" y="${margin.top + 69}" text-anchor="middle" fill="#197f96" class="m-small">抗力向小处偏</text>
+          <line x1="${x(p.meanS)}" y1="${margin.top + 104}" x2="${x(p.meanS + p.stdS)}" y2="${margin.top + 104}" stroke="#bb5146" stroke-width="2" marker-end="url(#arrowCoral)"/>
+          <text x="${x(p.meanS + p.stdS / 2)}" y="${margin.top + 125}" text-anchor="middle" fill="#bb5146" class="m-small">荷载向大处偏</text>
+          <text x="${margin.left + plotW / 2}" y="${height - 12}" text-anchor="middle" class="m-label">同一量纲下的抗力与荷载</text>`;
+      }
+
+      function renderSurface(p) {
+        const canvas = $("surfacePlot");
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(300, rect.width || 900);
+        const height = Math.max(260, rect.height || 460);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        const lowerRaw = Math.min(p.meanR - 3.6 * p.stdR, p.meanS - 3.6 * p.stdS);
+        const upperRaw = Math.max(p.meanR + 3.6 * p.stdR, p.meanS + 3.6 * p.stdS);
+        const spread = Math.max(upperRaw - lowerRaw, 2);
+        const lower = lowerRaw - spread * .04;
+        const upper = upperRaw + spread * .04;
+        const span = upper - lower;
+        const originX = width * .5;
+        const originY = height * .70;
+        const scale = Math.min(width * .31, height * .35) * state.surfaceView.zoom;
+        const maxDensity = jointDensity(p, p.meanS, p.meanR);
+        const project = (s, r, density = 0) => {
+          const x = ((s - lower) / span - .5) * 2;
+          const z = ((r - lower) / span - .5) * 2;
+          const y = density / maxDensity * .90;
+          const cy = Math.cos(state.surfaceView.yaw);
+          const sy = Math.sin(state.surfaceView.yaw);
+          const cp = Math.cos(state.surfaceView.pitch);
+          const sp = Math.sin(state.surfaceView.pitch);
+          const rotatedX = x * cy - z * sy;
+          const rotatedZ = x * sy + z * cy;
+          const rotatedY = y * cp - rotatedZ * sp;
+          const depth = y * sp + rotatedZ * cp;
+          return {
+            x: originX + rotatedX * scale,
+            y: originY - rotatedY * scale,
+            depth
+          };
+        };
+        const poly = (points, fill, stroke = "rgba(16,42,54,.14)", lineWidth = .7) => {
+          ctx.beginPath();
+          points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
+          ctx.closePath();
+          ctx.fillStyle = fill;
+          ctx.fill();
+          if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
+        };
+
+        const p00 = project(lower, lower), p10 = project(upper, lower), p11 = project(upper, upper), p01 = project(lower, upper);
+        poly([p00, p10, p11, p01], "rgba(255,255,255,.82)", "rgba(97,116,125,.35)", 1);
+        poly([p00, p10, p11], "rgba(187,81,70,.12)", null);
+        poly([p00, p11, p01], "rgba(25,127,150,.10)", null);
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(97,116,125,.17)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 5; i++) {
+          const value = lower + span * i / 5;
+          const a = project(value, lower), b = project(value, upper);
+          const c = project(lower, value), d = project(upper, value);
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.stroke();
+        }
+        ctx.restore();
+
+        const n = width < 520 ? 26 : 34;
+        const cells = [];
+        for (let i = 0; i < n; i++) {
+          for (let j = 0; j < n; j++) {
+            const s0 = lower + span * i / n, s1 = lower + span * (i + 1) / n;
+            const r0 = lower + span * j / n, r1 = lower + span * (j + 1) / n;
+            const d00 = jointDensity(p, s0, r0), d10 = jointDensity(p, s1, r0);
+            const d11 = jointDensity(p, s1, r1), d01 = jointDensity(p, s0, r1);
+            const avg = (d00 + d10 + d11 + d01) / 4;
+            const points = [project(s0, r0, d00), project(s1, r0, d10), project(s1, r1, d11), project(s0, r1, d01)];
+            cells.push({
+              depth: points.reduce((sum, point) => sum + point.depth, 0) / points.length,
+              failed: (s0 + s1) > (r0 + r1),
+              height: avg / maxDensity,
+              points
+            });
+          }
+        }
+        cells.sort((a, b) => a.depth - b.depth);
+        for (const cell of cells) {
+          const alpha = .32 + .54 * Math.pow(cell.height, .42);
+          const fill = cell.failed
+            ? `rgba(187,81,70,${alpha})`
+            : `rgba(25,127,150,${alpha})`;
+          poly(cell.points, fill, "rgba(255,255,255,.24)", .55);
+        }
+
+        const boundaryA = project(lower, lower), boundaryB = project(upper, upper);
+        ctx.beginPath(); ctx.moveTo(boundaryA.x, boundaryA.y); ctx.lineTo(boundaryB.x, boundaryB.y);
+        ctx.strokeStyle = "rgba(133,48,42,.95)"; ctx.lineWidth = 2; ctx.setLineDash([7,5]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath();
+        for (let i = 0; i <= 64; i++) {
+          const value = lower + span * i / 64;
+          const point = project(value, value, jointDensity(p, value, value));
+          if (i === 0) ctx.moveTo(point.x, point.y); else ctx.lineTo(point.x, point.y);
+        }
+        ctx.strokeStyle = "rgba(133,48,42,.96)";
+        ctx.lineWidth = 2.6;
+        ctx.stroke();
+        const meanTop = project(p.meanS, p.meanR, maxDensity);
+        ctx.beginPath(); ctx.arc(meanTop.x, meanTop.y, 4.5, 0, Math.PI * 2); ctx.fillStyle = "#d88b24"; ctx.fill();
+
+        const drawBadge = (point, text, foreground, background) => {
+          ctx.save();
+          ctx.font = `700 ${width < 520 ? 10 : 12}px "Microsoft YaHei", sans-serif`;
+          const boxWidth = ctx.measureText(text).width + 18;
+          const boxHeight = width < 520 ? 25 : 29;
+          const x = clamp(point.x - boxWidth / 2, 5, width - boxWidth - 5);
+          const y = clamp(point.y - boxHeight / 2, 76, height - boxHeight - 5);
+          ctx.beginPath();
+          ctx.roundRect(x, y, boxWidth, boxHeight, 7);
+          ctx.fillStyle = background;
+          ctx.fill();
+          ctx.strokeStyle = foreground;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+          ctx.fillStyle = foreground;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(text, x + boxWidth / 2, y + boxHeight / 2 + .5);
+          ctx.restore();
+        };
+        drawBadge(project(lower + span * .25, lower + span * .75), "安全侧  R ≥ S", "#176f87", "rgba(229,246,248,.94)");
+        drawBadge(project(lower + span * .75, lower + span * .25), "失效侧  R < S", "#9e433a", "rgba(255,235,231,.95)");
+
+        ctx.fillStyle = "#102a36";
+        ctx.font = `${width < 520 ? 10 : 12}px "Microsoft YaHei", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText("R = S 临界线", (boundaryA.x + boundaryB.x) / 2 + 34, (boundaryA.y + boundaryB.y) / 2 - 8);
+        ctx.fillText("荷载 S", p10.x + (width < 520 ? -8 : 16), p10.y + 24);
+        ctx.fillText("抗力 R", p01.x + (width < 520 ? 8 : -16), p01.y + 24);
+        ctx.fillStyle = "#61747d";
+        ctx.textAlign = "left";
+        ctx.fillText("联合概率密度", 14, 22);
+        ctx.fillText(`方位 ${Math.round(state.surfaceView.yaw * 180 / Math.PI)}° · 俯角 ${Math.round(state.surfaceView.pitch * 180 / Math.PI)}°`, 14, 42);
+      }
+
+      function axisTicks(min, max, count = 5) {
+        const raw = (max - min) / count;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+        const normalized = raw / magnitude;
+        const step = (normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10) * magnitude;
+        const first = Math.ceil(min / step) * step;
+        const ticks = [];
+        for (let value = first; value <= max + step * .001; value += step) ticks.push(value);
+        return ticks;
+      }
+      function renderJoint(p, sampled) {
+        const svg = $("jointPlot");
+        const margin = { left: 61, right: 25, top: 22, bottom: 54 };
+        const width = 600, height = 420;
+        const plotW = width - margin.left - margin.right;
+        const plotH = height - margin.top - margin.bottom;
+        const lowerRaw = Math.min(p.meanR - 3.8 * p.stdR, p.meanS - 3.8 * p.stdS);
+        const upperRaw = Math.max(p.meanR + 3.8 * p.stdR, p.meanS + 3.8 * p.stdS);
+        const spread = Math.max(upperRaw - lowerRaw, 2);
+        const lower = lowerRaw - spread * .04;
+        const upper = upperRaw + spread * .04;
+        const x = (value) => margin.left + (value - lower) / (upper - lower) * plotW;
+        const y = (value) => margin.top + (upper - value) / (upper - lower) * plotH;
+        const ticks = axisTicks(lower, upper, 5);
+        const grid = ticks.map(t => `<line x1="${x(t)}" y1="${margin.top}" x2="${x(t)}" y2="${margin.top + plotH}" class="grid-line"/><line x1="${margin.left}" y1="${y(t)}" x2="${margin.left + plotW}" y2="${y(t)}" class="grid-line"/><text x="${x(t)}" y="${margin.top + plotH + 25}" class="tick" text-anchor="middle">${fmt(t, t < 10 ? 1 : 0)}</text><text x="${margin.left - 10}" y="${y(t) + 4}" class="tick" text-anchor="end">${fmt(t, t < 10 ? 1 : 0)}</text>`).join("");
+        const root = Math.sqrt(Math.max(0, 1 - p.rho * p.rho));
+        const contours = [.75, 1.25, 1.75, 2.25, 2.75].map((radius, contourIndex) => {
+          const path = [];
+          for (let i = 0; i <= 120; i++) {
+            const angle = Math.PI * 2 * i / 120;
+            const u = radius * Math.cos(angle);
+            const v = radius * Math.sin(angle);
+            const s = p.meanS + p.stdS * u;
+            const r = p.meanR + p.stdR * (p.rho * u + root * v);
+            path.push(`${i ? "L" : "M"} ${x(s)} ${y(r)}`);
+          }
+          return `<path d="${path.join(" ")}" class="contour contour-${contourIndex}"/>`;
+        }).join("");
+        const points = sampled.shown.map(point => point.failed
+          ? `<path d="M ${x(point.s) - 2.4} ${y(point.r) - 2.4} l 4.8 4.8 m -4.8 0 l 4.8 -4.8" class="point-fail"/>`
+          : `<circle cx="${x(point.s)}" cy="${y(point.r)}" r="2" class="point-safe"/>`
+        ).join("");
+        svg.innerHTML = `
+          <title id="jointTitle">抗力与荷载随机样本散点图</title>
+          <desc id="jointDesc">共显示 ${sampled.shown.length} 个样本，其中红色叉号表示荷载大于抗力。</desc>
+          <defs>
+            <pattern id="failureHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="#f8dfdc"/><line x1="0" y1="0" x2="0" y2="9" stroke="#d8958e" stroke-width="2"/></pattern>
+            <clipPath id="jointClip"><rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}"/></clipPath>
+          </defs>
+          <style>
+            .grid-line{stroke:#dce4e6;stroke-width:1}.axis-line{stroke:#61747d;stroke-width:1.2}.tick{fill:#61747d;font:11px system-ui,sans-serif}.axis-label{fill:#102a36;font:600 12px system-ui,sans-serif}.boundary{stroke:#bb5146;stroke-width:2;stroke-dasharray:7 6}.boundary-label{fill:#9e433a;font:600 11px system-ui,sans-serif}.contour{fill:none;stroke:#176f87;stroke-width:1.4;stroke-opacity:.72}.contour-0{stroke-width:2;stroke-opacity:.94}.mean-point{fill:#d88b24;stroke:#fff;stroke-width:2}.point-safe{fill:#197f96;fill-opacity:.38}.point-fail{fill:none;stroke:#a63f36;stroke-width:1.6;stroke-linecap:round}.region{fill:#dceff2}.region-fail{fill:url(#failureHatch)}.region-label{fill:#4e6873;font:600 11px system-ui,sans-serif}
+          </style>
+          <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#fff"/>
+          <g clip-path="url(#jointClip)">
+            <polygon points="${margin.left},${margin.top} ${margin.left + plotW},${margin.top} ${margin.left},${margin.top + plotH}" class="region"/>
+            <polygon points="${margin.left},${margin.top + plotH} ${margin.left + plotW},${margin.top + plotH} ${margin.left + plotW},${margin.top}" class="region-fail"/>
+             ${grid}
+            ${contours}
+             <line x1="${margin.left}" y1="${margin.top + plotH}" x2="${margin.left + plotW}" y2="${margin.top}" class="boundary"/>
+             <g>${points}</g>
+            <circle cx="${x(p.meanS)}" cy="${y(p.meanR)}" r="5" class="mean-point"/>
+          </g>
+          <line x1="${margin.left}" y1="${margin.top + plotH}" x2="${margin.left + plotW}" y2="${margin.top + plotH}" class="axis-line"/>
+          <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotH}" class="axis-line"/>
+          <text x="${margin.left + plotW / 2}" y="${height - 10}" text-anchor="middle" class="axis-label">荷载 S</text>
+          <text x="17" y="${margin.top + plotH / 2}" text-anchor="middle" class="axis-label" transform="rotate(-90 17 ${margin.top + plotH / 2})">抗力 R</text>
+          <text x="${x(lower + spread * .18)}" y="${y(upper - spread * .14)}" class="region-label">抗力尚有余地</text>
+          <text x="${x(upper - spread * .19)}" y="${y(lower + spread * .12)}" text-anchor="end" class="boundary-label">荷载越过抗力</text>
+          <text x="${x(upper - spread * .08)}" y="${y(upper - spread * .04)}" text-anchor="end" class="boundary-label">R = S</text>`;
+        $("shownPoints").textContent = `图中显示 ${sampled.shown.length.toLocaleString("zh-CN")} 点；统计使用全部 ${p.n.toLocaleString("zh-CN")} 点`;
+      }
+
+      function renderGap(t) {
+        const svg = $("gapPlot");
+        const margin = { left: 61, right: 25, top: 22, bottom: 54 };
+        const width = 600, height = 420;
+        const plotW = width - margin.left - margin.right;
+        const plotH = height - margin.top - margin.bottom;
+        const lowerRaw = Math.min(0, t.meanZ - 4.2 * t.stdZ);
+        const upperRaw = Math.max(0, t.meanZ + 4.2 * t.stdZ);
+        const spread = Math.max(upperRaw - lowerRaw, 2);
+        const lower = lowerRaw - spread * .04;
+        const upper = upperRaw + spread * .04;
+        const maxPdf = normalPDF(t.meanZ, t.meanZ, t.stdZ) * 1.08;
+        const x = (value) => margin.left + (value - lower) / (upper - lower) * plotW;
+        const y = (value) => margin.top + plotH - value / maxPdf * plotH;
+        const ticks = axisTicks(lower, upper, 6);
+        const grid = ticks.map(value => `<line x1="${x(value)}" y1="${margin.top}" x2="${x(value)}" y2="${margin.top + plotH}" class="grid-line"/><text x="${x(value)}" y="${margin.top + plotH + 25}" class="tick" text-anchor="middle">${fmt(value, Math.abs(value) < 10 ? 1 : 0)}</text>`).join("");
+        const count = 180;
+        const line = [];
+        const failArea = [`M ${x(lower)} ${y(0)}`];
+        const safeArea = [`M ${x(Math.max(0, lower))} ${y(0)}`];
+        for (let i = 0; i <= count; i++) {
+          const value = lower + (upper - lower) * i / count;
+          const py = y(normalPDF(value, t.meanZ, t.stdZ));
+          line.push(`${i === 0 ? "M" : "L"} ${x(value)} ${py}`);
+          if (value <= 0) failArea.push(`L ${x(value)} ${py}`);
+          if (value >= 0) safeArea.push(`L ${x(value)} ${py}`);
+        }
+        failArea.push(`L ${x(Math.min(0, upper))} ${y(0)} Z`);
+        safeArea.push(`L ${x(upper)} ${y(0)} Z`);
+        const zeroX = x(0);
+        const meanX = x(t.meanZ);
+        svg.innerHTML = `
+          <title id="gapTitle">抗力减荷载的概率密度图</title>
+          <desc id="gapDesc">零左侧的理论概率为 ${probabilityText(t.pf)}，可靠指标为 ${fmt(t.beta, 3)}。</desc>
+          <defs><pattern id="gapHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="#f8dfdc"/><line x1="0" y1="0" x2="0" y2="9" stroke="#d8958e" stroke-width="2"/></pattern></defs>
+          <style>
+            .grid-line{stroke:#e0e7e9;stroke-width:1}.axis-line{stroke:#61747d;stroke-width:1.2}.tick{fill:#61747d;font:11px system-ui,sans-serif}.axis-label{fill:#102a36;font:600 12px system-ui,sans-serif}.density{fill:none;stroke:#102a36;stroke-width:2.5}.safe-area{fill:#dceff2}.fail-area{fill:url(#gapHatch)}.zero{stroke:#bb5146;stroke-width:2;stroke-dasharray:7 6}.mean{stroke:#d88b24;stroke-width:2}.anno{fill:#4e6873;font:600 11px system-ui,sans-serif}.fail-label{fill:#9e433a;font:700 11px system-ui,sans-serif}
+          </style>
+          <rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#fff"/>
+          ${grid}
+          <path d="${safeArea.join(" ")}" class="safe-area"/>
+          <path d="${failArea.join(" ")}" class="fail-area"/>
+          <path d="${line.join(" ")}" class="density"/>
+          <line x1="${zeroX}" y1="${margin.top}" x2="${zeroX}" y2="${margin.top + plotH}" class="zero"/>
+          <line x1="${meanX}" y1="${y(normalPDF(t.meanZ, t.meanZ, t.stdZ))}" x2="${meanX}" y2="${margin.top + plotH}" class="mean"/>
+          <line x1="${margin.left}" y1="${margin.top + plotH}" x2="${margin.left + plotW}" y2="${margin.top + plotH}" class="axis-line"/>
+          <text x="${margin.left + plotW / 2}" y="${height - 10}" text-anchor="middle" class="axis-label">抗力 − 荷载（Z）</text>
+          <text x="${clamp(zeroX - 8, margin.left + 55, margin.left + plotW - 55)}" y="${margin.top + 18}" text-anchor="end" class="fail-label">Z &lt; 0：${probabilityText(t.pf)}</text>
+          <text x="${clamp(meanX + 7, margin.left + 55, margin.left + plotW - 80)}" y="${margin.top + 38}" class="anno">平均差 ${fmt(t.meanZ, 2)}</text>
+          <text x="${zeroX + 6}" y="${margin.top + plotH - 9}" class="fail-label">边界 0</text>`;
+      }
+
+      function updateOutputs(p) {
+        $("meanROut").textContent = fmt(p.meanR, 1);
+        $("stdROut").textContent = fmt(p.stdR, 2);
+        $("meanSOut").textContent = fmt(p.meanS, 1);
+        $("stdSOut").textContent = fmt(p.stdS, 2);
+        $("rhoOut").textContent = (p.rho > 0 ? "+" : "") + fmt(p.rho, 2);
+        $("seed").value = p.seed;
+      }
+      function render() {
+        const p = params();
+        updateOutputs(p);
+        const t = theory(p);
+        const sampled = sample(p);
+        renderMarginals(p);
+        renderSurface(p);
+        renderJoint(p, sampled);
+        renderGap(t);
+        const samplePf = sampled.failures / p.n;
+        $("betaValue").textContent = fmt(t.beta, 3);
+        $("pfValue").textContent = probabilityText(t.pf);
+        $("sampleValue").textContent = `${sampled.failures.toLocaleString("zh-CN")} / ${p.n.toLocaleString("zh-CN")}`;
+        $("ciValue").textContent = `${probabilityText(sampled.ci[0])} – ${probabilityText(sampled.ci[1])}`;
+        const expected = t.pf * p.n;
+        const ciContainsTheory = t.pf >= sampled.ci[0] && t.pf <= sampled.ci[1];
+        $("sampleExplain").innerHTML = `理论上，这样的 ${p.n.toLocaleString("zh-CN")} 次情形平均约有 <strong>${fmt(expected, expected < 10 ? 1 : 0)} 次</strong>落到边界错误的一侧；这一批实际看见 ${sampled.failures.toLocaleString("zh-CN")} 次。${ciContainsTheory ? "理论值落在这批样本的 95% 区间内；" : "这批样本的 95% 区间没有罩住理论值；"}换一个随机种子，样本值会动，分布给出的理论值不会动。`;
+        $("formulaNote").innerHTML = Math.abs(p.rho) < 1e-12
+          ? `当前取 ρ = 0，R 与 S 相互独立，所以 σ<sub>Z</sub> = √(σ<sub>R</sub>² + σ<sub>S</sub>²) = ${fmt(t.stdZ, 3)}。“可靠指标 β”就是均值差里能放下多少个“差值的标准差”；P<sub>f</sub> = Φ(−β) 是 Z &lt; 0 的理论概率。`
+          : `当前取 ρ = ${fmt(p.rho, 2)}，所以 σ<sub>Z</sub> = √(σ<sub>R</sub>² + σ<sub>S</sub>² − 2ρσ<sub>R</sub>σ<sub>S</sub>) = ${fmt(t.stdZ, 3)}。相关性先改变差值的波动，再改变 β 与 P<sub>f</sub>。`;
+        $("predictionReturn").textContent = state.prediction
+          ? `你原来写的是：“${state.prediction}” 当前图中，理论失效概率是 ${probabilityText(t.pf)}。试过“波动减半”与“回到初始”以后，再判断原来的理由是否还站得住。`
+          : `当前图中，理论失效概率是 ${probabilityText(t.pf)}。先试“波动减半”，再回到初始；如果自己的理由变清楚了，可以回到上面留一句判断。`;
+        $("liveSummary").textContent = `理论可靠指标 ${fmt(t.beta, 3)}，理论失效概率 ${probabilityText(t.pf)}；样本 ${p.n} 次中失效 ${sampled.failures} 次，Wilson 百分之九十五区间 ${probabilityText(sampled.ci[0])} 到 ${probabilityText(sampled.ci[1])}。`;
+        reportHeight();
+      }
+      function scheduleRender() {
+        if (state.framePending) return;
+        state.framePending = true;
+        requestAnimationFrame(() => { state.framePending = false; render(); });
+      }
+      function scheduleSurfaceRender() {
+        if (state.surfacePending) return;
+        state.surfacePending = true;
+        requestAnimationFrame(() => {
+          state.surfacePending = false;
+          renderSurface(params());
+        });
+      }
+      function resetSurfaceView() {
+        Object.assign(state.surfaceView, defaultSurfaceView);
+        scheduleSurfaceRender();
+      }
+      function setValues(values) {
+        Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
+        scheduleRender();
+      }
+      function start() {
+        const written = $("predictionText").value.trim();
+        if (written.length < 2) return;
+        state.prediction = written;
+        $("predictionNote").dataset.ready = "true";
+        $("predictionNote").textContent = "这句话已经留下。现在用图来检查理由。";
+        $("commitPrediction").textContent = "已经留下";
+        $("commitPrediction").disabled = true;
+        render();
+      }
+      function reportHeight() {
+        if (window.parent === window) return;
+        requestAnimationFrame(() => {
+          const height = Math.ceil(document.documentElement.scrollHeight);
+          window.parent.postMessage({
+            source: "bridge-interaction-shell",
+            type: "resize",
+            height,
+            layout: "flow"
+          }, "*");
+        });
+      }
+
+      $("predictionText").addEventListener("input", () => {
+        $("commitPrediction").disabled = $("predictionText").value.trim().length < 2;
+      });
+      $("commitPrediction").addEventListener("click", start);
+      const surfaceCanvas = $("surfacePlot");
+      surfaceCanvas.addEventListener("pointerdown", event => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        surfaceCanvas.focus({ preventScroll: true });
+        surfaceCanvas.setPointerCapture(event.pointerId);
+        surfaceCanvas.classList.add("is-dragging");
+        state.surfaceDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+      });
+      surfaceCanvas.addEventListener("pointermove", event => {
+        const drag = state.surfaceDrag;
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        const dx = event.clientX - drag.x;
+        const dy = event.clientY - drag.y;
+        drag.x = event.clientX;
+        drag.y = event.clientY;
+        state.surfaceView.yaw += dx * .008;
+        state.surfaceView.pitch = clamp(state.surfaceView.pitch - dy * .006, .22, 1.16);
+        scheduleSurfaceRender();
+      });
+      const stopSurfaceDrag = event => {
+        if (!state.surfaceDrag || state.surfaceDrag.pointerId !== event.pointerId) return;
+        state.surfaceDrag = null;
+        surfaceCanvas.classList.remove("is-dragging");
+      };
+      surfaceCanvas.addEventListener("pointerup", stopSurfaceDrag);
+      surfaceCanvas.addEventListener("pointercancel", stopSurfaceDrag);
+      surfaceCanvas.addEventListener("lostpointercapture", () => {
+        state.surfaceDrag = null;
+        surfaceCanvas.classList.remove("is-dragging");
+      });
+      surfaceCanvas.addEventListener("wheel", event => {
+        event.preventDefault();
+        state.surfaceView.zoom = clamp(state.surfaceView.zoom * Math.exp(-event.deltaY * .0012), .72, 1.65);
+        scheduleSurfaceRender();
+      }, { passive: false });
+      surfaceCanvas.addEventListener("keydown", event => {
+        const step = event.shiftKey ? .18 : .08;
+        if (event.key === "ArrowLeft") state.surfaceView.yaw -= step;
+        else if (event.key === "ArrowRight") state.surfaceView.yaw += step;
+        else if (event.key === "ArrowUp") state.surfaceView.pitch = clamp(state.surfaceView.pitch + step, .22, 1.16);
+        else if (event.key === "ArrowDown") state.surfaceView.pitch = clamp(state.surfaceView.pitch - step, .22, 1.16);
+        else if (event.key === "+" || event.key === "=") state.surfaceView.zoom = clamp(state.surfaceView.zoom * 1.08, .72, 1.65);
+        else if (event.key === "-" || event.key === "_") state.surfaceView.zoom = clamp(state.surfaceView.zoom / 1.08, .72, 1.65);
+        else if (event.key === "0" || event.key === "Home") resetSurfaceView();
+        else return;
+        event.preventDefault();
+        scheduleSurfaceRender();
+      });
+      surfaceCanvas.addEventListener("dblclick", resetSurfaceView);
+      $("resetSurfaceView").addEventListener("click", resetSurfaceView);
+      parameterIds.forEach(id => $(id).addEventListener(id === "sampleN" ? "change" : "input", scheduleRender));
+      $("nextSeed").addEventListener("click", () => {
+        $("seed").value = clamp((+$("seed").value || 1) + 1, 1, 999999);
+        render();
+      });
+      document.querySelectorAll("[data-preset]").forEach(button => {
+        button.addEventListener("click", () => {
+          const presets = {
+            stable: { meanR: 10, stdR: .75, meanS: 6, stdS: .6, rho: 0 },
+            default: { meanR: 10, stdR: 1.5, meanS: 6, stdS: 1.2, rho: 0 },
+            close: { meanR: 8, stdR: 1.5, meanS: 7, stdS: 1.2, rho: 0 },
+            together: { meanR: 10, stdR: 1.5, meanS: 6, stdS: 1.2, rho: .7 }
+          };
+          setValues(presets[button.dataset.preset]);
+        });
+      });
+      $("advancedViews").addEventListener("toggle", () => {
+        scheduleRender();
+        reportHeight();
+      });
+      addEventListener("resize", () => { scheduleRender(); reportHeight(); }, { passive: true });
+      new ResizeObserver(reportHeight).observe(document.body);
+      render();
+      reportHeight();
+
+      window.__reliabilityLabTest = {
+        normalCDF,
+        theory,
+        wilsonInterval,
+        surfaceView: () => ({ ...state.surfaceView }),
+        defaultPoint: () => theory({ meanR: 10, stdR: 1.5, meanS: 6, stdS: 1.2, rho: 0 })
+      };
+    })();
+  </script>
+</body>
+</html>

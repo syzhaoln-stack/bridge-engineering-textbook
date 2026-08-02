@@ -1,0 +1,229 @@
+.learning-cycle-flow-mount {
+  --lc-ink: #17303a;
+  --lc-muted: #5c6f76;
+  --lc-line: #cbd9dc;
+  --lc-paper: #f7f9f9;
+  --lc-cyan: #1f8fa8;
+  --lc-amber: #dc922d;
+  position: relative;
+  z-index: auto;
+  display: block;
+  width: 100%;
+  margin: 0;
+  color: var(--lc-ink);
+  background: transparent;
+  font-family: "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  text-align: left;
+}
+
+.learning-cycle-flow-mount *,
+.learning-cycle-flow-mount *::before,
+.learning-cycle-flow-mount *::after {
+  box-sizing: border-box;
+}
+
+.learning-cycle-panel {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--lc-line);
+  border-radius: 10px;
+  background: var(--lc-paper);
+  box-shadow: none;
+}
+
+.learning-cycle-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 10px 0 0 10px;
+  background: var(--lc-cyan);
+}
+
+.learning-cycle-panel--result::before {
+  background: var(--lc-amber);
+}
+
+.learning-cycle-datum {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  color: var(--lc-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.learning-cycle-datum span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--lc-cyan);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0;
+}
+
+.learning-cycle-panel--result .learning-cycle-datum span {
+  background: var(--lc-amber);
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel .learning-cycle-question {
+  margin: 0 0 0.55rem !important;
+  color: var(--lc-ink);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel .learning-cycle-task {
+  margin: 0 0 0.75rem !important;
+  color: var(--lc-muted);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel .learning-cycle-task strong {
+  display: inline-block;
+  margin-right: 0.45rem;
+  color: #945b13;
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel .learning-cycle-label {
+  display: block;
+  margin: 0.25rem 0 0.35rem !important;
+  color: var(--lc-ink);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel textarea {
+  display: block;
+  width: 100%;
+  min-height: 3.5rem;
+  resize: vertical;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid #b8c9cd;
+  border-radius: 7px;
+  color: var(--lc-ink);
+  background: #fff;
+  font: inherit;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel textarea:focus {
+  outline: 3px solid rgba(31, 143, 168, 0.18);
+  border-color: var(--lc-cyan);
+}
+
+.learning-cycle-flow-mount .learning-cycle-panel .learning-cycle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 0.65rem !important;
+}
+
+.learning-cycle-start {
+  min-height: 2.55rem;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  border-radius: 7px;
+  color: #fff;
+  background: #176f83;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.learning-cycle-start:hover:not(:disabled) { background: #105d6e; }
+.learning-cycle-start:disabled { opacity: 0.45; cursor: not-allowed; }
+.learning-cycle-start:focus-visible { outline: 3px solid rgba(220, 146, 45, 0.4); outline-offset: 2px; }
+
+.learning-cycle-flow-mount .learning-cycle-progress,
+.learning-cycle-flow-mount .learning-cycle-result-progress {
+  color: var(--lc-muted);
+  font-size: 0.76rem;
+}
+
+.learning-cycle-flow-mount .learning-cycle-result-progress { margin-top: 0.55rem; }
+
+.learning-cycle-flow-mount .learning-cycle-principle {
+  min-height: 5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--lc-line);
+}
+
+.learning-cycle-flow-mount .learning-cycle-gate {
+  color: var(--lc-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.learning-cycle-flow-mount .learning-cycle-reveal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.7rem 1rem;
+}
+
+.learning-cycle-flow-mount .learning-cycle-reveal[hidden] { display: none; }
+
+.learning-cycle-flow-mount .learning-cycle-reveal h3 {
+  margin: 0;
+  color: #8b5718;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+}
+
+.learning-cycle-flow-mount .learning-cycle-reveal p {
+  margin: 0.25rem 0 0;
+  color: var(--lc-ink);
+  font-size: 0.84rem;
+  line-height: 1.62;
+}
+
+.learning-cycle-standalone .learning-cycle-flow-mount {
+  max-width: 980px;
+  margin: 0.75rem auto;
+  padding: 0 0.75rem;
+}
+
+.learning-cycle-standalone body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: auto !important;
+}
+
+.learning-cycle-standalone-stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: max(720px, 100vh);
+  overflow: clip;
+}
+
+.learning-cycle-standalone-stage .learning-cycle-was-fixed {
+  position: absolute !important;
+}
+
+@media (max-width: 620px) {
+  .learning-cycle-panel { padding: 0.78rem 0.8rem 0.85rem; border-radius: 8px; }
+  .learning-cycle-reveal { grid-template-columns: 1fr; }
+  .learning-cycle-flow-mount textarea { min-height: 4.2rem; }
+  .learning-cycle-start { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learning-cycle-flow-mount * { scroll-behavior: auto !important; transition: none !important; }
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>荷载组合：最坏的事会一起发生吗</title>
+  <style>
+    :root{--paper:#f5f8f8;--panel:#fff;--ink:#102a36;--muted:#60747c;--line:#d5e1e3;--cyan:#168da8;--amber:#df962f;--coral:#cb5f4e;--green:#4d9c74;--dead:#697f93}
+    *{box-sizing:border-box}html,body{margin:0;min-width:0;font-family:"Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}body{padding:12px}.shell{max-width:1180px;margin:auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(285px,.75fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 28px rgba(16,42,54,.07)}
+    .question{grid-column:1/-1;padding:15px 18px;border-left:5px solid var(--amber)}.question small{display:block;color:#8c5a16;font-weight:700;margin-bottom:4px}.question h1{font:600 23px/1.35 "STKaiti","KaiTi",serif;margin:0 0 6px}.question p{font-size:12px;color:var(--muted);line-height:1.65;margin:0}.chart-card{padding:14px;min-width:0}.chart-head{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:5px}.chart-head h2{font-size:15px;margin:0 0 3px}.chart-head p{font-size:10px;color:var(--muted);line-height:1.5;margin:0}.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:9px;color:var(--muted);justify-content:flex-end}.sw{display:inline-block;width:12px;height:6px;border-radius:4px;margin-right:4px}.chart-wrap{position:relative;min-height:430px}svg{display:block;width:100%;height:auto;overflow:visible}.desk{padding:15px}.desk h2{font-size:15px;margin:0 0 4px}.desk>p{font-size:11px;line-height:1.55;color:var(--muted);margin:0 0 9px}.modes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}button{border:1px solid #c7d5d8;border-radius:8px;background:#edf3f4;color:var(--ink);padding:8px 7px;min-height:42px;font-size:10px;cursor:pointer}button.active{border-color:var(--cyan);background:#dff1f4}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(22,141,168,.25);outline-offset:2px}.row{padding:9px 10px;margin:7px 0;border:1px solid var(--line);border-radius:9px;background:#fbfcfc}.row label{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#52666e}.row output{color:var(--cyan);font-weight:700}.row input{width:100%;height:38px;accent-color:var(--cyan)}select{width:100%;margin-top:7px;min-height:39px;border:1px solid #c7d5d8;border-radius:7px;padding:6px 8px;background:#fff;color:var(--ink)}details{margin-top:9px;border-top:1px solid var(--line);padding-top:8px}summary{font-size:11px;color:#3c6978;cursor:pointer}.mini{font-size:10px!important;color:var(--muted)!important;line-height:1.6!important}.metrics{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.metric{padding:11px 13px}.metric span{display:block;font-size:9px;color:var(--muted)}.metric b{display:block;margin-top:4px;font-size:16px;color:#8d5a17;font-variant-numeric:tabular-nums}.metric.ok b{color:#267a55}.metric.bad b{color:#ad4437}.reading{grid-column:1/-1;padding:14px 17px;border-top:4px solid var(--cyan)}.reading strong{display:block;color:#8b5715;margin-bottom:5px}.reading p{font-size:12px;line-height:1.72;margin:5px 0;color:#405962}.boundary{font-size:10px!important;color:#66777e!important}
+    @media(max-width:850px){.shell{grid-template-columns:1fr}.question,.chart-card,.desk,.metrics,.reading{grid-column:1}.chart-wrap{min-height:360px}.metrics{grid-template-columns:1fr 1fr}}@media(max-width:520px){body{padding:7px}.question h1{font-size:20px}.chart-head{display:block}.legend{justify-content:flex-start;margin-top:7px}.modes{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric b{font-size:14px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="question card">
+    <small>先猜，再看每一项把结果推高多少</small>
+    <h1>车最多、风最大、温差也最大——这些事真会在同一刻赶到吗？</h1>
+    <p>图里每一根柱子都是同一个控制截面的弯矩效应，单位全是 MN·m。先比较“所有峰值一起算”和“一项主导、其余伴随”，再看它离本例承载上限还剩多少。</p>
+  </section>
+
+  <section class="chart-card card">
+    <div class="chart-head"><div><h2>某控制截面的弯矩账本</h2><p>柱子从上一项的终点接着长；最后一根是合计，不是又加了一次。</p></div><div class="legend"><span><i class="sw" style="background:var(--dead)"></i>永久作用</span><span><i class="sw" style="background:var(--amber)"></i>主导作用</span><span><i class="sw" style="background:#8fc2ce"></i>伴随作用</span><span><i class="sw" style="background:var(--coral)"></i>超过上限</span></div></div>
+    <div class="chart-wrap"><svg id="chart" viewBox="0 0 900 470" role="img" aria-label="荷载效应组合瀑布图"></svg></div>
+  </section>
+
+  <aside class="desk card">
+    <h2>只改三个条件</h2>
+    <p>先换算法，再决定哪一项可变作用主导，最后移动承载上限。不要一上来调所有系数。</p>
+    <div class="modes"><button data-mode="peaks">所有峰值一起算</button><button data-mode="combo" class="active">一项主导，其余伴随</button></div>
+    <div class="row"><label for="lead">本次谁主导</label><select id="lead"><option value="traffic">车辆</option><option value="crowd">人群</option><option value="wind">横风</option><option value="temp">温差</option></select></div>
+    <div class="row"><label>可变作用整体放大 <output id="o-scale"></output></label><input id="scale" type="range" min="60" max="150" step="5" value="100"></div>
+    <div class="row"><label>本例承载上限 R<sub>d</sub> <output id="o-cap"></output></label><input id="cap" type="range" min="260" max="460" step="5" value="360"></div>
+    <details><summary>公式里究竟乘了什么</summary><p class="mini">这里取教学参数 γ<sub>G</sub>=1.20、γ<sub>Q</sub>=1.40。主导可变作用的伴随系数为 1.0；其余作用分别取车辆 0.70、人群 0.70、横风 0.60、温差 0.60。“所有峰值一起算”把所有可变作用的伴随系数都设为 1.0。</p></details>
+  </aside>
+
+  <section class="metrics" id="metrics"></section>
+  <section class="reading card"><strong id="answer"></strong><p id="explain"></p><p class="boundary">模型边界：这是用于理解组合思想的虚构截面与教学参数，只比较同一弯矩效应。图中的分项系数、伴随系数、效应值和承载上限不对应某一本现行规范，也不能用于真实桥梁设计。真实组合还需按采用的标准区分极限状态、作用类别、方向、互斥关系和控制截面。</p></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const P={mode:'combo',lead:'traffic',scale:100,cap:360,gammaG:1.2,gammaQ:1.4};
+const A=[
+  {id:'g1',name:'结构自重',kind:'dead',Ek:105,psi:1},
+  {id:'g2',name:'铺装与附属',kind:'dead',Ek:25,psi:1},
+  {id:'traffic',name:'车辆',kind:'variable',Ek:80,psi:.70},
+  {id:'crowd',name:'人群',kind:'variable',Ek:30,psi:.70},
+  {id:'wind',name:'横风',kind:'variable',Ek:15,psi:.60},
+  {id:'temp',name:'温差',kind:'variable',Ek:22,psi:.60}
+];
+function values(){return A.map(a=>{const gamma=a.kind==='dead'?P.gammaG:P.gammaQ;const psi=a.kind==='dead'||P.mode==='peaks'||a.id===P.lead?1:a.psi;const scale=a.kind==='dead'?1:P.scale/100;return{...a,gamma,psi,value:a.Ek*gamma*psi*scale,role:a.kind==='dead'?'dead':a.id===P.lead?'lead':'companion'}})}
+function fmt(v,n=1){return Number(v).toFixed(n)}
+function render(){const data=values(),cum=[];let total=0;for(const d of data){cum.push({from:total,to:total+d.value,...d});total+=d.value}draw(cum,total);const margin=P.cap-total,util=total/P.cap*100,largest=data.reduce((a,b)=>b.value>a.value?b:a),companions=data.filter(d=>d.role==='companion').reduce((s,d)=>s+d.value,0);$('metrics').innerHTML=metric('组合效应 E<sub>d</sub>',fmt(total)+' MN·m')+metric('本例上限 R<sub>d</sub>',fmt(P.cap,0)+' MN·m')+metric('还剩多少',fmt(margin)+' MN·m',margin>=0?'ok':'bad')+metric('用到上限的',fmt(util,0)+'%',util<=100?'ok':'bad');$('answer').textContent=margin>=0?`这一次没有越过上限，还剩 ${fmt(margin)} MN·m。`:`这一次越过上限 ${fmt(-margin)} MN·m；先找是哪一项把它推过去。`;$('explain').textContent=P.mode==='peaks'?`现在把四项可变作用的峰值都当成同时到达。最大的单项贡献是“${largest.name}”的 ${fmt(largest.value)} MN·m；这是一种容易理解、却可能把桥算成“碉堡”的假设。切回“一项主导”，看看其他作用退到伴随位置后改变多少。`:`本次以“${A.find(a=>a.id===P.lead).name}”为主导；其他可变作用不是消失，而是以伴随值进入，共贡献 ${fmt(companions)} MN·m。组合的本质不是少算，而是把“会不会同来”写进账本。`;$('o-scale').textContent=P.scale+'%';$('o-cap').textContent=P.cap+' MN·m'}
+function metric(label,value,state=''){return`<article class="metric card ${state}"><span>${label}</span><b>${value}</b></article>`}
+function draw(data,total){const svg=$('chart'),W=900,H=470,left=68,right=26,top=36,bottom=92,plotW=W-left-right,plotH=H-top-bottom,max=Math.max(P.cap,total)*1.16,y=v=>top+plotH*(1-v/max),step=plotW/(data.length+1),barW=Math.min(82,step*.62),colors={dead:'#697f93',lead:'#df962f',companion:'#8fc2ce'};let out=`<line x1="${left}" y1="${y(0)}" x2="${W-right}" y2="${y(0)}" stroke="#879aa1"/><line x1="${left}" y1="${y(P.cap)}" x2="${W-right}" y2="${y(P.cap)}" stroke="#cb5f4e" stroke-width="2" stroke-dasharray="8 6"/><text x="${W-right}" y="${y(P.cap)-8}" text-anchor="end" font-size="13" font-weight="700" fill="#a14639">本例承载上限 Rᵈ = ${P.cap} MN·m</text><text x="18" y="22" font-size="12" fill="#61737b">弯矩效应（MN·m）</text>`;data.forEach((d,i)=>{const x=left+step*(i+.7)-barW/2,yy=y(d.to),hh=y(d.from)-yy,color=colors[d.role];out+=`<rect x="${x}" y="${yy}" width="${barW}" height="${Math.max(1,hh)}" rx="5" fill="${color}"/><line x1="${x+barW}" y1="${y(d.to)}" x2="${x+step}" y2="${y(d.to)}" stroke="#9aabad" stroke-dasharray="4 4"/><text x="${x+barW/2}" y="${H-58}" text-anchor="middle" font-size="12" fill="#354e58">${d.name}</text><text x="${x+barW/2}" y="${H-41}" text-anchor="middle" font-size="10" fill="#71838a">${d.gamma.toFixed(2)}×${d.psi.toFixed(2)}×${fmt(d.Ek,0)}</text><text x="${x+barW/2}" y="${yy-7}" text-anchor="middle" font-size="12" font-weight="700" fill="#6f4a17">+${fmt(d.value)}</text>`});const x=left+step*(data.length+.7)-barW/2,yt=y(total),over=total>P.cap;out+=`<rect x="${x}" y="${yt}" width="${barW}" height="${y(0)-yt}" rx="5" fill="${over?'#cb5f4e':'#168da8'}"/><text x="${x+barW/2}" y="${H-58}" text-anchor="middle" font-size="12" font-weight="700" fill="#354e58">组合合计</text><text x="${x+barW/2}" y="${yt-8}" text-anchor="middle" font-size="13" font-weight="700" fill="${over?'#a13f33':'#146f84'}">${fmt(total)} MN·m</text>`;svg.innerHTML=out}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{P.mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));render()}));$('lead').addEventListener('change',e=>{P.lead=e.target.value;render()});for(const id of['scale','cap'])$(id).addEventListener('input',e=>{P[id]=+e.target.value;render()});render();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>空桥重量账本</title>
+<style>
+  :root{--bg:#0f1822;--panel:#162331;--line:#2a3b4d;--ink:#edf4f8;--muted:#9fb1bf;--dead:#7b91a6;--live:#f0ad4e;--coral:#ef7466;--cyan:#6fd3ed}
+  *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 18% 0,#213549 0,#0f1822 48%);color:var(--ink);font-family:"Microsoft YaHei","Segoe UI",sans-serif}
+  main{max-width:960px;margin:auto;padding:22px}.eyebrow{font-size:12px;color:var(--cyan);letter-spacing:.12em}.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-end}.top h1{font-size:23px;margin:5px 0 6px}.top p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.badge{border:1px solid #46596b;border-radius:999px;padding:6px 10px;font-size:12px;color:#c8d4dc;white-space:nowrap}
+  .grid{display:grid;grid-template-columns:minmax(250px,330px) 1fr;gap:16px;margin-top:18px}.card{background:rgba(22,35,49,.94);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 16px 34px rgba(0,0,0,.2)}
+  .control{margin:0 0 14px}.control label{display:flex;justify-content:space-between;font-size:13px;color:#c7d2da}.control output{color:var(--cyan);font-variant-numeric:tabular-nums;font-weight:700}.control input{width:100%;accent-color:var(--cyan);margin-top:6px}.hint{font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+  .guess{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.guess input{width:86px;background:#0d1620;border:1px solid #3c5064;border-radius:7px;color:white;padding:7px}.guess button,.reset{background:#24384a;border:1px solid #465e72;color:white;border-radius:7px;padding:8px 10px;cursor:pointer}.guess button:hover,.reset:hover{background:#2f4960}
+  .result{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.metric{background:#101b26;border:1px solid #293b4e;border-radius:10px;padding:11px}.metric b{display:block;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums}.metric span{font-size:11px;color:var(--muted)}
+  .bar{height:34px;border-radius:8px;overflow:hidden;display:flex;background:#0c141c;border:1px solid #34475a}.bar span{height:100%;min-width:0;transition:width .25s}.dead{background:linear-gradient(90deg,#65798c,#879cb0)}.live{background:linear-gradient(90deg,#d78a32,#f2bc64)}
+  .legend{display:flex;gap:18px;font-size:12px;color:#c7d2da;margin:8px 0 15px;flex-wrap:wrap}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.story{background:#101b26;border-left:3px solid var(--coral);padding:11px 13px;color:#ced9e0;font-size:13px;line-height:1.7}.story strong{color:white}.uncertain{color:#f4c879}.check{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:#c9d4db}.check b{color:var(--cyan)}
+  @media(max-width:720px){main{padding:14px}.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.result{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div><div class="eyebrow">数量级实验 · 03</div><h1>一座空桥，已经背了多少东西</h1><p>把“几千吨的桥、几吨的车”变成可操作的比例。先猜，再看错在哪。</p></div>
+    <div class="badge">课堂数值待核 · 非设计验算</div>
+  </div>
+  <div class="grid">
+    <section class="card" aria-label="参数控制">
+      <div class="control"><label>结构自重 <output id="deadOut"></output></label><input id="dead" type="range" min="100" max="5000" step="50" value="2800"></div>
+      <div class="control"><label>单车质量 <output id="vehicleOut"></output></label><input id="vehicle" type="range" min="2" max="100" step="1" value="8"></div>
+      <div class="control"><label>同时在桥车辆数 <output id="countOut"></output></label><input id="count" type="range" min="1" max="40" step="1" value="1"></div>
+      <div class="control"><label>附属恒载 <output id="extraOut"></output></label><input id="extra" type="range" min="0" max="1000" step="25" value="0"></div>
+      <button class="reset" id="reset">回到课堂数值</button>
+      <div class="hint">这里把质量直接相加，只为比较数量级。真实设计还要区分作用类型、位置、组合、动力效应与结构抗力。</div>
+    </section>
+    <section class="card" aria-live="polite">
+      <div class="guess"><label for="guess">你猜：恒载是交通重量的</label><input id="guess" type="number" min="0" value="20"><span>倍</span><button id="reveal">对一下</button></div>
+      <div class="result">
+        <div class="metric"><span>恒载 ÷ 交通重量</span><b id="ratio">—</b></div>
+        <div class="metric"><span>交通占当前总重量</span><b id="share">—</b></div>
+        <div class="metric"><span>每 100 格中交通约占</span><b id="cells">—</b></div>
+      </div>
+      <div class="bar" aria-label="重量比例条"><span class="dead" id="deadBar"></span><span class="live" id="liveBar"></span></div>
+      <div class="legend"><span><i class="dot" style="background:#7b91a6"></i>结构与附属恒载</span><span><i class="dot" style="background:#f0ad4e"></i>当前交通重量</span></div>
+      <div class="story" id="story">点击“对一下”，再看直觉差了多少。</div>
+      <div class="check">再问一步：如果车辆数增加一倍，交通占比会不会也增加一倍？<br><b id="meta">先动滑块，不急着回答。</b></div>
+    </section>
+  </div>
+</main>
+<script>
+const $=id=>document.getElementById(id); const ids=['dead','vehicle','count','extra']; let revealed=false;
+function fmt(n,d=0){return n.toLocaleString('zh-CN',{maximumFractionDigits:d,minimumFractionDigits:d})}
+function update(){
+  const dead=+$('dead').value, vehicle=+$('vehicle').value, count=+$('count').value, extra=+$('extra').value;
+  $('deadOut').textContent=fmt(dead)+' t'; $('vehicleOut').textContent=fmt(vehicle)+' t'; $('countOut').textContent=count+' 辆'; $('extraOut').textContent=fmt(extra)+' t';
+  const permanent=dead+extra, traffic=vehicle*count, total=permanent+traffic, ratio=permanent/traffic, share=traffic/total*100;
+  $('ratio').textContent=fmt(ratio,ratio<10?1:0)+' 倍'; $('share').textContent=fmt(share,share<1?2:1)+'%'; $('cells').textContent=fmt(share,share<1?2:1)+' 格';
+  $('deadBar').style.width=(100-share)+'%'; $('liveBar').style.width=share+'%';
+  const doubled=2*traffic/(permanent+2*traffic)*100;
+  $('meta').textContent=`车辆翻倍后占比约 ${fmt(doubled,doubled<1?2:1)}%，并不等于原占比简单乘二——分母也变了。`;
+  if(revealed){
+    const guess=Math.max(0,+$('guess').value||0), factor=guess?ratio/guess:Infinity;
+    let verdict=guess===0?'你猜的是 0；这个问题值得先分清“重量”和“能力”。':factor>2?`实际比你的猜测还大约 ${fmt(factor,1)} 倍。`:factor<.5?`你的猜测约为当前结果的 ${fmt(1/factor,1)} 倍。`:'你的数量感已经落在同一个量级。';
+    $('story').innerHTML=`当前恒载约为交通重量的 <strong>${fmt(ratio,ratio<10?1:0)} 倍</strong>，交通只占当前总重量的 <strong>${fmt(share,share<1?2:1)}%</strong>。${verdict}<br><span class="uncertain">注意：这仍不是“桥只能承受多少”的结论，只是一张重量账。</span>`;
+  }
+}
+ids.forEach(id=>$(id).addEventListener('input',update)); $('guess').addEventListener('input',()=>{revealed=false;$('story').textContent='点击“对一下”，再看直觉差了多少。'}); $('reveal').onclick=()=>{revealed=true;update()};
+$('reset').onclick=()=>{$('dead').value=2800;$('vehicle').value=8;$('count').value=1;$('extra').value=0;revealed=false;update()}; update();
+</script>
+<script src="./learning-cycle.js"></script>
+</body>
+</html>

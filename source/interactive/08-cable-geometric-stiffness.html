@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>同一辆车：原来拉得更紧的主缆会怎样</title>
+  <style>
+    :root{--paper:#f5f8f8;--ink:#112b36;--muted:#61737b;--line:#d5e1e3;--cyan:#168da8;--amber:#df962f;--coral:#cf604f;--panel:#fff;--deep:#0d2632}
+    *{box-sizing:border-box}html,body{margin:0;min-width:0;font-family:"Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}body{padding:12px}
+    .shell{max-width:1180px;margin:auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.78fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:0 12px 28px rgba(17,43,54,.08)}
+    .question{grid-column:1/-1;padding:15px 18px;border-left:5px solid var(--amber)}.question small{display:block;color:#8a5a16;font-weight:700;margin-bottom:4px}.question h1{font:600 22px/1.35 "STKaiti","KaiTi",serif;margin:0 0 6px}.question p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+    .scene-card{overflow:hidden}.scene-head{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px;border-radius:3px}.modes{display:flex;gap:6px}.modes button{min-height:38px}
+    #scene{position:relative;height:570px;overflow:hidden;background:#87a5b5}#scene canvas{display:block;width:100%!important;height:100%!important}.label{position:absolute;z-index:4;transform:translate(-50%,-50%);padding:4px 7px;border-radius:5px;background:rgba(7,20,28,.86);border:1px solid rgba(255,255,255,.18);color:#f3f7f8;font-size:10px;white-space:nowrap;pointer-events:none}.scene-note{position:absolute;left:10px;bottom:9px;background:rgba(7,20,28,.78);color:#dce8eb;border-radius:6px;padding:5px 8px;font-size:9px}
+    .desk{padding:15px}.desk h2{font-size:15px;margin:0 0 4px}.desk>p{font-size:11px;color:var(--muted);line-height:1.55;margin:0 0 9px}.row{padding:9px 10px;margin:7px 0;border:1px solid var(--line);border-radius:9px;background:#fbfcfc}.row label{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#52666e}.row output{color:var(--cyan);font-weight:700}.row input{width:100%;height:38px;accent-color:var(--cyan)}details{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}summary{font-size:11px;color:#3c6978;cursor:pointer}
+    button{border:1px solid #c7d5d8;border-radius:8px;background:#edf3f4;color:var(--ink);padding:7px 10px;cursor:pointer}button.active{border-color:var(--cyan);background:#dff1f4}button:focus-visible,input:focus-visible{outline:3px solid rgba(22,141,168,.25);outline-offset:2px}
+    .results{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.result{padding:13px 15px}.result h3{font-size:13px;margin:0 0 8px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.metric{padding:8px;border-radius:8px;background:#eef3f4;border:1px solid var(--line);min-width:0}.metric span{display:block;font-size:9px;color:var(--muted)}.metric b{display:block;margin-top:3px;color:#9a6117;font-size:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.reading{grid-column:1/-1;padding:14px 17px;border-top:4px solid var(--cyan)}.reading strong{color:#8b5715}.reading p{font-size:12px;line-height:1.72;margin:5px 0;color:#405962}.boundary{font-size:10px!important;color:#66777e!important}
+    @media(max-width:880px){.shell{grid-template-columns:1fr}.question,.results,.reading{grid-column:1}.scene-card,.desk{grid-column:1}.results{grid-template-columns:1fr}#scene{height:500px}}@media(max-width:560px){body{padding:7px}.question h1{font-size:19px}#scene{height:420px}.metrics{grid-template-columns:1fr 1fr}.scene-head{align-items:flex-start}.modes{width:100%}.modes button{flex:1}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="question card"><small>先猜，再拖动车辆</small><h1>同一辆车压上去，原来已经拉得更紧的主缆，为什么反而动得更少？</h1><p>两座模型跨度、垂度、材料和车辆完全相同，只改变恒载形成的初张力。别把“索被拉长”和“索形改变”当成两段可以直接相加的竖向位移：这里把它们分别量出来，再看它们怎样耦合。</p></section>
+  <section class="scene-card card">
+    <header class="scene-head"><div class="legend"><span><i class="sw" style="background:#d8e1e3;border-top:1px dashed #60737b"></i>加载前索形</span><span><i class="sw" style="background:#df962f"></i>低初张力模型</span><span><i class="sw" style="background:#29a5bd"></i>高初张力模型</span><span><i class="sw" style="background:#cf604f"></i>同一附加荷载</span></div><div class="modes"><button id="linear" type="button">固定初张力估算</button><button id="nonlinear" class="active" type="button">伸长后重新找形</button></div></header>
+    <div id="scene"><div class="scene-note">可旋转、缩放。实线按计算后的实际几何绘制，不使用位移放大。</div></div>
+  </section>
+  <aside class="desk card"><h2>只改必要的量</h2><p>左、右模型承受同一辆车；右侧恒载与初张力更大。</p>
+    <div class="row"><label>附加集中荷载 <output id="o-live"></output></label><input id="live" type="range" min="200" max="1800" step="50" value="900"></div>
+    <div class="row"><label>车辆位置 x/L <output id="o-x"></output></label><input id="x" type="range" min="15" max="85" step="1" value="50"></div>
+    <div class="row"><label>高／低恒载比 <output id="o-ratio"></output></label><input id="ratio" type="range" min="1.2" max="4" step=".1" value="3"></div>
+    <details><summary>进一步试：几何和材料</summary>
+      <div class="row"><label>初始垂跨比 f/L <output id="o-sag"></output></label><input id="sag" type="range" min="7" max="14" step="1" value="10"></div>
+      <div class="row"><label>轴向刚度 EA <output id="o-ea"></output></label><input id="ea" type="range" min="8" max="40" step="2" value="20"></div>
+    </details>
+  </aside>
+  <section class="results">
+    <article class="result card"><h3>橙色：较低恒载／较低初张力</h3><div class="metrics" id="lowMetrics"></div></article>
+    <article class="result card"><h3>蓝色：较高恒载／较高初张力</h3><div class="metrics" id="highMetrics"></div></article>
+  </section>
+  <section class="reading card"><strong id="answer"></strong><p id="explain"></p><p class="boundary">模型边界：二维柔索、固定塔顶、离散竖向恒载与一组集中附加荷载；为让两个初始状态保持同一垂度，模型分别确定其无应力索长，相当于经过不同的制作与调索，而不是把同一根未调整的索直接换一份恒载。重新找形满足整体自然长度兼容，并计入轴向弹性伸长。未包含加劲梁共同工作、吊索松弛、索鞍滑移、温度、动力和施工阶段。</p></section>
+</main>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const $=id=>document.getElementById(id),P={L:180,N:28,q0:38,live:900,x:50,ratio:3,sag:10,ea:20,mode:'nonlinear'},C={low:0xdf962f,high:0x29a5bd,ghost:0xe8eef0,tower:0x5e6d72,deck:0x667d8d,load:0xcf604f,hanger:0x72d0ff};
+const V=(x,y,z)=>new THREE.Vector3(x,z,-y); // x桥向，y横桥向，z竖向
+const scene=new THREE.Scene(),container=$('scene'),camera=new THREE.PerspectiveCamera(43,1,.1,700),renderer=new THREE.WebGLRenderer({antialias:true}),controls=new OrbitControls(camera,renderer.domElement),world=new THREE.Group(),labels=[];
+scene.background=new THREE.Color(0x87a5b5);scene.fog=new THREE.Fog(0x87a5b5,360,760);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;container.appendChild(renderer.domElement);scene.add(world,new THREE.HemisphereLight(0xeaf5ff,0x40554a,1.45));const sun=new THREE.DirectionalLight(0xffffff,1.25);sun.position.set(110,130,90);scene.add(sun);controls.enableDamping=true;
+function clear(g){while(g.children.length){const c=g.children[0];c.geometry?.dispose();if(Array.isArray(c.material))c.material.forEach(m=>m.dispose());else c.material?.dispose();g.remove(c)}}
+function box(x,y,z,sx,sy,sz,c,op=1){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sz,sy),new THREE.MeshStandardMaterial({color:c,roughness:.62,transparent:op<1,opacity:op}));m.position.copy(V(x,y,z));m.castShadow=m.receiveShadow=true;world.add(m);return m}
+function cyl(a,b,r,c,op=1){const d=b.clone().sub(a),m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),12),new THREE.MeshStandardMaterial({color:c,roughness:.45,transparent:op<1,opacity:op}));m.position.copy(a.clone().add(b).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.clone().normalize());m.castShadow=true;world.add(m);return m}
+function tube(points,r,c,op=1){const m=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),Math.max(64,points.length*3),r,12,false),new THREE.MeshStandardMaterial({color:c,roughness:.42,transparent:op<1,opacity:op}));m.castShadow=true;world.add(m);return m}
+function dashed(points){const g=new THREE.BufferGeometry().setFromPoints(points),m=new THREE.Line(g,new THREE.LineDashedMaterial({color:C.ghost,dashSize:2,gapSize:1.2,transparent:true,opacity:.9}));m.computeLineDistances();world.add(m)}
+function label(text,x,y,z){const e=document.createElement('div');e.className='label';e.textContent=text;container.appendChild(e);labels.push({e,p:V(x,y,z)})}
+function clearLabels(){labels.forEach(x=>x.e.remove());labels.length=0}
+function loads(q0,live,xPct){const dx=P.L/P.N,a=Array(P.N+1).fill(0);for(let i=1;i<P.N;i++)a[i]=q0*dx;const xc=P.L*xPct/100,sig=dx*.85,w=[];let sum=0;for(let i=1;i<P.N;i++){const wi=Math.exp(-.5*((i*dx-xc)/sig)**2);w[i]=wi;sum+=wi}for(let i=1;i<P.N;i++)a[i]+=live*(w[i]||0)/sum;return a}
+function verticals(nodal){const seg=Array(P.N).fill(0),cum=Array(P.N).fill(0);let s=0;for(let j=0;j<P.N;j++){if(j>0)s+=nodal[j];cum[j]=s}const avg=cum.reduce((a,b)=>a+b,0)/P.N;for(let j=0;j<P.N;j++)seg[j]=cum[j]-avg;return seg}
+function profile(v,H){const dx=P.L/P.N,y=[0];for(let j=0;j<P.N;j++)y.push(y[j]-v[j]*dx/H);const end=y[y.length-1];for(let i=0;i<y.length;i++)y[i]-=end*i/P.N;return y}
+function geom(v,H){const dx=P.L/P.N,y=profile(v,H);let length=0;for(let j=0;j<P.N;j++)length+=Math.hypot(dx,y[j+1]-y[j]);return{y,length}}
+function natural(v,H,EA){const dx=P.L/P.N,y=profile(v,H);let s=0,maxT=0,weightedE=0,current=0;for(let j=0;j<P.N;j++){const dz=y[j+1]-y[j],l=Math.hypot(dx,dz),T=Math.hypot(H,v[j]);s+=l/(1+T/EA);current+=l;weightedE+=T/EA*l;maxT=Math.max(maxT,T)}return{snat:s,current,maxT,meanStrain:weightedE/current,y}}
+function initialState(q0,EA){const nodal=loads(q0,0,50),v=verticals(nodal),unit=profile(v,1),f0=P.L/P.sag,H0=Math.max(...unit)/f0,n=natural(v,H0,EA);return{q0,v,H0,f0,...n}}
+function solveH(v,target,EA,H0){let lo=Math.max(1,H0*.08),hi=H0*12;const fn=h=>natural(v,h,EA).snat-target;while(fn(lo)<0)lo*=.5;while(fn(hi)>0)hi*=2;for(let i=0;i<90;i++){const m=(lo+hi)/2;if(fn(m)>0)lo=m;else hi=m}return(lo+hi)/2}
+function solveCase(q0){const EA=P.ea*1e6,ini=initialState(q0,EA),nodal=loads(q0,P.live,P.x),v=verticals(nodal),H=P.mode==='linear'?ini.H0:solveH(v,ini.snat,EA,ini.H0),fin=natural(v,H,EA),near=Math.max(1,Math.min(P.N-1,Math.round(P.N*P.x/100))),delta=fin.y[near]-ini.y[near],extraLength=fin.current-ini.current;return{ini,fin,H,delta,extraLength,near,EA}}
+function metric(label,value){return`<div class="metric"><span>${label}</span><b>${value}</b></div>`}
+function buildOne(y0,q0,color){const r=solveCase(q0),zTop=42,zDeck=8,dx=P.L/P.N;box(P.L/2,y0,zDeck,P.L,8,1.1,C.deck);for(const x of[0,P.L]){box(x,y0-4,22,3,3,43,C.tower);box(x,y0+4,22,3,3,43,C.tower);box(x,y0,43,4,10,2,C.tower)}const p0=r.ini.y.map((d,i)=>V(i*dx,y0,zTop-d)),p1=r.fin.y.map((d,i)=>V(i*dx,y0,zTop-d));dashed(p0);tube(p1,.34,color);for(let i=2;i<P.N;i+=3)cyl(V(i*dx,y0,zDeck+.5),p1[i],.08,C.hanger,.78);const xc=P.L*P.x/100;world.add(new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),V(xc,y0,zTop+12),10,C.load,2.2,1.1));label(`H₀ ${r.ini.H0.toFixed(0)} kN`,P.L*.18,y0,zTop-r.ini.y[Math.round(P.N*.18)]+5);return r}
+function render(){clear(world);clearLabels();const low=buildOne(-20,P.q0,C.low),high=buildOne(20,P.q0*P.ratio,C.high);$('lowMetrics').innerHTML=metric('初始水平分力 H₀',low.ini.H0.toFixed(0)+' kN')+metric('车下新增下挠',(low.delta*1000).toFixed(0)+' mm')+metric('索长增量',(low.extraLength*1000).toFixed(0)+' mm')+metric('加载后最大索力',low.fin.maxT.toFixed(0)+' kN');$('highMetrics').innerHTML=metric('初始水平分力 H₀',high.ini.H0.toFixed(0)+' kN')+metric('车下新增下挠',(high.delta*1000).toFixed(0)+' mm')+metric('索长增量',(high.extraLength*1000).toFixed(0)+' mm')+metric('加载后最大索力',high.fin.maxT.toFixed(0)+' kN');const ratio=Math.abs(low.delta/high.delta);$('answer').textContent=`同一附加荷载下，高初张力模型的车下位移约为低初张力模型的 ${(Math.abs(high.delta/low.delta)*100).toFixed(0)}%。`;$('explain').textContent=P.mode==='linear'?`固定 H₀ 的线性化模型直接用原有水平分力抵抗新增荷载；初张力越大，形状改变越小。当前低／高初张力模型的位移比约为 ${ratio.toFixed(2)}。`:`重新找形模型同时满足竖向平衡和索的自然长度兼容。附加荷载改变索形，也增加索的拉伸与索力；初始恒载较大时，原有几何刚度更高，所以同一辆车带来的增量位移更小。索长增量和竖向下挠是同一次变形的不同量度，不能相加。`;sync();}
+function sync(){$('o-live').textContent=P.live+' kN';$('o-x').textContent=P.x+'%';$('o-ratio').textContent=P.ratio.toFixed(1);$('o-sag').textContent='1/'+P.sag;$('o-ea').textContent=P.ea+'×10⁶ kN'}
+for(const id of['live','x','ratio','sag','ea'])$(id).addEventListener('input',e=>{P[id]=+e.target.value;render()});for(const id of['linear','nonlinear'])$(id).addEventListener('click',()=>{P.mode=id;for(const k of['linear','nonlinear'])$(k).classList.toggle('active',k===id);render()});
+function resize(){const w=Math.max(1,container.clientWidth),h=Math.max(1,container.clientHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}function updateLabels(){const w=container.clientWidth,h=container.clientHeight;for(const o of labels){const p=o.p.clone().project(camera),ok=p.z>-1&&p.z<1&&Math.abs(p.x)<.96&&Math.abs(p.y)<.96;o.e.style.display=ok?'block':'none';if(ok){o.e.style.left=((p.x*.5+.5)*w)+'px';o.e.style.top=((-p.y*.5+.5)*h)+'px'}}}
+new ResizeObserver(resize).observe(container);camera.position.set(235,155,180);controls.target.copy(V(P.L/2,0,20));controls.update();render();resize();(function loop(){requestAnimationFrame(loop);controls.update();updateLabels();renderer.render(scene,camera)})();
+</script>
+</body>
+</html>

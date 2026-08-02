@@ -1,0 +1,97 @@
+project:
+  type: book
+  output-dir: ../docs
+  resources:
+    - interactive/**
+    - interaction-host.js
+    - assets/videos/**
+    - assets/code/**
+    - assets/data-figures/**
+    - assets/gallery/**
+    - assets/print/**
+    - assets/references/**
+
+lang: zh-CN
+
+book:
+  title: "我所理解的桥梁工程"
+  subtitle: "从力学出发，重新理解桥梁"
+  author: "赵诗宇"
+  favicon: assets/bridge-favicon.svg
+  search: true
+  page-navigation: true
+  reader-mode: true
+  chapters:
+    - index.qmd
+    - chapters/00-reading-tools.qmd
+    - part: "第一部分｜把问题问清楚"
+      chapters:
+        - chapters/01-crossing.qmd
+        - chapters/02-scale.qmd
+        - chapters/03-loads.qmd
+        - chapters/04-moving-load.qmd
+    - part: "第二部分｜从力路长出结构体系"
+      chapters:
+        - chapters/05-force-path.qmd
+        - chapters/06-beam.qmd
+        - chapters/07-arch.qmd
+        - chapters/08-suspension.qmd
+        - chapters/09-cable-stayed.qmd
+        - chapters/10-parabola.qmd
+    - part: "第三部分｜让结构进入真实工程"
+      chapters:
+        - chapters/11-system-choice.qmd
+        - chapters/12-supports.qmd
+        - chapters/13-construction.qmd
+        - chapters/14-durability.qmd
+        - chapters/15-failures.qmd
+    - part: "第四部分｜从复杂现象到可信证据"
+      chapters:
+        - chapters/16-wind.qmd
+        - chapters/17-models.qmd
+        - chapters/18-fem-ai.qmd
+    - part: "第五部分｜作出愿意负责的设计"
+      chapters:
+        - chapters/19-beauty.qmd
+        - chapters/20-design-defense.qmd
+    - part: "案例工作台"
+      chapters:
+        - appendices/rc-bending-worked-example.qmd
+        - appendices/spancraft-bridge-game.qmd
+        - appendices/projection-master.qmd
+    - part: "索引与工具"
+      chapters:
+        - gallery.qmd
+        - appendices/concept-index.qmd
+  downloads: [epub]
+  sidebar:
+    style: docked
+    collapse-level: 1
+  page-footer:
+    left: "《我所理解的桥梁工程》"
+    right: "从力学出发，重新理解桥梁"
+
+format:
+  html:
+    theme: cosmo
+    html-math-method: katex
+    css:
+      - styles.css
+      - interactive/learning-cycle.css
+      - interaction-host.css
+    include-after-body:
+      - section-cards-include.html
+      - interaction-host-include.html
+      - video-posters-include.html
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-copy: true
+  epub:
+    toc: true
+    css: epub-cards.css
+    filters:
+      - section-cards-epub.lua
+
+execute:
+  freeze: auto

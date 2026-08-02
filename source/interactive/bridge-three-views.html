@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>一座桥，为什么要看三张图</title>
+  <style>
+    :root{--ink:#dbe8ef;--muted:#91a4af;--paper:#071015;--panel:#0c1820;--line:#223843;--cyan:#4ed7d1;--amber:#ffbe5c;--red:#ff6b68;--blue:#72a7ff}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 15% 0,#152832 0,#071015 45%);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+    button,input{font:inherit}.shell{max-width:1500px;margin:auto;padding:18px}.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;margin-bottom:14px}
+    .eyebrow{color:var(--cyan);letter-spacing:.14em;font-size:12px}.top h1{font-size:clamp(25px,3vw,42px);line-height:1.08;margin:4px 0 8px;font-weight:750}.top p{margin:0;color:var(--muted);max-width:850px}
+    .question{border-left:3px solid var(--amber);background:rgba(255,190,92,.07);padding:10px 14px;max-width:430px}.question strong{display:block;color:var(--amber);font-weight:700}.question span{font-size:13px;color:#cad6dc}
+    .layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px}.controls,.stage,.view,.after{background:rgba(10,23,30,.91);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 55px #0007}
+    .controls{padding:16px;align-self:start;position:sticky;top:10px}.control{margin:0 0 15px}.control label{display:flex;justify-content:space-between;gap:10px;color:#c8d5dc;font-size:13px;margin-bottom:7px}.control output{color:var(--cyan);font-variant-numeric:tabular-nums}
+    input[type=range]{width:100%;accent-color:var(--cyan)}.steps{display:grid;gap:8px;margin:15px 0}.steps button,.dimension-tabs button{border:1px solid #34505e;background:#10232d;color:#c9d8df;border-radius:10px;padding:9px 10px;cursor:pointer;text-align:left}.steps button:hover,.dimension-tabs button:hover{border-color:var(--cyan)}.steps button.active,.dimension-tabs button.active{background:#12363b;border-color:var(--cyan);color:white}
+    .small{font-size:12px;color:var(--muted)}.verdict{border:1px solid #38505a;border-radius:12px;padding:11px;margin-top:12px;background:#071217}.verdict b{display:block;margin-bottom:4px}.verdict.danger{border-color:#8e3b3a;background:#261315}.verdict.safe{border-color:#2b756e;background:#0c2523}
+    .main{display:grid;gap:14px}.stage{padding:12px;min-height:440px;position:relative;overflow:hidden}.stage-head,.view-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}.badge{font-size:11px;letter-spacing:.12em;color:var(--cyan);border:1px solid #2d5960;border-radius:999px;padding:3px 8px}.stage canvas,.view canvas{display:block;width:100%;height:100%;border-radius:10px;background:linear-gradient(#0a161d,#071015)}#space{height:390px;cursor:grab}#space:active{cursor:grabbing}
+    .hint{position:absolute;right:20px;bottom:16px;background:#061017cc;border:1px solid #27404b;border-radius:9px;padding:6px 9px;font-size:12px;color:var(--muted)}
+    .views{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.view{padding:12px;min-height:275px}.view canvas{height:220px}.view.is-hidden{filter:blur(8px);opacity:.18;pointer-events:none;user-select:none}.view.is-focus{border-color:var(--cyan);box-shadow:0 0 0 1px #4ed7d144,0 20px 55px #0007}
+    .after{padding:14px 16px}.after h2{font-size:17px;margin:0 0 8px}.after-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.after-grid div{border-top:1px solid #2a424e;padding-top:8px}.after-grid b{color:var(--cyan);display:block}.term{margin-top:11px;color:#c3d0d7}.term strong{color:var(--amber)}
+    .dimension-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.dimension-tabs button{padding:7px 9px;font-size:12px}.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;color:var(--muted)}.dot{width:9px;height:9px;display:inline-block;border-radius:50%;margin-right:4px}
+    @media(max-width:1000px){.top,.layout{grid-template-columns:1fr}.controls{position:static}.views{grid-template-columns:1fr}.view canvas{height:260px}.after-grid{grid-template-columns:1fr}.question{max-width:none}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="top">
+    <div><div class="eyebrow">空间读图实验 · 同一座悬索桥</div><h1>一张立面，藏住了桥的一半</h1><p>拖动同一组尺寸，空间模型、立面、平面和横向布置检查会一起变化。这里使用桥梁工程常见的总体布置表达，不把它硬说成机械制图里的严格三视图。</p></div>
+    <div class="question"><strong>先别展开另外两张图</strong><span>只看立面，你能判断塔位塔腿和跨中主缆在横向上是否压进车行空间吗？先在心里猜，再展开核对。</span></div>
+  </header>
+  <div class="layout">
+    <aside class="controls">
+      <div class="steps">
+        <button id="elevationOnly" class="active">① 只给我看立面</button>
+        <button id="revealAll">② 展开平面与横断面</button>
+      </div>
+      <div class="control"><label>主跨 <output id="oMain"></output></label><input id="mainSpan" type="range" min="160" max="800" step="20" value="420"></div>
+      <div class="control"><label>边跨（每侧） <output id="oSide"></output></label><input id="sideSpan" type="range" min="60" max="240" step="10" value="130"></div>
+      <div class="control"><label>桥面以上塔高 <output id="oTower"></output></label><input id="towerHeight" type="range" min="45" max="150" step="5" value="90"></div>
+      <div class="control"><label>主缆垂度 <output id="oSag"></output></label><input id="sag" type="range" min="25" max="100" step="1" value="42"></div>
+      <div class="control"><label>桥面总宽 <output id="oWidth"></output></label><input id="deckWidth" type="range" min="18" max="42" step="1" value="30"></div>
+      <div class="control"><label>车行净区宽 <output id="oTraffic"></output></label><input id="trafficWidth" type="range" min="6" max="40" step="1" value="18"></div>
+      <div class="control"><label>两索面间距 <output id="oCable"></output></label><input id="cableGap" type="range" min="12" max="40" step="1" value="25"></div>
+      <div class="control"><label>桥墩斜交角 <output id="oSkew"></output></label><input id="skew" type="range" min="0" max="35" step="5" value="10"></div>
+      <div class="dimension-tabs" aria-label="关联尺寸高亮">
+        <button data-dim="span" class="active">纵向：跨径组合</button><button data-dim="width">横向：桥面宽</button>
+        <button data-dim="tower">竖向：塔高</button><button data-dim="cable">空间：索面间距</button><button data-dim="traffic">横向：车行净区</button>
+      </div>
+      <div id="verdict" class="verdict"><b>证据还藏着</b><span>立面里，两根主缆在投影中重合；现在还不能判断。</span></div>
+      <div class="legend"><span><i class="dot" style="background:#dbe8ef"></i>构造</span><span><i class="dot" style="background:#4ed7d1"></i>当前尺寸</span><span><i class="dot" style="background:#ffbe5c"></i>车行净区</span></div>
+      <p class="small">模型用于读图训练：全部比例以主跨为基准。默认每侧边跨/主跨 = 0.31，塔高/主跨 = 0.214，垂跨比 = 1/10；主缆按抛物线示意。塔腿横向宽度暂取 3 m，车行区到塔腿内缘留 1 m 检查余量。没有计算主缆索力、桥塔稳定或施工线形。</p>
+    </aside>
+    <section class="main">
+      <div class="stage"><div class="stage-head"><strong>可旋转空间模型</strong><span class="badge">拖动旋转 · 滚轮缩放</span></div><canvas id="space"></canvas><span class="hint">颜色高亮会在四张图里对应出现</span></div>
+      <div class="views">
+        <article class="view is-focus" id="elevationCard"><div class="view-head"><strong>立面 / 总体布置</strong><span class="badge">x–z</span></div><canvas id="elevation"></canvas></article>
+        <article class="view is-hidden" id="planCard"><div class="view-head"><strong>平面</strong><span class="badge">x–y</span></div><canvas id="plan"></canvas></article>
+        <article class="view is-hidden" id="sectionCard"><div class="view-head"><strong>横向布置叠合检查</strong><span class="badge">塔位 + 跨中</span></div><canvas id="section"></canvas></article>
+      </div>
+      <section class="after">
+        <h2>三张图各自回答什么</h2>
+        <div class="after-grid"><div><b>立面</b>跨径怎么分、塔多高、主缆垂度多大、桥下净空是否够。</div><div><b>平面</b>路线是否弯或斜交、桥面多宽、桥塔和墩台在平面上怎样摆。</div><div><b>横向布置</b>把塔位的塔腿和跨中的主缆位置叠合到同一横向坐标，初筛它们与车行净区的关系；正式设计仍应分别看对应断面。</div></div>
+        <p class="term"><strong>工程图里的名称：</strong>桥轴方向为纵向 (x)，桥宽方向为横向 (y)，竖向为 (z)。总体布置图给出跨径组合与控制高程，平面图给出路线及平面布置，典型横断面给出桥面与承重构件的横向关系。</p>
+      </section>
+    </section>
+  </div>
+</main>
+<script>
+(() => {
+  const $=id=>document.getElementById(id), ids=['mainSpan','sideSpan','towerHeight','sag','deckWidth','trafficWidth','cableGap','skew'],TOWER_LEG_WIDTH=3,CLEARANCE=1,MIN_MID_CABLE_HEIGHT=6,SIDE_MIN=.20,SIDE_MAX=.40,TOWER_MIN=.15,TOWER_MAX=.25,SAG_MIN=1/12,SAG_MAX=1/8;
+  const canvases=['space','elevation','plan','section'].map($); let dim='span', revealed=false, yaw=-.72, pitch=.38, zoom=1;
+  const val=()=>Object.fromEntries(ids.map(id=>[id,+$(id).value]));
+  const fit=c=>{const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(c.width!==Math.round(r.width*d)||c.height!==Math.round(r.height*d)){c.width=Math.round(r.width*d);c.height=Math.round(r.height*d)}const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return {x,w:r.width,h:r.height}};
+  function line(ctx,a,b,color='#dbe8ef',width=1,dash=[]){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();ctx.restore()}
+  function poly(ctx,p,color='#dbe8ef',width=1,fill=null){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();p.forEach((q,i)=>(i?ctx.lineTo(...q):ctx.moveTo(...q)));if(fill){ctx.fillStyle=fill;ctx.fill()}ctx.stroke();ctx.restore()}
+  function txt(ctx,s,p,color='#91a4af',align='center'){ctx.save();ctx.font='12px system-ui';ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(s,...p);ctx.restore()}
+  const hi=name=>dim===name?'#4ed7d1':'#dbe8ef';
+  function cableZ(x,p){const m=p.mainSpan/2;if(Math.abs(x)<=m)return p.towerHeight-p.sag*(1-(x/m)**2);const edge=m+p.sideSpan;return p.towerHeight*(edge-Math.abs(x))/p.sideSpan}
+  function layoutCheck(p){const innerFace=p.cableGap/2-TOWER_LEG_WIDTH/2,outerFace=p.cableGap/2+TOWER_LEG_WIDTH/2,required=p.trafficWidth/2+CLEARANCE,midCableZ=cableZ(0,p),sideRatio=p.sideSpan/p.mainSpan,towerRatio=p.towerHeight/p.mainSpan,sagRatio=p.sag/p.mainSpan;return{innerFace,outerFace,required,midCableZ,sideRatio,towerRatio,sagRatio,trafficClear:innerFace>=required-1e-9,deckFit:outerFace<=p.deckWidth/2+1e-9,verticalOK:midCableZ>=MIN_MID_CABLE_HEIGHT-1e-9,sideOK:sideRatio>=SIDE_MIN&&sideRatio<=SIDE_MAX,towerOK:towerRatio>=TOWER_MIN&&towerRatio<=TOWER_MAX,sagOK:sagRatio>=SAG_MIN&&sagRatio<=SAG_MAX,safe:innerFace>=required-1e-9&&outerFace<=p.deckWidth/2+1e-9&&midCableZ>=MIN_MID_CABLE_HEIGHT-1e-9&&sideRatio>=SIDE_MIN&&sideRatio<=SIDE_MAX&&towerRatio>=TOWER_MIN&&towerRatio<=TOWER_MAX&&sagRatio>=SAG_MIN&&sagRatio<=SAG_MAX}}
+  function applyConstraints(){const deck=+$('deckWidth').value,traffic=$('trafficWidth'),sag=$('sag'),tower=+$('towerHeight').value;traffic.max=Math.max(traffic.min,deck-2);if(+traffic.value>+traffic.max)traffic.value=traffic.max;sag.max=Math.max(+sag.min,tower-MIN_MID_CABLE_HEIGHT);if(+sag.value>+sag.max)sag.value=sag.max}
+  function drawElevation(c,p){const {x:ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);const total=p.mainSpan+2*p.sideSpan,s=.82*w/total,ox=w/2,base=h*.78,sy=Math.min(s*1.55,h*.62/(p.towerHeight+10));const P=(xx,z)=>[ox+xx*s,base-z*sy], edge=total/2, tower=p.mainSpan/2;
+    line(ctx,P(-edge,0),P(edge,0),'#dbe8ef',5);[-tower,tower].forEach(xx=>{line(ctx,P(xx,0),P(xx,p.towerHeight),hi('tower'),5);line(ctx,P(xx-5,p.towerHeight*.45),P(xx+5,p.towerHeight*.45),'#8297a2',2);line(ctx,P(xx-5,p.towerHeight),P(xx+5,p.towerHeight),hi('tower'),2)});[-edge,edge].forEach(xx=>line(ctx,P(xx,0),P(xx,5),'#d8a85b',6));
+    [-1,1].forEach(side=>{let pts=[];for(let i=0;i<=90;i++){let xx=-edge+total*i/90;pts.push(P(xx,cableZ(xx,p)))}poly(ctx,pts,'#72a7ff',2);for(let xx=-edge+20;xx<edge;xx+=28)if(Math.abs(Math.abs(xx)-tower)>14)line(ctx,P(xx,0),P(xx,cableZ(xx,p)),'#4e778a',1)});
+    const y=base+32;line(ctx,[ox-edge*s,y],[ox+tower*s,y],hi('span'),1);line(ctx,[ox+tower*s,y],[ox+edge*s,y],hi('span'),1);txt(ctx,`${p.sideSpan} m`,[ox-(tower+p.sideSpan/2)*s,y+17],hi('span'));txt(ctx,`${p.mainSpan} m`,[ox,y+17],hi('span'));txt(ctx,`${p.sideSpan} m`,[ox+(tower+p.sideSpan/2)*s,y+17],hi('span'));
+    if(dim==='tower'){line(ctx,P(tower+14,0),P(tower+14,p.towerHeight),hi('tower'),2);txt(ctx,`${p.towerHeight} m`,P(tower+18,p.towerHeight/2),hi('tower'),'left')}
+    txt(ctx,'立面里两索面、前后塔腿投影重合；端部金色块为锚碇/端支承示意',[w/2,20],'#ffbe5c');
+  }
+  function drawPlan(c,p){const {x:ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);const total=p.mainSpan+2*p.sideSpan,s=.82*w/total,sy=Math.min(5.2,h*.62/p.deckWidth),ox=w/2,oy=h/2;const P=(xx,y)=>[ox+xx*s,oy-y*sy],edge=total/2,tower=p.mainSpan/2;
+    poly(ctx,[P(-edge,-p.deckWidth/2),P(edge,-p.deckWidth/2),P(edge,p.deckWidth/2),P(-edge,p.deckWidth/2),P(-edge,-p.deckWidth/2)],'#dbe8ef',2,'#17303a88');
+    [-p.cableGap/2,p.cableGap/2].forEach(y=>line(ctx,P(-edge,y),P(edge,y),hi('cable'),2));[-tower,tower].forEach(xx=>{let d=Math.tan(p.skew*Math.PI/180)*p.cableGap/2;line(ctx,P(xx-d,-p.cableGap/2),P(xx+d,p.cableGap/2),'#72a7ff',5)});
+    const road=[P(-edge,-p.trafficWidth/2),P(edge,-p.trafficWidth/2),P(edge,p.trafficWidth/2),P(-edge,p.trafficWidth/2),P(-edge,-p.trafficWidth/2)];poly(ctx,road,hi('traffic'),1,'#ffbe5c18');[-p.trafficWidth/2,p.trafficWidth/2].forEach(y=>line(ctx,P(-edge,y),P(edge,y),'#ffbe5c',1,[7,7]));txt(ctx,'车行净区',[ox,oy+3],'#ffbe5c');
+    [-tower,tower].forEach(xx=>[-p.cableGap/2,p.cableGap/2].forEach(y=>{const dx=Math.tan(p.skew*Math.PI/180)*y,pt=P(xx+dx,y);ctx.fillStyle='#72a7ff99';ctx.beginPath();ctx.arc(pt[0],pt[1],Math.max(3,TOWER_LEG_WIDTH*sy/2),0,Math.PI*2);ctx.fill()}));
+    if(dim==='width'){line(ctx,P(edge+18,-p.deckWidth/2),P(edge+18,p.deckWidth/2),hi('width'),2);txt(ctx,`${p.deckWidth} m`,[ox+(edge+22)*s,oy],hi('width'),'left')}
+    if(dim==='span'){line(ctx,[ox-edge*s,oy+p.deckWidth*sy/2+28],[ox+edge*s,oy+p.deckWidth*sy/2+28],hi('span'),2);txt(ctx,`${total} m 总长`,[ox,oy+p.deckWidth*sy/2+45],hi('span'))}
+    txt(ctx,`桥墩斜交 ${p.skew}°`,[18,22],'#91a4af','left');
+  }
+  function drawSection(c,p){const {x:ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);const midZ=cableZ(0,p),s=Math.min((w-55)/(p.deckWidth+9),(h-55)/(Math.max(midZ,16)+10),6.5),ox=w/2,base=h*.68,P=(y,z)=>[ox+y*s,base-z*s];
+    poly(ctx,[P(-p.deckWidth/2,0),P(p.deckWidth/2,0),P(p.deckWidth/2,-2.2),P(-p.deckWidth/2,-2.2),P(-p.deckWidth/2,0)],'#dbe8ef',2,'#17303acc');
+    const road=[P(-p.trafficWidth/2,0),P(p.trafficWidth/2,0),P(p.trafficWidth/2,1.2),P(-p.trafficWidth/2,1.2),P(-p.trafficWidth/2,0)];poly(ctx,road,hi('traffic'),1,'#ffbe5c22');[-p.trafficWidth/2,p.trafficWidth/2].forEach(y=>line(ctx,P(y,-.1),P(y,1.2),'#ffbe5c',2));
+    [-p.cableGap/2,p.cableGap/2].forEach(y=>{const a=P(y-TOWER_LEG_WIDTH/2,0),b=P(y+TOWER_LEG_WIDTH/2,Math.min(14,midZ));ctx.fillStyle='#72a7ff33';ctx.fillRect(a[0],b[1],b[0]-a[0],a[1]-b[1]);line(ctx,P(y,0),P(y,midZ),'#4b7487',1);ctx.fillStyle=hi('cable');ctx.beginPath();ctx.arc(...P(y,midZ),4,0,Math.PI*2);ctx.fill()});
+    line(ctx,P(-p.deckWidth/2,-8),P(p.deckWidth/2,-8),hi('width'),2);txt(ctx,`${p.deckWidth} m`,P(0,-10),hi('width'));
+    const dimZ=Math.min(midZ+4,18);line(ctx,P(-p.cableGap/2,dimZ),P(p.cableGap/2,dimZ),hi('cable'),2);txt(ctx,`索面 ${p.cableGap} m`,P(0,dimZ+2),hi('cable'));
+    txt(ctx,`← 车行净区 ${p.trafficWidth} m →`,P(0,3.5),'#ffbe5c');txt(ctx,`跨中主缆高 ${midZ.toFixed(1)} m`,[ox,Math.max(14,P(0,midZ)[1]-9)],'#91a4af');txt(ctx,'半透明：塔位塔腿；圆点：跨中主缆',P(0,-5),'#91a4af');
+  }
+  function drawSpace(c,p){const {x:ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);const total=p.mainSpan+2*p.sideSpan,scale=Math.min(w/(total*1.25),h/(p.towerHeight*2.1))*zoom,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),O=[w/2,h*.69];
+    const P=(xx,y,z)=>{let X=xx*cy-y*sy,Y=xx*sy+y*cy;return[O[0]+X*scale,O[1]+(Y*sp-z*cp)*scale]};const edge=total/2,t=p.mainSpan/2;
+    const deck=[[-edge,-p.deckWidth/2,0],[edge,-p.deckWidth/2,0],[edge,p.deckWidth/2,0],[-edge,p.deckWidth/2,0],[-edge,-p.deckWidth/2,0]].map(q=>P(...q));poly(ctx,deck,'#dbe8ef',2,'#17303aaa');const road=[[-edge,-p.trafficWidth/2,.25],[edge,-p.trafficWidth/2,.25],[edge,p.trafficWidth/2,.25],[-edge,p.trafficWidth/2,.25],[-edge,-p.trafficWidth/2,.25]].map(q=>P(...q));poly(ctx,road,hi('traffic'),1,'#ffbe5c1a');
+    [-p.deckWidth/2,p.deckWidth/2].forEach(y=>line(ctx,P(-edge,y,-2),P(edge,y,-2),'#94a8b3',3));
+    [-t,t].forEach(xx=>{const k=Math.tan(p.skew*Math.PI/180);[-p.cableGap/2,p.cableGap/2].forEach(y=>line(ctx,P(xx+k*y,y,0),P(xx+k*y,y,p.towerHeight),hi('tower'),4));line(ctx,P(xx-k*p.cableGap/2,-p.cableGap/2,p.towerHeight*.58),P(xx+k*p.cableGap/2,p.cableGap/2,p.towerHeight*.58),hi('tower'),4);line(ctx,P(xx-k*p.cableGap/2,-p.cableGap/2,p.towerHeight),P(xx+k*p.cableGap/2,p.cableGap/2,p.towerHeight),hi('tower'),4)});
+    [-p.cableGap/2,p.cableGap/2].forEach(y=>{let pts=[];for(let i=0;i<=100;i++){let xx=-edge+total*i/100;pts.push(P(xx,y,cableZ(xx,p)))}poly(ctx,pts,'#72a7ff',2);for(let xx=-edge+25;xx<edge;xx+=32)if(Math.abs(Math.abs(xx)-t)>14)line(ctx,P(xx,y,0),P(xx,y,cableZ(xx,p)),'#4b7487',1);[-edge,edge].forEach(ex=>line(ctx,P(ex,y,0),P(ex,y,5),'#d8a85b',5))});
+    if(dim==='width')line(ctx,P(0,-p.deckWidth/2,6),P(0,p.deckWidth/2,6),hi('width'),4);if(dim==='cable')line(ctx,P(0,-p.cableGap/2,p.towerHeight*.25),P(0,p.cableGap/2,p.towerHeight*.25),hi('cable'),4);if(dim==='span')line(ctx,P(-t,0,-7),P(t,0,-7),hi('span'),4);if(dim==='tower')line(ctx,P(t,p.cableGap/2+4,0),P(t,p.cableGap/2+4,p.towerHeight),hi('tower'),4);
+  }
+  function update(){applyConstraints();const p=val(),check=layoutCheck(p);$('oMain').textContent=p.mainSpan+' m';$('oSide').textContent=p.sideSpan+' m';$('oTower').textContent=p.towerHeight+' m';$('oSag').textContent=p.sag+' m';$('oWidth').textContent=p.deckWidth+' m';$('oTraffic').textContent=p.trafficWidth+' m';$('oCable').textContent=p.cableGap+' m';$('oSkew').textContent=p.skew+'°';drawSpace($('space'),p);drawElevation($('elevation'),p);drawPlan($('plan'),p);drawSection($('section'),p);if(revealed){const v=$('verdict'),issues=[];if(!check.trafficClear)issues.push(`塔腿内缘仅到桥轴 ${check.innerFace.toFixed(1)} m，小于车行半宽加余量 ${check.required.toFixed(1)} m`);if(!check.deckFit)issues.push(`塔腿外缘到桥轴 ${check.outerFace.toFixed(1)} m，超出半桥宽 ${(p.deckWidth/2).toFixed(1)} m`);if(!check.verticalOK)issues.push(`跨中主缆仅高出桥面 ${check.midCableZ.toFixed(1)} m`);if(!check.sideOK)issues.push(`边跨/主跨 = ${check.sideRatio.toFixed(2)}，超出悬索桥教学常规 0.20–0.40`);if(!check.towerOK)issues.push(`塔高/主跨 = ${check.towerRatio.toFixed(3)}，超出 0.15–0.25`);if(!check.sagOK)issues.push(`垂跨比 = 1/${(1/check.sagRatio).toFixed(1)}，超出 1/8–1/12`);v.className='verdict '+(check.safe?'safe':'danger');v.innerHTML=`<b>${check.safe?'横向初筛通过':'横向或比例体检提示风险'}</b><span>${check.safe?`塔腿内缘与车行净区之间留有 ${(check.innerFace-p.trafficWidth/2).toFixed(1)} m；跨中主缆高 ${check.midCableZ.toFixed(1)} m。`:issues.join('；')+'。'} 比例体检：边/主=${check.sideRatio.toFixed(2)}，塔/主=${check.towerRatio.toFixed(3)}，垂跨=1/${(1/check.sagRatio).toFixed(1)}；判断来自平面、横向和主跨比例，不来自立面。</span>`}}
+  ids.forEach(id=>$(id).addEventListener('input',update));document.querySelectorAll('[data-dim]').forEach(b=>b.onclick=()=>{dim=b.dataset.dim;document.querySelectorAll('[data-dim]').forEach(x=>x.classList.toggle('active',x===b));update()});
+  $('elevationOnly').onclick=()=>{revealed=false;$('planCard').classList.add('is-hidden');$('sectionCard').classList.add('is-hidden');$('elevationCard').classList.add('is-focus');$('elevationOnly').classList.add('active');$('revealAll').classList.remove('active');$('verdict').className='verdict';$('verdict').innerHTML='<b>证据还藏着</b><span>立面里，两根主缆在投影中重合；现在还不能判断。</span>'};
+  $('revealAll').onclick=()=>{revealed=true;$('planCard').classList.remove('is-hidden');$('sectionCard').classList.remove('is-hidden');$('elevationCard').classList.remove('is-focus');$('elevationOnly').classList.remove('active');$('revealAll').classList.add('active');update()};
+  let drag=false,last=[0,0];$('space').addEventListener('pointerdown',e=>{drag=true;last=[e.clientX,e.clientY];$('space').setPointerCapture(e.pointerId)});$('space').addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-last[0])*.008;pitch=Math.max(-.05,Math.min(1.1,pitch+(e.clientY-last[1])*.006));last=[e.clientX,e.clientY];update()});$('space').addEventListener('pointerup',()=>drag=false);$('space').addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.65,Math.min(1.7,zoom*(e.deltaY>0?.92:1.08)));update()},{passive:false});
+  function selfTest(){const base={mainSpan:420,sideSpan:130,towerHeight:90,sag:42,deckWidth:30,trafficWidth:18,cableGap:25,skew:0};console.assert(layoutCheck(base).safe,'default layout safe');console.assert(!layoutCheck({...base,cableGap:12}).trafficClear,'narrow cable gap intrudes traffic');console.assert(!layoutCheck({...base,cableGap:40}).deckFit,'tower legs outside deck');console.assert(Math.abs(cableZ(0,base)-48)<1e-12&&Math.abs(cableZ(base.mainSpan/2,base)-90)<1e-12&&Math.abs(cableZ(base.mainSpan/2+base.sideSpan,base))<1e-12,'cable key elevations')}
+  window.bridgeThreeViews={cableZ,layoutCheck,constants:{TOWER_LEG_WIDTH,CLEARANCE,MIN_MID_CABLE_HEIGHT}};selfTest();addEventListener('resize',update);update();
+})();
+</script>
+</body>
+</html>

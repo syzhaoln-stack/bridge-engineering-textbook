@@ -1,0 +1,78 @@
+# 概念索引
+
+忘记术语很正常。重要的是能从一个词回到它回答的问题、图和工程情形。
+
+## 概率、荷载与可靠度
+
+| 概念 | 它回答的朴素问题 | 最短表达 | 回到书中 |
+|---|---|---|---|
+| 概率密度 | 一批数集中在哪里、散得多开？ | 曲线下面积为 1 | [读桥之前](../chapters/00-reading-tools.qmd#概率密度不是发生概率) |
+| 均值 | 这批数大致站在哪里？ | $\mu=E[X]$ | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 标准差 | 同样的平均值，谁更不稳定？ | $\sigma=\sqrt{E[(X-\mu)^2]}$ | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 保证率 | 材料标准值以下允许留多少比例？ | $P(X\ge x_k)=0.95$ | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 标准值 | 用哪个有保证的代表值描述材料或作用？ | 分位值，不一定是均值 | [读桥之前](../chapters/00-reading-tools.qmd#保证率与可靠度名字很近问题不同) |
+| 设计值 | 真正进入设计表达式的代表值是什么？ | $f_d=f_k/\gamma_M$（示意） | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 抗力 $R$ | 结构在某种失效模式下能提供多少能力？ | 与极限状态相伴 | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 荷载效应 $S$ | 外部作用在所关注位置造成多大需求？ | 力、弯矩、应力、位移等 | [第3章](../chapters/03-loads.qmd#空桥其实不空) |
+| 极限状态 | 哪条边界把可接受与不可接受分开？ | $g(R,S)=0$ | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 失效概率 | 同一次事件落到边界错误一侧的概率多大？ | $P_f=P[g<0]$ | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 可靠指标 | 把安全余量按波动大小量成多少个标准差？ | $\beta=\mu_g/\sigma_g$（正态线性情形） | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 联合分布 | 两个会波动的量在同一次事件中怎样配对？ | $f_{R,S}(r,s)$ | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 相关性 | 一个量变大时，另一个是否倾向一起变化？ | $-1\le\rho\le1$ | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 蒙特卡洛模拟 | 重复抽取许多可能情形，能看见什么？ | $\hat P_f=n_f/n$ | [可靠度实验](../interactive/03-resistance-load-reliability-lab.html) |
+| 失效边界上的高密度区 | 分界线上哪一带更容易被样本碰到？ | 边界与概率密度共同决定；严格设计点还需先定义坐标变换与优化问题 | [第3章动画](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 荷载组合 | 哪些作用可能同时出现，怎样取代表值？ | 不是各自最大值相加 | [第3章](../chapters/03-loads.qmd#空桥其实不空) |
+
+## 力学、模型与桥梁体系
+
+| 概念 | 它回答的朴素问题 | 最短表达 | 回到书中 |
+|---|---|---|---|
+| 平衡 | 外力和反力能否对上账？ | $\sum F=0,\ \sum M=0$ | [第3章](../chapters/03-loads.qmd#先查重力对不对) |
+| 传力路径 | 车轮力最终从哪条路走到地基？ | 荷载—构件—支座—基础 | [第5章](../chapters/05-force-path.qmd) |
+| 弯矩 | 哪一段有把构件掰弯的趋势？ | $M$ | [第6章](../chapters/06-beam.qmd) |
+| 剪力 | 哪一段有沿截面错动的趋势？ | $V$ | [第6章](../chapters/06-beam.qmd) |
+| 轴力 | 构件沿自身方向被拉还是被压？ | $N$ | [第7章](../chapters/07-arch.qmd) |
+| 刚度 | 结构有多不愿意变形？ | $F=Ku$ | [第17章](../chapters/17-models.qmd) |
+| 强度 | 材料或构件能否承受需求而不破坏？ | $S\le R$ | [第3章](../chapters/03-loads.qmd#可靠不是越大越好) |
+| 稳定 | 结构会不会在强度尚够时突然换一种形态？ | 屈曲与分岔 | [第15章](../chapters/15-failures.qmd) |
+| 变形协调 | 连在一起的构件能不能各走各的？ | 连接处位移相容 | [第12章](../chapters/12-supports.qmd) |
+| 影响线 | 车移动时，某个固定结果怎样变化？ | $E=P\,y(x)$ | [第4章](../chapters/04-moving-load.qmd) |
+| 横向分布 | 同一排车轮怎样分给不同主梁？ | 与桥面系和横向刚度有关 | [第4章](../chapters/04-moving-load.qmd) |
+| 线性叠加 | 两个工况能否分别算完再相加？ | $K(u_1+u_2)=F_1+F_2$ | [第17章](../chapters/17-models.qmd) |
+| 几何非线性 | 变形是否已经明显改变受力？ | $K(u)u=F$ | [第7章](../chapters/07-arch.qmd) |
+| 材料非线性 | 材料刚度是否随应力、开裂或屈服改变？ | 本构关系不再线性 | [第14章](../chapters/14-durability.qmd) |
+| 边界条件 | 模型在哪里能动、哪里不能动？ | 约束决定解 | [第12章](../chapters/12-supports.qmd) |
+| 板、梁格与实体 | 我们用什么尺度代表真实桥面与构件？ | 模型选择取决于问题 | [第17章](../chapters/17-models.qmd) |
+| 有限元 | 如何把连续结构拆成可计算的小块？ | 离散—组装—求解—校核 | [第18章](../chapters/18-fem-ai.qmd) |
+| 参数分析 | 哪个变量真正在推动结果变化？ | 一次改变一个条件或系统采样 | [第18章](../chapters/18-fem-ai.qmd) |
+| 模型误差 | 算法算得很准，为什么工程判断仍可能错？ | 被删掉的机制没有进入模型 | [第17章](../chapters/17-models.qmd) |
+| 冗余 | 一条传力路径受损后，还有没有别的路？ | 不等于无限加材料 | [第11章](../chapters/11-system-choice.qmd) |
+
+## 动态图：从概率入口到桥梁力学
+
+- [试块为什么要压很多个](../chapters/00-reading-tools.qmd#概率密度不是发生概率)：试块点、概率密度与 95% 保证率。
+- [试块的数怎样走进设计](../chapters/03-loads.qmd#试块值还不能直接拿去算桥)：样本、标准值与设计值不是同一个数。
+- [从两条曲线到联合分布](../chapters/00-reading-tools.qmd#保证率与可靠度名字很近问题不同)：边缘分布、同次配对、失效边界与联合曲面。
+- [车在动，谁在看](../chapters/00-reading-tools.qmd#影响线车在动观察位置不动)：右支座反力与跨中弯矩的两条影响线。
+- [相似放大为什么会吃亏](../chapters/02-scale.qmd)：自重需求与截面能力的增长速度。
+- [一股力怎样走到地基](../chapters/05-force-path.qmd)：先追力，再说构件名称。
+- [梁高为何比加宽更灵](../chapters/06-beam.qmd)：惯性矩里的三次方。
+- [拱轴线为何要靠近压力线](../chapters/07-arch.qmd)：轴压与附加弯矩。
+- [索放低一点，拉力会怎样](../chapters/08-suspension.qmd)：垂度与水平分力。
+- [偏载为什么会把弯矩送进塔](../chapters/09-cable-stayed.qmd)：两侧索力不平衡。
+- [温度变化时，支座在替谁让路](../chapters/12-supports.qmd)：自由伸长与完全约束。
+- [两边悬臂为何要一段段配平](../chapters/13-construction.qmd)：未平衡弯矩。
+- [风速翻倍，平均风力为何约四倍](../chapters/16-wind.qmd)：平方关系的前提。
+- [什么时候同样的推力会越推越大](../chapters/16-wind.qmd)：频率比、阻尼与共振入口。
+- [网格画细，答案就可信吗](../chapters/18-fem-ai.qmd)：有限元离散、收敛与基准。
+
+## 可复算数据图
+
+六张图都提供 CSV 数据和同一份 Python 绘图源码。读者可以先改数据，再判断结论是否仍成立。
+
+- [尺度与自重](../chapters/02-scale.qmd)
+- [梁高、刚度与挠度](../chapters/06-beam.qmd)
+- [索垂度与水平分力](../chapters/08-suspension.qmd)
+- [风速平方关系](../chapters/16-wind.qmd)
+- [频率比、阻尼与动力放大](../chapters/16-wind.qmd)
+- [简支梁网格收敛](../chapters/18-fem-ai.qmd)

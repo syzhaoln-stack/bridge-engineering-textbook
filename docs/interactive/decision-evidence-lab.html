@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>桥梁判断与证据实验台</title>
+  <style>
+    :root{
+      color-scheme:dark;
+      --ink:#eef4f3;--muted:#a5b5bb;--faint:#71858e;
+      --bg:#081219;--panel:#10212b;--panel-2:#142a36;--line:#304955;
+      --cyan:#69d5ea;--cyan-soft:#153e4a;--amber:#f1bd68;--amber-soft:#4a3720;
+      --red:#f08a78;--red-soft:#492a29;--green:#82d9a4;--green-soft:#1c4434;
+      --shadow:0 18px 48px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    html{background:var(--bg);scroll-behavior:smooth}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 8% -10%,rgba(34,91,116,.46),transparent 38rem),
+        linear-gradient(160deg,#0a171f 0,#081219 60%,#0a151b 100%);
+    }
+    button,input,select,textarea{font:inherit}
+    button,select,textarea{color:var(--ink)}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+      outline:3px solid rgba(105,213,234,.35);outline-offset:2px
+    }
+    main{width:min(1180px,100%);margin:0 auto;padding:18px 18px 36px}
+    .hero{
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;
+      border-bottom:1px solid var(--line);padding:4px 0 16px
+    }
+    .eyebrow{font-size:11px;letter-spacing:.18em;color:var(--cyan);font-weight:700}
+    h1{font:700 clamp(25px,4vw,38px)/1.2 "STKaiti","KaiTi",serif;margin:6px 0 8px}
+    .lead{max-width:820px;color:#bac7cb;font-size:14px;line-height:1.75}
+    .chapter-badge{
+      border:1px solid var(--line);background:rgba(14,33,43,.75);
+      padding:8px 11px;color:#c6d2d5;font-size:12px;white-space:nowrap
+    }
+    .mode-nav{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
+    .mode-nav a{
+      color:var(--muted);text-decoration:none;border:1px solid var(--line);
+      padding:7px 11px;border-radius:999px;font-size:12px;background:rgba(10,25,33,.7)
+    }
+    .mode-nav a:hover{border-color:var(--cyan);color:var(--ink)}
+    .mode-nav a.current{background:var(--cyan-soft);border-color:#4e9caf;color:#eafdff}
+    .cycle{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-bottom:14px;
+      border:1px solid var(--line);background:var(--line)
+    }
+    .cycle-step{background:#0d1c25;padding:10px 12px;color:var(--faint);font-size:12px}
+    .cycle-step b{
+      display:inline-grid;place-items:center;width:23px;height:23px;border:1px solid #49606b;
+      border-radius:50%;margin-right:7px;font-size:11px
+    }
+    .cycle-step.active{color:var(--ink);background:#132b36}
+    .cycle-step.active b{border-color:var(--cyan);color:var(--cyan)}
+    .cycle-step.done{color:#c9e9d5;background:#12291f}
+    .cycle-step.done b{border-color:var(--green);color:var(--green)}
+    .stage{
+      border:1px solid var(--line);background:rgba(15,33,43,.94);
+      box-shadow:var(--shadow);margin-top:12px
+    }
+    .stage-head{
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+      padding:15px 17px;border-bottom:1px solid var(--line)
+    }
+    .stage-kicker{font-size:10px;letter-spacing:.16em;color:var(--cyan);font-weight:700}
+    .stage h2{font:700 21px/1.35 "STKaiti","KaiTi",serif;margin:4px 0 2px}
+    .stage-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+    .stage-body{padding:17px}
+    .stage.locked .stage-body{filter:saturate(.55)}
+    .lock-note{
+      display:none;padding:18px;border:1px dashed #49606a;background:#0b1921;
+      color:#b8c5c9;text-align:center;line-height:1.7
+    }
+    .stage.locked .lock-note{display:block}
+    .stage.locked .evidence-content{display:none}
+    .form-grid{display:grid;grid-template-columns:minmax(220px,.75fr) minmax(280px,1.25fr);gap:12px}
+    label.field{display:block;font-size:12px;color:#c8d3d6}
+    label.field span{display:block;margin-bottom:6px}
+    select,textarea{
+      width:100%;border:1px solid #46616d;background:#0b1a23;padding:10px 11px;border-radius:3px
+    }
+    textarea{min-height:84px;line-height:1.65;resize:vertical}
+    select:disabled,textarea:disabled{opacity:.65}
+    .primary,.ghost,.tiny,.stance,.lens-button,.quick-button{
+      border:1px solid #46616d;background:#183240;color:var(--ink);border-radius:3px;
+      transition:border-color .16s,background .16s,transform .16s
+    }
+    .primary:hover,.ghost:hover,.tiny:hover,.stance:hover,.lens-button:hover,.quick-button:hover{
+      border-color:var(--cyan)
+    }
+    .primary:active,.ghost:active,.tiny:active,.stance:active,.lens-button:active,.quick-button:active{
+      transform:translateY(1px)
+    }
+    .primary{padding:10px 15px;background:#1d5363;border-color:#3b8497;font-weight:700}
+    .ghost{padding:8px 12px;background:#112630}
+    .tiny{padding:7px 9px;font-size:11px;background:#102631}
+    .form-actions{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .error{color:#ffc0b4;font-size:12px;min-height:18px;margin:0}
+    .saved-note{color:var(--green);font-size:12px}
+    .progress-wrap{min-width:180px;text-align:right}
+    .progress-label{font-size:11px;color:#c4d0d3;margin-bottom:5px}
+    .progress-track{height:6px;background:#09161d;border:1px solid #314751;overflow:hidden}
+    .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .25s}
+    .evidence-grid{display:grid;grid-template-columns:245px minmax(0,1fr);gap:14px}
+    .lens-list{display:grid;gap:8px;align-content:start}
+    .lens-button{
+      width:100%;text-align:left;padding:11px;background:#0d1d26;display:grid;
+      grid-template-columns:30px 1fr auto;gap:8px;align-items:center
+    }
+    .lens-button .num{
+      display:grid;place-items:center;width:28px;height:28px;border:1px solid #455d68;
+      border-radius:50%;color:var(--cyan);font-size:11px
+    }
+    .lens-button strong{font-size:13px}
+    .lens-button small{display:block;color:var(--faint);font-size:10px;margin-top:3px}
+    .lens-button .mark{color:var(--green);font-size:11px}
+    .lens-button.current{border-color:var(--cyan);background:#153744}
+    .lens-button.rated{border-left:3px solid var(--green)}
+    .evidence-desk{min-width:0;border:1px solid #334b56;background:#0b1921;padding:14px}
+    .empty-desk{
+      min-height:360px;display:grid;place-items:center;text-align:center;color:var(--muted);
+      border:1px dashed #3e5661;padding:24px;line-height:1.8
+    }
+    .evidence-title{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:10px}
+    .evidence-title h3{font:700 19px/1.35 "STKaiti","KaiTi",serif;margin:0}
+    .evidence-title p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+    .source-tag{font-size:10px;color:var(--amber);border:1px solid #6c5735;padding:5px 7px;white-space:nowrap}
+    .visual{
+      width:100%;overflow:hidden;border:1px solid #2f4651;background:#07141b;
+      min-height:250px;display:grid;place-items:center
+    }
+    .visual svg{display:block;width:100%;height:auto;max-height:390px}
+    .fact-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0}
+    .fact{
+      background:#10232d;border:1px solid #2f4651;padding:9px;min-height:68px;
+      font-size:11px;color:var(--muted);line-height:1.5
+    }
+    .fact b{display:block;color:var(--ink);font-size:13px;margin-bottom:3px}
+    .ask{margin-top:11px;border-top:1px solid #2e444e;padding-top:11px}
+    .ask > p{font-size:12px;color:#d6dfe1;margin:0 0 8px;line-height:1.6}
+    .stance-row{display:flex;gap:7px;flex-wrap:wrap}
+    .stance{padding:8px 10px;background:#102630;font-size:11px}
+    .stance.selected{border-color:var(--cyan);background:#1a4654;box-shadow:inset 0 0 0 1px rgba(105,213,234,.18)}
+    .stance[data-value="conflict"].selected,.stance[data-value="refute"].selected{border-color:var(--red);background:var(--red-soft)}
+    .stance[data-value="support"].selected,.stance[data-value="a"].selected{border-color:var(--green);background:var(--green-soft)}
+    .stance[data-value="b"].selected{border-color:var(--amber);background:var(--amber-soft)}
+    .micro-note{font-size:11px;color:var(--faint);line-height:1.55;margin-top:8px}
+    .two-up{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .specimen{border:1px solid #334b56;background:#091820}
+    .specimen h4{margin:0;padding:9px 10px;border-bottom:1px solid #334b56;font-size:12px}
+    .specimen h4 span{float:right;color:var(--cyan);font-weight:400}
+    .durability-controls{
+      display:grid;grid-template-columns:minmax(200px,1fr) minmax(260px,1.5fr);gap:12px;
+      margin-bottom:12px;border:1px solid #334b56;background:#0c1d26;padding:11px
+    }
+    .range-row label{display:flex;justify-content:space-between;font-size:12px;color:#c8d3d6}
+    input[type=range]{width:100%;accent-color:var(--cyan);margin:10px 0 3px}
+    .quick-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+    .quick-button{padding:7px 10px;background:#102630;font-size:11px}
+    .quick-button.visited{border-color:var(--green);color:#d8f6e4}
+    .timeline{position:relative;height:58px;margin:8px 3px 2px;border-top:2px solid #536975;top:17px}
+    .tick{position:absolute;top:-6px;transform:translateX(-50%);text-align:center;color:var(--muted);font-size:9px}
+    .tick i{display:block;width:10px;height:10px;background:var(--amber);border:2px solid #111f27;border-radius:50%;margin:0 auto 4px}
+    .tick.current i{background:var(--cyan);box-shadow:0 0 0 4px rgba(105,213,234,.16)}
+    .observation{
+      border-left:3px solid var(--amber);background:#1c211f;padding:10px 12px;
+      font-size:12px;line-height:1.7;color:#d5d9d5;margin-top:10px
+    }
+    .hypotheses{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .hypothesis{border:1px solid #354d58;background:#0c1d26;padding:10px}
+    .hypothesis b{color:var(--cyan);font-size:12px}
+    .hypothesis p{font-size:11px;color:var(--muted);line-height:1.55;margin:5px 0 0}
+    .failure-grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:12px}
+    .evidence-card{
+      width:100%;text-align:left;border:1px solid #38505b;background:#0d2029;color:var(--ink);
+      padding:10px;margin-bottom:7px
+    }
+    .evidence-card:hover{border-color:var(--cyan)}
+    .evidence-card.current{border-color:var(--cyan);background:#143844}
+    .evidence-card.complete{border-left:3px solid var(--green)}
+    .evidence-card b{display:block;font-size:12px}
+    .evidence-card small{color:var(--muted);line-height:1.45}
+    .evidence-card .card-state{float:right;color:var(--green);font-size:10px}
+    .matrix{display:grid;gap:7px;margin-top:10px}
+    .matrix-row{
+      display:grid;grid-template-columns:minmax(150px,1fr) auto;gap:8px;align-items:center;
+      border:1px solid #304954;background:#0e2029;padding:8px
+    }
+    .matrix-row strong{font-size:11px;color:#d7e0e2}
+    .matrix-row .stance-row{justify-content:flex-end}
+    .reference{
+      margin-top:10px;border:1px solid #4a5c4c;background:#12261c;padding:10px;
+      font-size:11px;line-height:1.65;color:#c9d9cf
+    }
+    .reference ul{margin:5px 0 0;padding-left:18px}
+    .compare-visual{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .scheme{border:1px solid #354d58;background:#091820;min-width:0}
+    .scheme > svg{display:block;width:100%;height:auto}
+    .scheme-head{padding:9px 10px;border-bottom:1px solid #354d58}
+    .scheme-head b{display:block;font-size:13px}
+    .scheme-head small{color:var(--muted)}
+    .scheme-copy{padding:9px 10px;font-size:11px;line-height:1.6;color:var(--muted)}
+    .scheme-copy b{color:var(--ink)}
+    .sequence{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px}
+    .sequence div{border:1px solid #354d58;background:#10232d;padding:8px 6px;min-height:76px;font-size:10px;line-height:1.45}
+    .sequence b{display:block;color:var(--amber);font-size:11px;margin-bottom:4px}
+    .revision-locked{
+      border:1px dashed #465e69;background:#0b1921;padding:16px;color:var(--muted);
+      text-align:center;font-size:12px;line-height:1.7
+    }
+    .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .insight-card{border:1px solid #35505b;background:#0b1b23;padding:14px}
+    .insight-card h3{font:700 18px/1.4 "STKaiti","KaiTi",serif;margin:0 0 7px}
+    .insight-card p{font-size:12px;color:#c2ced1;line-height:1.75;margin:0}
+    .insight-card.term-card{border-left:3px solid var(--cyan)}
+    .insight-card.term-card h3{color:var(--cyan)}
+    .transfer{margin-top:10px;color:var(--amber)!important}
+    .page-actions{display:flex;justify-content:flex-end;margin-top:12px}
+    .visually-hidden{
+      position:absolute!important;width:1px!important;height:1px!important;padding:0!important;
+      margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;
+      white-space:nowrap!important;border:0!important
+    }
+    @media(max-width:820px){
+      main{padding:12px 10px 28px}.hero{grid-template-columns:1fr}.chapter-badge{justify-self:start}
+      .stage-head{display:block}.progress-wrap{text-align:left;margin-top:10px}.progress-track{max-width:260px}
+      .form-grid,.evidence-grid,.failure-grid,.durability-controls{grid-template-columns:1fr}
+      .lens-list{grid-template-columns:repeat(2,1fr)}.empty-desk{min-height:230px}
+      .matrix-row{grid-template-columns:1fr}.matrix-row .stance-row{justify-content:flex-start}
+    }
+    @media(max-width:560px){
+      .cycle-step{padding:9px 6px;font-size:10px}.cycle-step b{display:block;margin:0 0 5px}
+      .stage-head,.stage-body{padding:13px}.mode-nav{display:grid;grid-template-columns:1fr 1fr}
+      .mode-nav a{text-align:center}.lens-list{grid-template-columns:1fr}
+      .fact-strip,.hypotheses,.two-up,.compare-visual,.insight-grid{grid-template-columns:1fr}
+      .source-tag{white-space:normal}.evidence-title{display:block}.source-tag{display:inline-block;margin-top:7px}
+      .stance-row{display:grid;grid-template-columns:1fr 1fr}.stance{min-height:42px}
+      .quick-button{min-height:42px}
+      .matrix-row .stance-row{display:grid;grid-template-columns:1fr}.sequence{grid-template-columns:1fr 1fr}
+      .visual{min-height:200px}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">DECISION · EVIDENCE · REVISION</div>
+        <h1 id="title"></h1>
+        <div class="lead" id="lead"></div>
+      </div>
+      <div class="chapter-badge" id="badge"></div>
+    </header>
+
+    <nav class="mode-nav" aria-label="切换实验">
+      <a href="?mode=choice" data-mode="choice">桥位读图</a>
+      <a href="?mode=durability" data-mode="durability">裂缝与时间</a>
+      <a href="?mode=failure" data-mode="failure">事故证据</a>
+      <a href="?mode=defense" data-mode="defense">方案辩护</a>
+    </nav>
+
+    <div class="cycle" aria-label="学习步骤">
+      <div class="cycle-step" id="cycle1"><b>1</b>先留下判断</div>
+      <div class="cycle-step" id="cycle2"><b>2</b>动手取得证据</div>
+      <div class="cycle-step" id="cycle3"><b>3</b>用证据改判</div>
+    </div>
+
+    <section class="stage" id="predictionStage">
+      <div class="stage-head">
+        <div>
+          <div class="stage-kicker">QUESTION → PREDICTION</div>
+          <h2 id="question"></h2>
+          <p id="questionNote"></p>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div id="predictionHost"></div>
+      </div>
+    </section>
+
+    <section class="stage locked" id="evidenceStage">
+      <div class="stage-head">
+        <div>
+          <div class="stage-kicker">OPERATION → EVIDENCE</div>
+          <h2 id="evidenceHeading">把图翻开，让证据进来</h2>
+          <p id="evidenceNote"></p>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label" id="progressLabel">证据 0 / 0</div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="lock-note">先写下你的初判。没有初判，就看不见证据究竟改动了什么。</div>
+        <div class="evidence-content" id="evidenceHost"></div>
+      </div>
+    </section>
+
+    <section class="stage" id="revisionStage">
+      <div class="stage-head">
+        <div>
+          <div class="stage-kicker">EVIDENCE → REVISED JUDGMENT</div>
+          <h2>现在再回答一次</h2>
+          <p>不要求一定改变答案；要说清楚哪些证据让你维持、修正，或暂时不下结论。</p>
+        </div>
+      </div>
+      <div class="stage-body" id="revisionHost"></div>
+    </section>
+
+    <section class="stage" id="insightStage" hidden>
+      <div class="stage-head">
+        <div>
+          <div class="stage-kicker">INSIGHT → TERM → TRANSFER</div>
+          <h2>这条证据对应什么</h2>
+        </div>
+      </div>
+      <div class="stage-body insight-grid">
+        <article class="insight-card"><h3>这轮操作留下的认识</h3><div id="insightCopy"></div></article>
+        <article class="insight-card term-card"><h3>工程上怎样称呼它</h3><div id="termCopy"></div></article>
+      </div>
+    </section>
+
+    <div class="page-actions"><button class="ghost" id="resetButton" type="button">清空本实验记录</button></div>
+    <p class="visually-hidden" id="live" aria-live="polite"></p>
+  </main>
+
+  <script>
+  (function(){
+    "use strict";
+
+    var allowedModes=["choice","durability","failure","defense"];
+    var requested=new URLSearchParams(location.search).get("mode")||"choice";
+    var mode=allowedModes.indexOf(requested)>-1?requested:"choice";
+    var $=function(id){return document.getElementById(id);};
+    var storageKey="bridge-decision-evidence-v2-"+mode;
+
+    var META={
+      choice:{
+        title:"这座河谷，哪一种桥值得留下来继续谈？",
+        lead:"先押一个候选，再依次读平面、净空、地质和施工条件。这里不替你选桥型；它只让每一次保留和放弃都有证据。",
+        badge:"第 11 章 · 体系选择",
+        question:"中央通航带不能落墩、两岸地基一软一硬、上方又有限高。你先从哪一种体系查起？",
+        note:"这不是考试。先写下此刻最直观的答案和理由，后面才看得见自己的判断有没有被证据推动。",
+        evidenceNote:"四张图各回答一件事。读图后，标出它对你初选方案是支持、冲突，还是仍需补证。",
+        target:3
+      },
+      durability:{
+        title:"两条同样宽的裂缝，会不会走向同一个结果？",
+        lead:"两块板的裂缝都是 0.20 mm，保护层也同为 45 mm；一个在干燥遮蔽处，一个处在浪溅区。把时间和检查间隔拉开来看。",
+        badge:"第 14 章 · 耐久性",
+        question:"服役 12 年后，哪一块板更应优先近距离检查？",
+        note:"先别用“裂缝宽就危险”一句话带过。选一个答案，并写下你此刻最看重的原因。",
+        evidenceNote:"依次观察 3、9、15 年，再比较每 2 年和每 8 年检查一次。前缘位置是教学示意，不是寿命预测。",
+        target:5
+      },
+      failure:{
+        title:"事故留下五份材料，你准备怎样改写第一判断？",
+        lead:"这是一个虚构但按真实调查逻辑编成的桥梁事故案卷。三个解释同时在场；每份证据都要分别判断支持、反驳，还是暂时不能说明。",
+        badge:"第 15 章 · 失败与证据",
+        question:"桥面在中等风速下出现扭转振动，随后一处连接失效。你现在更偏向哪个解释？",
+        note:"初判可以很粗，但别把“风很大”或“构件坏了”直接当成完整因果链。",
+        evidenceNote:"打开证据卡，为三个假设分别做判断。完整处理三张卡即可改判，其余两张可以继续追查。",
+        target:3
+      },
+      defense:{
+        title:"两种方案都能跨过去，你凭什么留下其中一个？",
+        lead:"同一座 180 m 主跨，低塔斜拉与系杆拱都满足通航和限高。先写清楚什么情况会让你放弃当前偏好，再看受力、施工和养护。",
+        badge:"第 20 章 · 设计辩护",
+        question:"如果今天必须选一个方案进入下一轮深化，你先留 A 还是 B？什么证据会让你放弃它？",
+        note:"“退出条件”要先写。否则人很容易一边看证据，一边悄悄移动自己的标准。",
+        evidenceNote:"三个镜头分别比较永久受力、最脆弱的施工阶段和长期养护入口。每看完一个，记录它把你推向哪边。",
+        target:3
+      }
+    };
+
+    var choiceLenses=[
+      {id:"plan",title:"平面：河里哪里不能落墩",short:"通航带与桥位走廊",source:"桥位总平面"},
+      {id:"profile",title:"立面：下面要让船，上面不能太高",short:"净空与结构高度",source:"控制标高"},
+      {id:"geology",title:"地质：两岸不是同一种地基",short:"软土与浅岩",source:"两孔钻探"},
+      {id:"access",title:"施工：场地只在一岸宽裕",short:"运输、拼装与保通航",source:"施工踏勘"}
+    ];
+
+    var hypotheses=[
+      {id:"h1",name:"H1 完好结构的纯风致失稳",copy:"结构本来完好，事件风本身越过气动稳定边界。"},
+      {id:"h2",name:"H2 连接先有疲劳或腐蚀",copy:"旧损伤先削弱连接，风振只是把它推过最后一步。"},
+      {id:"h3",name:"H3 支座异常造成受力重分布",copy:"局部约束失常，让原本对称的体系出现扭转偏置。"}
+    ];
+
+    var failureEvidence=[
+      {
+        id:"video",title:"E1 监控视频与加速度记录",short:"40 秒内扭转振幅持续放大",
+        detail:"桥面扭转振幅约由 0.06 m 增至 0.42 m；同一时段 10 分钟平均风速约 18 m/s，波动约 ±1.2 m/s。扭转响应领先竖向响应约四分之一周期。",
+        source:"桥面相机 03 + 监测站 A",
+        readings:{
+          h1:"支持存在气动参与，但单凭“振幅增长”还不能证明完好结构发生纯颤振。",
+          h2:"不能排除。已有损伤会改变刚度、阻尼和触发门槛。",
+          h3:"不能排除。异常约束也可能先制造扭转偏置。"
+        }
+      },
+      {
+        id:"fracture",title:"E2 C7 连接断口",short:"旧痕迹与最后撕裂同时存在",
+        detail:"断口约 65% 区域颜色较深，可见多道疲劳扩展痕迹；其余约 35% 为较亮的新鲜撕裂区。取样附近排水孔有长期渗水痕迹。",
+        source:"残骸近摄 + 金相记录",
+        readings:{
+          h1:"反驳“完好结构只因一次风事件突然破坏”这一完整说法，但不排除风参与最后阶段。",
+          h2:"直接支持连接在事故前已经经历疲劳或腐蚀劣化。",
+          h3:"这份断口本身不能说明支座是否卡滞。"
+        }
+      },
+      {
+        id:"bearing",title:"E3 两侧支座位移",short:"同温差下，一侧几乎不动",
+        detail:"气温变化 18°C 时，东侧活动支座纵向位移约 19 mm；西侧同类支座不足 2 mm。西侧锚固区混凝土可见反复擦碰痕迹。",
+        source:"位移计 B2/B3 + 现场照片",
+        readings:{
+          h1:"削弱“结构边界条件完全正常”的前提，但不直接否定气动参与。",
+          h2:"这份位移记录不能判断连接旧损伤从何而来。",
+          h3:"明显支持一侧约束异常以及由此产生的受力重分布。"
+        }
+      },
+      {
+        id:"tunnel",title:"E4 完好节段风洞复核",short:"到 32 m/s 仍为正阻尼",
+        detail:"按原设计外形制作的完好节段模型，在复核范围内至 32 m/s 仍保持正气动阻尼；事件平均风速约 18 m/s。试验没有模拟支座卡滞和连接刚度退化。",
+        source:"复核试验报告 WT-02",
+        readings:{
+          h1:"反驳“完好原型在 18 m/s 仅凭纯颤振失稳”，但试验边界之外的损伤状态仍未覆盖。",
+          h2:"不能直接证明旧损伤，却提示必须检查完好模型未包含的退化状态。",
+          h3:"不能直接证明支座异常，却提示边界条件变化可能是关键漏项。"
+        }
+      },
+      {
+        id:"inspection",title:"E5 过去三次检查的盲区",short:"关键连接没有近距离影像",
+        detail:"过去三次常规检查均因检修车无法贴近 C7，只留下远景照片；最近一次手触和无损检查在 5 年前。记录中没有足够信息确认裂纹何时出现。",
+        source:"2019—2024 检查档案",
+        readings:{
+          h1:"不能据此判断风致机制是否成立。",
+          h2:"不能把“没记录到裂纹”当成“当时没有裂纹”；它保留了旧损伤假设。",
+          h3:"不能据此判断支座状态，但说明检查资料存在系统性空白。"
+        }
+      }
+    ];
+
+    var defenseLenses=[
+      {id:"force",title:"永久受力",short:"力从桥面怎样回到地基"},
+      {id:"construction",title:"施工阶段",short:"合龙以前，谁最脆弱"},
+      {id:"maintenance",title:"养护入口",short:"以后要检查和更换什么"}
+    ];
+
+    function defaultState(){
+      return {
+        predicted:false,predictionChoice:"",predictionReason:"",exitCondition:"",
+        active:null,seen:[],ratings:{},references:{},
+        year:3,interval:2,durabilitySeen:[],
+        revisionChoice:"",revisionReason:"",nextEvidence:"",exitTriggered:"",
+        revised:false
+      };
+    }
+
+    function loadState(){
+      var base=defaultState();
+      try{
+        var saved=JSON.parse(localStorage.getItem(storageKey)||"{}");
+        Object.keys(base).forEach(function(key){
+          if(Object.prototype.hasOwnProperty.call(saved,key)){base[key]=saved[key];}
+        });
+      }catch(e){}
+      if(!Array.isArray(base.seen)){base.seen=[];}
+      if(!Array.isArray(base.durabilitySeen)){base.durabilitySeen=[];}
+      if(!base.ratings||typeof base.ratings!=="object"){base.ratings={};}
+      if(!base.references||typeof base.references!=="object"){base.references={};}
+      return base;
+    }
+
+    var state=loadState();
+    var meta=META[mode];
+
+    function save(){
+      try{localStorage.setItem(storageKey,JSON.stringify(state));}catch(e){}
+    }
+
+    function announce(text){
+      $("live").textContent="";
+      window.setTimeout(function(){$("live").textContent=text;},20);
+    }
+
+    function addUnique(list,value){
+      if(list.indexOf(value)===-1){list.push(value);}
+    }
+
+    function optionMarkup(items,current,placeholder){
+      var html="<option value=''>"+placeholder+"</option>";
+      items.forEach(function(item){
+        html+="<option value='"+item[0]+"'"+(current===item[0]?" selected":"")+">"+item[1]+"</option>";
+      });
+      return html;
+    }
+
+    function setupHeader(){
+      $("title").textContent=meta.title;
+      $("lead").textContent=meta.lead;
+      $("badge").textContent=meta.badge;
+      $("question").textContent=meta.question;
+      $("questionNote").textContent=meta.note;
+      $("evidenceNote").textContent=meta.evidenceNote;
+      document.querySelectorAll(".mode-nav a").forEach(function(link){
+        link.classList.toggle("current",link.getAttribute("data-mode")===mode);
+      });
+    }
+
+    function predictionOptions(){
+      if(mode==="choice"){
+        return [["beam","梁桥"],["arch","拱桥"],["cable","斜拉桥"],["suspension","悬索桥"]];
+      }
+      if(mode==="durability"){
+        return [["dry","干燥遮蔽处先查"],["splash","浪溅区先查"],["same","两块一样急"],["unknown","现在还不能判断"]];
+      }
+      if(mode==="failure"){
+        return [["h1","H1 完好结构的纯风致失稳"],["h2","H2 连接先有疲劳或腐蚀"],["h3","H3 支座异常造成受力重分布"],["unknown","证据不足，暂不选"]];
+      }
+      return [["a","A 低塔斜拉方案"],["b","B 系杆拱方案"],["unknown","暂不偏向任何一边"]];
+    }
+
+    function renderPrediction(){
+      var disabled=state.predicted?" disabled":"";
+      var extra="";
+      if(mode==="defense"){
+        extra="<label class='field'><span>先写退出条件：看到什么情况，你会放弃当前偏好？</span><textarea id='exitInput'"+disabled+" placeholder='例如：若施工阶段必须长期封航，或关键构件无法安全更换，我就放弃它。'></textarea></label>";
+      }
+      var html="<div class='form-grid'>"+
+        "<label class='field'><span>"+(mode==="defense"?"此刻准备留下哪一个":"你的第一判断")+"</span>"+
+        "<select id='predictionChoice'"+disabled+">"+optionMarkup(predictionOptions(),state.predictionChoice,"先选一个")+"</select></label>"+
+        "<label class='field'><span>把理由写成一句完整的话</span>"+
+        "<textarea id='predictionReason'"+disabled+" placeholder='我现在这样判断，是因为……'></textarea></label>"+
+        extra+"</div><div class='form-actions'>";
+      if(state.predicted){
+        html+="<span class='saved-note'>初判已保存，下面的证据不会覆盖它。</span><button class='ghost' id='editPrediction' type='button'>修改初判</button>";
+      }else{
+        html+="<button class='primary' id='commitPrediction' type='button'>封存初判，开始查证</button>";
+      }
+      html+="<p class='error' id='predictionError' role='alert'></p></div>";
+      $("predictionHost").innerHTML=html;
+      $("predictionReason").value=state.predictionReason||"";
+      if(mode==="defense"){$("exitInput").value=state.exitCondition||"";}
+
+      if(!state.predicted){
+        $("predictionChoice").addEventListener("change",function(){state.predictionChoice=this.value;save();});
+        $("predictionReason").addEventListener("input",function(){state.predictionReason=this.value;save();});
+        if(mode==="defense"){
+          $("exitInput").addEventListener("input",function(){state.exitCondition=this.value;save();});
+        }
+        $("commitPrediction").addEventListener("click",commitPrediction);
+      }else{
+        $("editPrediction").addEventListener("click",function(){
+          state.predicted=false;state.revised=false;save();renderAll();
+          $("predictionChoice").focus();
+        });
+      }
+    }
+
+    function commitPrediction(){
+      state.predictionChoice=$("predictionChoice").value;
+      state.predictionReason=$("predictionReason").value.trim();
+      if(mode==="defense"){state.exitCondition=$("exitInput").value.trim();}
+      var error="";
+      if(!state.predictionChoice){error="先选一个初步答案；“暂不选”也是有效答案。";}
+      else if(state.predictionReason.length<4){error="再多写几个字：你现在主要凭什么这样判断？";}
+      else if(mode==="defense"&&state.exitCondition.length<6){error="先写清楚退出条件。它必须能被后面的证据触发。";}
+      if(error){$("predictionError").textContent=error;return;}
+      state.predicted=true;save();renderAll();announce("初判已保存，现在可以开始查证。");
+      $("evidenceStage").scrollIntoView({behavior:"smooth",block:"start"});
+    }
+
+    function progress(){
+      if(mode==="choice"){
+        return {done:Object.keys(state.ratings).filter(function(k){return choiceLenses.some(function(x){return x.id===k;});}).length,target:meta.target};
+      }
+      if(mode==="durability"){
+        return {done:state.durabilitySeen.filter(function(k){return ["age3","age9","age15","int2","int8"].indexOf(k)>-1;}).length,target:meta.target};
+      }
+      if(mode==="failure"){
+        var complete=failureEvidence.filter(function(e){
+          var r=state.ratings[e.id]||{};
+          return hypotheses.every(function(h){return !!r[h.id];});
+        }).length;
+        return {done:complete,target:meta.target};
+      }
+      return {done:defenseLenses.filter(function(x){return !!state.ratings[x.id];}).length,target:meta.target};
+    }
+
+    function canRevise(){
+      var p=progress();
+      return state.predicted&&p.done>=p.target;
+    }
+
+    function updateCycle(){
+      var p=progress();
+      $("cycle1").className="cycle-step "+(state.predicted?"done":"active");
+      $("cycle2").className="cycle-step "+(!state.predicted?"":(state.revised?"done":(p.done>=p.target?"done":"active")));
+      $("cycle3").className="cycle-step "+(state.revised?"done":(canRevise()?"active":""));
+      $("evidenceStage").classList.toggle("locked",!state.predicted);
+      $("progressLabel").textContent="有效证据 "+p.done+" / "+p.target;
+      $("progressBar").style.width=Math.min(100,p.done/p.target*100)+"%";
+    }
+
+    function stanceButtons(context,current){
+      var items=context==="choice"?
+        [["support","✓ 支持初选"],["conflict","× 与初选冲突"],["unclear","？还需补证"]]:
+        [["a","← 更偏向 A"],["b","→ 更偏向 B"],["neutral","○ 暂不改变"]];
+      return "<div class='stance-row'>"+items.map(function(item){
+        return "<button class='stance"+(current===item[0]?" selected":"")+"' type='button' data-value='"+item[0]+"'>"+item[1]+"</button>";
+      }).join("")+"</div>";
+    }
+
+    function bridgeCandidateName(){
+      var names={beam:"梁桥",arch:"拱桥",cable:"斜拉桥",suspension:"悬索桥"};
+      return names[state.predictionChoice]||"初选体系";
+    }
+
+    function choiceSvg(id){
+      var common="<defs><pattern id='dots' width='12' height='12' patternUnits='userSpaceOnUse'><circle cx='2' cy='2' r='1' fill='#34515e'/></pattern><marker id='arrow' viewBox='0 0 10 10' refX='8' refY='5' markerWidth='6' markerHeight='6' orient='auto'><path d='M0 0 L10 5 L0 10 z' fill='#f1bd68'/></marker></defs>";
+      if(id==="plan"){
+        return "<svg viewBox='0 0 760 310' role='img' aria-label='桥位平面图，显示河道、通航禁墩区和路线'>"+common+
+          "<rect width='760' height='310' fill='#0a1820'/><path d='M0 80 C180 30 275 120 410 78 C545 36 625 94 760 52 L760 260 C595 302 500 225 370 270 C220 320 125 230 0 278Z' fill='#174454'/>"+
+          "<path d='M0 116 C185 65 275 148 415 108 C552 70 630 122 760 86' fill='none' stroke='#4f8ca1' stroke-width='2' stroke-dasharray='7 5'/>"+
+          "<rect x='284' y='66' width='206' height='205' fill='rgba(240,138,120,.16)' stroke='#f08a78' stroke-dasharray='7 5'/>"+
+          "<path d='M44 235 L710 72' stroke='#f1bd68' stroke-width='6'/><path d='M44 244 L710 81' stroke='#1b2a31' stroke-width='2'/>"+
+          "<text x='300' y='92' fill='#ffc0b4' font-size='15'>170 m 中央通航带：永久墩不得进入</text>"+
+          "<text x='34' y='42' fill='#a9bcc3' font-size='13'>桥位走廊约 620 m；常水面约 360 m</text>"+
+          "<text x='72' y='266' fill='#f1bd68' font-size='12'>路线中心线</text><text x='585' y='242' fill='#9db0b8' font-size='12'>主航道保持通行</text>"+
+          "<line x1='510' y1='232' x2='470' y2='208' stroke='#f1bd68' marker-end='url(#arrow)'/></svg>";
+      }
+      if(id==="profile"){
+        return "<svg viewBox='0 0 760 310' role='img' aria-label='桥位立面控制图，显示通航净空和结构限高'>"+common+
+          "<rect width='760' height='310' fill='#09171f'/><path d='M0 235 Q160 200 270 230 T520 222 T760 238 L760 310 L0 310Z' fill='#132b25'/>"+
+          "<rect x='0' y='236' width='760' height='74' fill='#164555'/><line x1='54' y1='151' x2='706' y2='151' stroke='#f1bd68' stroke-width='5'/>"+
+          "<rect x='305' y='171' width='168' height='65' fill='none' stroke='#69d5ea' stroke-width='2' stroke-dasharray='7 5'/>"+
+          "<line x1='25' y1='62' x2='735' y2='62' stroke='#f08a78' stroke-width='2' stroke-dasharray='8 6'/>"+
+          "<line x1='86' y1='151' x2='86' y2='62' stroke='#f1bd68' marker-end='url(#arrow)'/><line x1='86' y1='62' x2='86' y2='151' stroke='#f1bd68' marker-end='url(#arrow)'/>"+
+          "<text x='100' y='105' fill='#f1bd68' font-size='13'>桥面以上可用结构高度约 56 m</text>"+
+          "<text x='500' y='54' fill='#ffc0b4' font-size='13'>区域限高：结构最高点 +74 m</text>"+
+          "<text x='316' y='194' fill='#a7eef7' font-size='12'>通航净空 140 m × 10 m</text>"+
+          "<text x='500' y='143' fill='#f1bd68' font-size='12'>桥面控制标高 +18 m</text></svg>";
+      }
+      if(id==="geology"){
+        return "<svg viewBox='0 0 760 310' role='img' aria-label='两岸地质剖面，北岸深厚软土，南岸浅层岩体'>"+common+
+          "<rect width='760' height='310' fill='#09171f'/><path d='M0 94 Q180 122 375 104 Q560 86 760 110 L760 310 L0 310Z' fill='#5b4937'/>"+
+          "<path d='M0 126 Q200 145 380 126 L380 232 Q180 225 0 242Z' fill='#735e48'/><path d='M380 126 Q560 105 760 126 L760 155 Q560 142 380 160Z' fill='#78634d'/>"+
+          "<path d='M0 242 Q190 220 380 232 L380 310 L0 310Z' fill='url(#dots)'/><path d='M380 160 Q555 140 760 155 L760 310 L380 310Z' fill='#2f4852'/>"+
+          "<line x1='155' y1='76' x2='155' y2='268' stroke='#e7eef0' stroke-width='3'/><line x1='610' y1='78' x2='610' y2='193' stroke='#e7eef0' stroke-width='3'/>"+
+          "<circle cx='155' cy='232' r='6' fill='#f08a78'/><circle cx='610' cy='153' r='6' fill='#69d5ea'/>"+
+          "<text x='42' y='48' fill='#e7eef0' font-size='14'>北岸钻孔 N1</text><text x='488' y='48' fill='#e7eef0' font-size='14'>南岸钻孔 S1</text>"+
+          "<text x='48' y='172' fill='#ffe1bb' font-size='13'>35—42 m 粉质黏土与淤泥质土</text>"+
+          "<text x='468' y='188' fill='#bdebf3' font-size='13'>约 5—8 m 后进入中风化岩</text>"+
+          "<text x='26' y='286' fill='#9fb2ba' font-size='11'>剖面只说明地基条件不对称；基础方案仍需勘察与计算。</text></svg>";
+      }
+      return "<svg viewBox='0 0 760 310' role='img' aria-label='施工场地平面，南岸场地宽裕，北岸狭窄并要求保通航'>"+common+
+        "<rect width='760' height='310' fill='#09171f'/><path d='M0 100 C220 55 310 120 430 88 C570 52 650 92 760 65 L760 225 C590 265 510 198 390 242 C245 292 130 215 0 260Z' fill='#164555'/>"+
+        "<rect x='518' y='170' width='190' height='102' fill='#17362e' stroke='#82d9a4' stroke-width='2'/><text x='538' y='200' fill='#c9f5da' font-size='13'>南岸 90 × 160 m 拼装场</text>"+
+        "<rect x='28' y='66' width='220' height='40' fill='#3b3024' stroke='#f1bd68'/><text x='42' y='91' fill='#ffe0a8' font-size='12'>北岸临河作业带仅约 14 m</text>"+
+        "<path d='M265 165 C375 140 485 150 585 120' stroke='#69d5ea' stroke-width='34' opacity='.28'/><path d='M265 165 C375 140 485 150 585 120' stroke='#69d5ea' stroke-width='2' stroke-dasharray='9 6'/>"+
+        "<text x='297' y='151' fill='#bceef6' font-size='12'>施工期主航道不断航</text>"+
+        "<path d='M608 218 C550 204 510 185 476 163' fill='none' stroke='#f1bd68' stroke-width='3' marker-end='url(#arrow)'/>"+
+        "<text x='530' y='294' fill='#9fb2ba' font-size='11'>场地会改变运输、拼装、吊装和临时体系，不直接替你选桥型。</text></svg>";
+    }
+
+    function choiceFacts(id){
+      if(id==="plan"){
+        return [["620 m","桥位走廊"],["170 m","中央禁墩通航带"],["不断航","施工期约束"]];
+      }
+      if(id==="profile"){
+        return [["+18 m","桥面控制标高"],["+74 m","结构最高点限高"],["140 × 10 m","通航净空框"]];
+      }
+      if(id==="geology"){
+        return [["35—42 m","北岸软弱覆盖层"],["5—8 m","南岸见岩深度"],["不对称","两岸基础条件"]];
+      }
+      return [["90 × 160 m","南岸拼装场"],["约 14 m","北岸作业带"],["保持通行","主航道施工要求"]];
+    }
+
+    function renderChoice(){
+      var active=choiceLenses.find(function(x){return x.id===state.active;});
+      var list="<div class='lens-list'>"+choiceLenses.map(function(x,i){
+        var rated=!!state.ratings[x.id];
+        return "<button class='lens-button"+(state.active===x.id?" current":"")+(rated?" rated":"")+"' type='button' data-lens='"+x.id+"'>"+
+          "<span class='num'>0"+(i+1)+"</span><span><strong>"+x.title+"</strong><small>"+x.short+"</small></span><span class='mark'>"+(rated?"已判断":"")+"</span></button>";
+      }).join("")+"</div>";
+      var desk="<div class='evidence-desk'>";
+      if(!active){
+        desk+="<div class='empty-desk'><div><b>先翻开一张桥位图</b><br>图上没有自动判定，也没有绿色“标准答案”。<br>你要自己说明这条证据怎样影响初选。</div></div>";
+      }else{
+        var facts=choiceFacts(active.id);
+        desk+="<div class='evidence-title'><div><h3>"+active.title+"</h3><p>"+active.short+"</p></div><span class='source-tag'>"+active.source+"</span></div>"+
+          "<div class='visual'>"+choiceSvg(active.id)+"</div><div class='fact-strip'>"+
+          facts.map(function(f){return "<div class='fact'><b>"+f[0]+"</b>"+f[1]+"</div>";}).join("")+"</div>"+
+          "<div class='ask'><p>只针对你的初选“"+bridgeCandidateName()+"”：这张图更像支持、冲突，还是提醒你补一份证据？</p>"+
+          stanceButtons("choice",state.ratings[active.id])+
+          "<div class='micro-note'>这里记录的是你的论证位置，不是系统给桥型打分。相同证据，对不同候选会提出不同问题。</div></div>";
+      }
+      desk+="</div>";
+      $("evidenceHost").innerHTML="<div class='evidence-grid'>"+list+desk+"</div>";
+      document.querySelectorAll("[data-lens]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.active=this.getAttribute("data-lens");addUnique(state.seen,state.active);save();renderAll();
+        });
+      });
+      document.querySelectorAll(".ask .stance").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.ratings[state.active]=this.getAttribute("data-value");save();renderAll();
+          announce("这张桥位图的影响已经记下。");
+        });
+      });
+    }
+
+    function frontStatus(env,year){
+      if(env==="dry"){
+        if(year<10){return "介质前缘仍离钢筋较远";}
+        return "前缘继续推进，但尚未接近钢筋";
+      }
+      if(year<6){return "裂缝通道已让局部前缘领先";}
+      if(year<12){return "沿裂缝的局部前缘正在接近钢筋";}
+      return "沿裂缝的局部前缘已经越过钢筋位置";
+    }
+
+    function specimenSvg(env,year){
+      var splash=env==="splash";
+      var bulk=Math.min(splash?88:60,(splash?14:8)+(splash?4.4:2.2)*year);
+      var crack=Math.min(splash?126:70,(splash?12:8)+(splash?8.6:2.7)*year);
+      var water=splash?"#69d5ea":"#66838d";
+      var salt=splash?"#f1bd68":"#80959c";
+      return "<svg viewBox='0 0 330 245' role='img' aria-label='"+(splash?"浪溅区":"干燥遮蔽处")+"混凝土保护层与介质前缘示意'>"+
+        "<defs><pattern id='grain"+env+"' width='17' height='17' patternUnits='userSpaceOnUse'><circle cx='4' cy='5' r='1.4' fill='#344b55'/><circle cx='12' cy='12' r='1' fill='#2c434d'/></pattern></defs>"+
+        "<rect width='330' height='245' fill='#08161d'/><rect x='45' y='30' width='240' height='190' fill='url(#grain"+env+")' stroke='#58707a'/>"+
+        "<rect x='45' y='30' width='240' height='"+bulk.toFixed(1)+"' fill='"+water+"' opacity='"+(splash?".22":".12")+"'/>"+
+        "<path d='M164 30 l-5 17 8 15 -7 18 7 17 -5 19 6 18 -5 18' fill='none' stroke='#e7eef0' stroke-width='2'/>"+
+        "<path d='M164 32 C154 60 171 82 163 "+(30+crack).toFixed(1)+"' fill='none' stroke='"+salt+"' stroke-width='5' opacity='.78'/>"+
+        "<circle cx='164' cy='160' r='19' fill='#27353c' stroke='#c6d1d4' stroke-width='5'/><circle cx='164' cy='160' r='10' fill='#171f23'/>"+
+        "<line x1='294' y1='30' x2='294' y2='160' stroke='#a6bbc2' stroke-width='1'/><path d='M289 35 l5 -5 5 5 M289 155 l5 5 5 -5' fill='none' stroke='#a6bbc2'/>"+
+        "<text x='207' y='101' fill='#b4c5ca' font-size='11'>体内前缘</text><line x1='202' y1='105' x2='178' y2='"+(30+bulk).toFixed(1)+"' stroke='#9fb0b5'/>"+
+        "<text x='53' y='19' fill='#dce8ea' font-size='12'>表面</text><text x='204' y='165' fill='#dce8ea' font-size='12'>钢筋</text>"+
+        "<text x='235' y='98' fill='"+salt+"' font-size='11'>裂缝局部通道</text><text x='270' y='103' fill='#b4c5ca' font-size='10' transform='rotate(90 270 103)'>保护层 45 mm</text>"+
+        "<text x='54' y='237' fill='#90a5ad' font-size='10'>裂缝宽度固定为 0.20 mm · 相对位置示意</text></svg>";
+    }
+
+    function timelineMarkup(interval,year){
+      var ticks=[];
+      for(var y=0;y<=18;y+=interval){ticks.push(y);}
+      if(ticks[ticks.length-1]!==18){ticks.push(18);}
+      return "<div class='timeline' aria-label='检查时间轴'>"+ticks.map(function(y){
+        return "<span class='tick"+(Math.abs(y-year)<.6?" current":"")+"' style='left:"+(y/18*100)+"%'><i></i>"+y+" 年</span>";
+      }).join("")+"</div>";
+    }
+
+    function durabilityObservation(){
+      var age=state.year;
+      var front=age<6?"此时两块板都还没有给出钢筋处已受侵入的迹象；差别先出现在裂缝附近的推进速度。":
+        (age<12?"浪溅区沿裂缝的局部前缘已经逼近钢筋，干燥板仍有明显距离。":
+        "浪溅区的局部前缘越过钢筋位置；干燥板的同宽裂缝仍不能单独说明同样的紧迫性。");
+      var inspection=state.interval===2?
+        "若约每 2 年检查一次，示意中的关键变化可被夹在约 10—12 年之间。":
+        "若约每 8 年检查一次，只能知道变化发生在约 8—16 年之间；检查空档把过程藏起来了。";
+      return front+" "+inspection;
+    }
+
+    function renderDurability(){
+      var seen=state.durabilitySeen;
+      var html="<div class='durability-controls'><div class='range-row'>"+
+        "<label for='yearRange'><span>把时间移到</span><output id='yearOutput'>"+state.year+" 年</output></label>"+
+        "<input id='yearRange' type='range' min='0' max='18' step='1' value='"+state.year+"'>"+
+        "<div class='quick-row'><button class='quick-button"+(seen.indexOf("age3")>-1?" visited":"")+"' type='button' data-age='3'>观察 3 年</button>"+
+        "<button class='quick-button"+(seen.indexOf("age9")>-1?" visited":"")+"' type='button' data-age='9'>观察 9 年</button>"+
+        "<button class='quick-button"+(seen.indexOf("age15")>-1?" visited":"")+"' type='button' data-age='15'>观察 15 年</button></div></div>"+
+        "<div><div class='range-row'><label><span>检查记录间隔</span><output>"+state.interval+" 年一次</output></label></div>"+
+        "<div class='quick-row'><button class='quick-button"+(seen.indexOf("int2")>-1?" visited":"")+(state.interval===2?" current":"")+"' type='button' data-interval='2'>每 2 年</button>"+
+        "<button class='quick-button"+(seen.indexOf("int8")>-1?" visited":"")+(state.interval===8?" current":"")+"' type='button' data-interval='8'>每 8 年</button></div>"+
+        timelineMarkup(state.interval,state.year)+"</div></div>"+
+        "<div class='two-up'><article class='specimen'><h4>试件 D · 干燥遮蔽处 <span>"+frontStatus("dry",state.year)+"</span></h4><div class='visual'>"+specimenSvg("dry",state.year)+"</div></article>"+
+        "<article class='specimen'><h4>试件 S · 浪溅区 <span>"+frontStatus("splash",state.year)+"</span></h4><div class='visual'>"+specimenSvg("splash",state.year)+"</div></article></div>"+
+        "<div class='observation'><b>这一帧可以支持什么：</b> "+durabilityObservation()+"</div>"+
+        "<div class='micro-note'>边界：前缘只表达“环境与裂缝会改变到达钢筋的先后”，不提供扩散系数、临界浓度或剩余寿命。真实工程还需暴露等级、材料试验和现场检测。</div>";
+      $("evidenceHost").innerHTML=html;
+      $("yearRange").addEventListener("input",function(){
+        state.year=+this.value;save();renderAll();
+      });
+      document.querySelectorAll("[data-age]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.year=+this.getAttribute("data-age");addUnique(state.durabilitySeen,"age"+state.year);
+          save();renderAll();announce("已观察 "+state.year+" 年时的前缘。");
+        });
+      });
+      document.querySelectorAll("[data-interval]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.interval=+this.getAttribute("data-interval");addUnique(state.durabilitySeen,"int"+state.interval);
+          save();renderAll();announce("已查看每 "+state.interval+" 年一次的检查记录。");
+        });
+      });
+    }
+
+    function classificationButtons(evidenceId,hypothesisId,current){
+      var values=[["support","＋ 支持"],["refute","－ 反驳"],["unclear","？不能判断"]];
+      return "<div class='stance-row'>"+values.map(function(x){
+        return "<button type='button' class='stance"+(current===x[0]?" selected":"")+"' data-evidence='"+evidenceId+"' data-hypothesis='"+hypothesisId+"' data-value='"+x[0]+"'>"+x[1]+"</button>";
+      }).join("")+"</div>";
+    }
+
+    function renderFailure(){
+      var active=failureEvidence.find(function(x){return x.id===state.active;});
+      var hyp="<div class='hypotheses'>"+hypotheses.map(function(h){
+        return "<article class='hypothesis'><b>"+h.name+"</b><p>"+h.copy+"</p></article>";
+      }).join("")+"</div>";
+      var cards="<div>"+failureEvidence.map(function(e){
+        var r=state.ratings[e.id]||{};
+        var count=hypotheses.filter(function(h){return !!r[h.id];}).length;
+        return "<button class='evidence-card"+(state.active===e.id?" current":"")+(count===3?" complete":"")+"' type='button' data-card='"+e.id+"'>"+
+          "<span class='card-state'>"+count+"/3</span><b>"+e.title+"</b><small>"+e.short+"</small></button>";
+      }).join("")+"<p class='micro-note'>案卷数值只属于这个教学案例，不对应任何真实事故。</p></div>";
+      var desk="<div class='evidence-desk'>";
+      if(!active){
+        desk+="<div class='empty-desk'><div><b>选五份材料中的任意一份</b><br>同一份证据要分别面对三个假设。<br>“不能判断”不是偷懒，是给证据划边界。</div></div>";
+      }else{
+        var ratings=state.ratings[active.id]||{};
+        var complete=hypotheses.every(function(h){return !!ratings[h.id];});
+        desk+="<div class='evidence-title'><div><h3>"+active.title+"</h3><p>"+active.detail+"</p></div><span class='source-tag'>"+active.source+"</span></div>"+
+          "<div class='matrix'>"+hypotheses.map(function(h){
+            return "<div class='matrix-row'><strong>"+h.name+"</strong>"+classificationButtons(active.id,h.id,ratings[h.id])+"</div>";
+          }).join("")+"</div>"+
+          "<div class='form-actions'><button class='ghost' id='referenceButton' type='button'"+(complete?"":" disabled")+">"+(complete?"查看一种谨慎的解读":"先完成三项判断")+"</button></div>";
+        if(state.references[active.id]){
+          desk+="<div class='reference'><b>参考解读不是标准答案：</b><ul>"+hypotheses.map(function(h){
+            return "<li><b>"+h.name.split(" ")[0]+"</b>："+active.readings[h.id]+"</li>";
+          }).join("")+"</ul></div>";
+        }
+      }
+      desk+="</div>";
+      $("evidenceHost").innerHTML=hyp+"<div class='failure-grid'>"+cards+desk+"</div>";
+      document.querySelectorAll("[data-card]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.active=this.getAttribute("data-card");addUnique(state.seen,state.active);save();renderAll();
+        });
+      });
+      document.querySelectorAll(".matrix .stance").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          var e=this.getAttribute("data-evidence"),h=this.getAttribute("data-hypothesis");
+          if(!state.ratings[e]||typeof state.ratings[e]!=="object"){state.ratings[e]={};}
+          state.ratings[e][h]=this.getAttribute("data-value");save();renderAll();
+          announce("这一项证据判断已记录。");
+        });
+      });
+      var referenceButton=$("referenceButton");
+      if(referenceButton&&!referenceButton.disabled){
+        referenceButton.addEventListener("click",function(){
+          state.references[state.active]=true;save();renderAll();
+        });
+      }
+    }
+
+    function defenseForceSvg(scheme){
+      if(scheme==="a"){
+        return "<svg viewBox='0 0 390 205' role='img' aria-label='低塔斜拉桥传力路径'>"+
+          "<defs><marker id='ga' viewBox='0 0 10 10' refX='8' refY='5' markerWidth='5' markerHeight='5' orient='auto'><path d='M0 0 L10 5 L0 10z' fill='#82d9a4'/></marker></defs>"+
+          "<rect width='390' height='205' fill='#08161d'/><line x1='25' y1='120' x2='365' y2='120' stroke='#d8e1e3' stroke-width='8'/>"+
+          "<line x1='135' y1='120' x2='135' y2='45' stroke='#d8e1e3' stroke-width='9'/><line x1='255' y1='120' x2='255' y2='45' stroke='#d8e1e3' stroke-width='9'/>"+
+          "<g stroke='#69d5ea' stroke-width='2'><line x1='135' y1='48' x2='58' y2='118'/><line x1='135' y1='55' x2='95' y2='118'/><line x1='135' y1='55' x2='190' y2='118'/><line x1='255' y1='55' x2='200' y2='118'/><line x1='255' y1='55' x2='300' y2='118'/><line x1='255' y1='48' x2='340' y2='118'/></g>"+
+          "<g stroke='#82d9a4' stroke-width='3' marker-end='url(#ga)'><line x1='82' y1='99' x2='125' y2='60'/><line x1='188' y1='99' x2='145' y2='61'/><line x1='308' y1='99' x2='265' y2='61'/><line x1='204' y1='99' x2='245' y2='62'/><line x1='135' y1='69' x2='135' y2='155'/><line x1='255' y1='69' x2='255' y2='155'/></g>"+
+          "<text x='25' y='24' fill='#a9bbc1' font-size='11'>桥面荷载 → 索拉力 → 塔柱压力 → 基础</text><text x='20' y='186' fill='#82d9a4' font-size='11'>绿色箭头：本镜头追踪的主要传力方向</text></svg>";
+      }
+      return "<svg viewBox='0 0 390 205' role='img' aria-label='系杆拱桥传力路径'>"+
+        "<defs><marker id='gb' viewBox='0 0 10 10' refX='8' refY='5' markerWidth='5' markerHeight='5' orient='auto'><path d='M0 0 L10 5 L0 10z' fill='#f1bd68'/></marker></defs>"+
+        "<rect width='390' height='205' fill='#08161d'/><path d='M34 127 Q195 18 356 127' fill='none' stroke='#d8e1e3' stroke-width='10'/><line x1='34' y1='130' x2='356' y2='130' stroke='#d8e1e3' stroke-width='8'/>"+
+        "<g stroke='#69d5ea' stroke-width='2'><line x1='75' y1='91' x2='75' y2='127'/><line x1='115' y1='64' x2='115' y2='127'/><line x1='155' y1='47' x2='155' y2='127'/><line x1='195' y1='41' x2='195' y2='127'/><line x1='235' y1='47' x2='235' y2='127'/><line x1='275' y1='64' x2='275' y2='127'/><line x1='315' y1='91' x2='315' y2='127'/></g>"+
+        "<g stroke='#f1bd68' stroke-width='3' marker-end='url(#gb)'><path d='M195 45 Q116 52 48 119' fill='none'/><path d='M195 45 Q273 52 342 119' fill='none'/><line x1='75' y1='108' x2='75' y2='73'/><line x1='155' y1='108' x2='155' y2='55'/><line x1='235' y1='108' x2='235' y2='55'/><line x1='315' y1='108' x2='315' y2='73'/><line x1='62' y1='146' x2='329' y2='146'/></g>"+
+        "<text x='25' y='24' fill='#a9bbc1' font-size='11'>桥面荷载 → 吊杆拉力 → 拱肋压力；系杆闭合水平推力</text><text x='20' y='186' fill='#f1bd68' font-size='11'>黄色箭头：本镜头追踪的主要传力方向</text></svg>";
+    }
+
+    function constructionMarkup(){
+      return "<div class='compare-visual'><article class='scheme'><div class='scheme-head'><b>A 低塔斜拉</b><small>平衡悬臂与索力调整</small></div>"+
+        "<div class='sequence'><div><b>1 塔梁起步</b>墩顶临时固结</div><div><b>2 对称悬臂</b>节段与张拉交替</div><div><b>3 边跨先合龙</b>体系开始转换</div><div><b>4 中跨合龙</b>复调索力与线形</div></div>"+
+        "<div class='scheme-copy'><b>最值得盯住：</b>不对称施工荷载、临时固结、每轮张拉后的线形与索力。</div></article>"+
+        "<article class='scheme'><div class='scheme-head'><b>B 系杆拱</b><small>拱肋架设、合龙与受力转换</small></div>"+
+        "<div class='sequence'><div><b>1 系杆与桥面</b>临时支架承受重量</div><div><b>2 拱肋分段</b>吊装与临时风撑</div><div><b>3 拱肋合龙</b>温度与几何控制</div><div><b>4 吊杆加载</b>逐步拆除临时支架</div></div>"+
+        "<div class='scheme-copy'><b>最值得盯住：</b>拱肋未闭合时的侧向稳定、合龙误差、吊杆加载次序。</div></article></div>";
+    }
+
+    function maintenanceSvg(scheme){
+      if(scheme==="a"){
+        var cables="";
+        for(var i=0;i<11;i++){
+          var x=38+i*31;
+          var tower=x<195?130:260;
+          cables+="<line x1='"+tower+"' y1='52' x2='"+x+"' y2='128' stroke='#69d5ea' stroke-width='1.6'/><circle cx='"+x+"' cy='128' r='3.5' fill='#82d9a4'/>";
+        }
+        return "<svg viewBox='0 0 390 205' role='img' aria-label='低塔斜拉桥养护点示意'><rect width='390' height='205' fill='#08161d'/><line x1='24' y1='130' x2='366' y2='130' stroke='#dce5e6' stroke-width='8'/><line x1='130' y1='130' x2='130' y2='48' stroke='#dce5e6' stroke-width='8'/><line x1='260' y1='130' x2='260' y2='48' stroke='#dce5e6' stroke-width='8'/>"+cables+
+          "<text x='22' y='24' fill='#c7d4d7' font-size='11'>42 根索 · 84 处索端；桥面锚固端可由检修道接近</text><text x='22' y='180' fill='#82d9a4' font-size='11'>圆点：需要反复检查的索端、护套与减振构件</text></svg>";
+      }
+      var hangers="";
+      for(var j=0;j<9;j++){
+        var hx=55+j*35;
+        var dx=(hx-195)/160;
+        var top=42+82*dx*dx;
+        hangers+="<line x1='"+hx+"' y1='"+top.toFixed(0)+"' x2='"+hx+"' y2='132' stroke='#69d5ea' stroke-width='2'/><circle cx='"+hx+"' cy='132' r='3.5' fill='#f1bd68'/>";
+      }
+      return "<svg viewBox='0 0 390 205' role='img' aria-label='系杆拱桥养护点示意'><rect width='390' height='205' fill='#08161d'/><path d='M35 132 Q195 20 355 132' fill='none' stroke='#dce5e6' stroke-width='9'/><line x1='35' y1='135' x2='355' y2='135' stroke='#dce5e6' stroke-width='8'/>"+hangers+
+        "<text x='22' y='24' fill='#c7d4d7' font-size='11'>24 根吊杆 · 48 处索端；拱肋外表面需要高空涂装维护</text><text x='22' y='180' fill='#f1bd68' font-size='11'>圆点：吊杆索端；拱顶检查还需要高空到达手段</text></svg>";
+    }
+
+    function defenseDesk(active){
+      var title=defenseLenses.find(function(x){return x.id===active;});
+      if(!title){return "<div class='empty-desk'><div><b>任选一个镜头开始比较</b><br>每个镜头只引入一件新事情：<br>力怎样走、桥怎样建、以后怎样靠近它。</div></div>";}
+      var body="";
+      var facts="";
+      if(active==="force"){
+        body="<div class='compare-visual'><article class='scheme'><div class='scheme-head'><b>A 低塔斜拉</b><small>索拉力 · 塔柱与桥面受压</small></div>"+defenseForceSvg("a")+"</article>"+
+          "<article class='scheme'><div class='scheme-head'><b>B 系杆拱</b><small>吊杆与系杆受拉 · 拱肋受压</small></div>"+defenseForceSvg("b")+"</article></div>";
+        facts="<div class='fact-strip'><div class='fact'><b>A：力被分散到多根索</b>索力与梁塔刚度共同决定线形</div><div class='fact'><b>B：水平推力在系杆内闭合</b>不把主要水平推力交给软弱地基</div><div class='fact'><b>两者都不是“没有弯矩”</b>节点、局部与不均匀荷载仍需分析</div></div>";
+      }else if(active==="construction"){
+        body=constructionMarkup();
+        facts="<div class='fact-strip'><div class='fact'><b>A 的敏感点</b>索力、线形与不对称悬臂</div><div class='fact'><b>B 的敏感点</b>拱肋合龙前的侧向稳定</div><div class='fact'><b>共同事实</b>永久体系安全，不代表施工中间状态自动安全</div></div>";
+      }else{
+        body="<div class='compare-visual'><article class='scheme'><div class='scheme-head'><b>A 低塔斜拉</b><small>索端多，但桥面端较易接近</small></div>"+maintenanceSvg("a")+"</article>"+
+          "<article class='scheme'><div class='scheme-head'><b>B 系杆拱</b><small>吊杆较少，但拱肋有高空维护</small></div>"+maintenanceSvg("b")+"</article></div>";
+        facts="<div class='fact-strip'><div class='fact'><b>A：84 处索端</b>数量多，巡检路径连续；可设计单索更换</div><div class='fact'><b>B：48 处吊杆索端</b>数量较少；拱顶涂层与节点需要高空到达</div><div class='fact'><b>问题不是只数构件</b>还要问能否看见、够到、隔离并更换</div></div>";
+      }
+      return "<div class='evidence-title'><div><h3>"+title.title+"</h3><p>"+title.short+"</p></div><span class='source-tag'>同桥位 A/B 对照</span></div>"+body+facts+
+        "<div class='ask'><p>只看这个镜头，它把你推向 A、推向 B，还是还不足以改变偏好？</p>"+stanceButtons("defense",state.ratings[active])+
+        "<div class='micro-note'>这不是总分表。记录某一类证据的方向，最后再回到你预先写下的退出条件。</div></div>";
+    }
+
+    function renderDefense(){
+      var list="<div class='lens-list'>"+defenseLenses.map(function(x,i){
+        var rated=!!state.ratings[x.id];
+        return "<button class='lens-button"+(state.active===x.id?" current":"")+(rated?" rated":"")+"' type='button' data-defense-lens='"+x.id+"'>"+
+          "<span class='num'>0"+(i+1)+"</span><span><strong>"+x.title+"</strong><small>"+x.short+"</small></span><span class='mark'>"+(rated?"已判断":"")+"</span></button>";
+      }).join("")+"<div class='observation'><b>你封存的退出条件</b><br><span id='exitEcho'></span></div></div>";
+      $("evidenceHost").innerHTML="<div class='evidence-grid'>"+list+"<div class='evidence-desk'>"+defenseDesk(state.active)+"</div></div>";
+      $("exitEcho").textContent=state.exitCondition;
+      document.querySelectorAll("[data-defense-lens]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.active=this.getAttribute("data-defense-lens");addUnique(state.seen,state.active);save();renderAll();
+        });
+      });
+      document.querySelectorAll(".ask .stance").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          state.ratings[state.active]=this.getAttribute("data-value");save();renderAll();
+          announce("这个镜头对方案偏好的影响已经记下。");
+        });
+      });
+    }
+
+    function renderEvidence(){
+      if(!state.predicted){$("evidenceHost").innerHTML="";return;}
+      if(mode==="choice"){renderChoice();}
+      else if(mode==="durability"){renderDurability();}
+      else if(mode==="failure"){renderFailure();}
+      else{renderDefense();}
+    }
+
+    function revisionOptions(){
+      if(mode==="choice"){
+        return [["beam","梁桥"],["arch","拱桥"],["cable","斜拉桥"],["suspension","悬索桥"],["more","还不能定，先补勘察或方案"]];
+      }
+      if(mode==="durability"){
+        return [["splash","浪溅区优先"],["dry","干燥处优先"],["same","仍认为一样急"],["more","需要现场检测后再排"]];
+      }
+      if(mode==="failure"){
+        return [["h1","H1 仍是主解释"],["h2","H2 仍是主解释"],["h3","H3 仍是主解释"],["combined","更像多因素链条"],["more","现有证据仍不足"]];
+      }
+      return [["a","推进 A 低塔斜拉"],["b","推进 B 系杆拱"],["parallel","两案并行补证"],["stop","两案都暂不推进"]];
+    }
+
+    function renderRevision(){
+      if(!canRevise()){
+        var p=progress();
+        $("revisionHost").innerHTML="<div class='revision-locked'>还差 "+Math.max(0,p.target-p.done)+" 项有效证据。这里数的是完整读图、对照或判断，不是点击次数。</div>";
+        return;
+      }
+      var extra="";
+      if(mode==="failure"){
+        extra="<label class='field'><span>下一份最值得找的证据</span><textarea id='nextEvidence' placeholder='为了区分这些解释，我接下来会找……'></textarea></label>";
+      }
+      if(mode==="defense"){
+        extra="<label class='field'><span>原先的退出条件被触发了吗？</span><select id='exitTriggered'>"+
+          optionMarkup([["yes","是，已经触发"],["no","没有触发"],["unclear","仍需补证"]],state.exitTriggered,"请选择")+"</select></label>";
+      }
+      var html="<div class='form-grid'><label class='field'><span>查证后的判断</span><select id='revisionChoice'>"+
+        optionMarkup(revisionOptions(),state.revisionChoice,"重新选一个")+"</select></label>"+
+        "<label class='field'><span>至少引用两条刚才看见的具体证据</span><textarea id='revisionReason' placeholder='我维持／改变判断，因为……'></textarea></label>"+extra+"</div>"+
+        "<div class='form-actions'><button class='primary' id='commitRevision' type='button'>提交改判</button><p class='error' id='revisionError' role='alert'></p></div>";
+      $("revisionHost").innerHTML=html;
+      $("revisionReason").value=state.revisionReason||"";
+      if(mode==="failure"){$("nextEvidence").value=state.nextEvidence||"";}
+      $("revisionChoice").addEventListener("change",function(){state.revisionChoice=this.value;save();});
+      $("revisionReason").addEventListener("input",function(){state.revisionReason=this.value;save();});
+      if(mode==="failure"){$("nextEvidence").addEventListener("input",function(){state.nextEvidence=this.value;save();});}
+      if(mode==="defense"){$("exitTriggered").addEventListener("change",function(){state.exitTriggered=this.value;save();});}
+      $("commitRevision").addEventListener("click",commitRevision);
+    }
+
+    function commitRevision(){
+      state.revisionChoice=$("revisionChoice").value;
+      state.revisionReason=$("revisionReason").value.trim();
+      if(mode==="failure"){state.nextEvidence=$("nextEvidence").value.trim();}
+      if(mode==="defense"){state.exitTriggered=$("exitTriggered").value;}
+      var error="";
+      if(!state.revisionChoice){error="先给出查证后的判断。";}
+      else if(state.revisionReason.length<12){error="请把证据写具体些：至少说清楚两条图上或案卷中的事实。";}
+      else if(mode==="failure"&&state.nextEvidence.length<6){error="再写一份下一步要找的证据，帮助区分竞争性解释。";}
+      else if(mode==="defense"&&!state.exitTriggered){error="回到开头：原先的退出条件有没有被触发？";}
+      if(error){$("revisionError").textContent=error;return;}
+      state.revised=true;save();renderAll();announce("改判已经保存，术语与迁移问题已展开。");
+      $("insightStage").scrollIntoView({behavior:"smooth",block:"start"});
+    }
+
+    function insightContent(){
+      if(mode==="choice"){
+        return {
+          insight:"<p>桥型不是由一个跨径数字自动生出来的。平面决定哪里可以落地，立面把上下空间夹出来，地质改变基础代价，施工条件又会改变临时体系。证据做的，是把“我喜欢哪座桥”改成“哪些候选还值得继续算”。</p><p class='transfer'>迁移：选设备、选路线、选软件架构时，也可以先把场地、接口和不可违反的条件画出来，再谈偏好。</p>",
+          term:"<p><b>桥位约束与候选体系：</b>先用通航净空、地形地质、施工组织等约束缩小候选集，再进行方案比选。这里没有采用跨径硬阈值自动淘汰；正式选择仍需勘察、结构分析、造价、风险和全寿命论证。</p>"
+        };
+      }
+      if(mode==="durability"){
+        return {
+          insight:"<p>裂缝宽度相同，不等于后果相同。环境决定外面有什么介质，裂缝改变局部通道，保护层决定到钢筋还有多远，检查间隔则决定我们能否看见关键变化发生在什么时候。</p><p class='transfer'>迁移：同样一个“缺口”，放在干燥仓库和海边设备上，意义不会相同；风险来自缺口与环境共同作用。</p>",
+          term:"<p><b>暴露环境、介质侵入与可观测性：</b>浪溅区的干湿循环和氯盐供给会改变侵入过程；裂缝可形成局部优先通道。检查间隔影响的是发现窗口，不等于改变材料本身的劣化速度。本图只示趋势，不能用于寿命预测。</p>"
+        };
+      }
+      if(mode==="failure"){
+        return {
+          insight:"<p>事故不一定只有一个“凶手”。旧损伤可以是前提，支座异常可以改变受力，风振可能成为触发。真正有用的证据，既要能支持某个解释，也要能让另一个解释变得困难；资料空白本身不能被当作无事发生。</p><p class='transfer'>迁移：设备故障、医疗诊断和软件事故复盘，都应让多个解释同时接受同一批证据，而不是先认定结论再搜材料。</p>",
+          term:"<p><b>竞争性假设与证据矩阵：</b>把每份证据分别标记为支持、反驳或暂不能判断，并区分先存缺陷、促成条件与直接触发。参考解读不是责任认定；真实事故还需保存证据链并由有资质团队调查。</p>"
+        };
+      }
+      return {
+        insight:"<p>一个方案能算过去，只说明它还在桌上。进入下一轮之前，还要看力怎样回到地基、施工时有没有短暂而脆弱的状态，以及几十年后人能不能靠近、检查和更换关键构件。退出条件让评价标准不至于随着偏好悄悄移动。</p><p class='transfer'>迁移：做产品、科研路线或投资决策，也可以在看结果以前写下“什么证据会让我停手或换路”。</p>",
+        term:"<p><b>设计辩护与退出条件：</b>把目标、约束、传力路径、施工阶段、养护可达性、证据和改判记录连成一条可追溯的论证链。A/B 数据属于教学场景，不代替结构验算、施工专项分析和全寿命费用比较。</p>"
+      };
+    }
+
+    function renderInsight(){
+      $("insightStage").hidden=!state.revised;
+      if(!state.revised){return;}
+      var content=insightContent();
+      $("insightCopy").innerHTML=content.insight;
+      $("termCopy").innerHTML=content.term;
+    }
+
+    function renderAll(){
+      setupHeader();renderPrediction();updateCycle();renderEvidence();renderRevision();renderInsight();
+    }
+
+    $("resetButton").addEventListener("click",function(){
+      var ok=window.confirm("清空这个模式的初判、证据记录和改判？");
+      if(!ok){return;}
+      state=defaultState();save();renderAll();announce("本实验记录已清空。");
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+
+    renderAll();
+  })();
+  </script>
+</body>
+</html>

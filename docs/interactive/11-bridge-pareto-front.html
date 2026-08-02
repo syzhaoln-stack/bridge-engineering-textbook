@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>桥型取舍：没有一个方案能把所有好处都拿走</title>
+  <style>
+    :root{
+      --paper:#f3f6f5;--panel:#fff;--ink:#17303a;--muted:#667980;--line:#d9e2e1;
+      --teal:#1f7a8c;--teal-open:#d9edf0;--amber:#d4872e;--blue:#4668a9;--violet:#785a9e;
+      --front:#17303a;--soft:#edf2f2;--warning:#b45b45;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-width:0;font-family:"Microsoft YaHei","Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
+    body{padding:12px}
+    .shell{max-width:1220px;margin:auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.72fr);gap:12px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 26px rgba(23,48,58,.065)}
+    .question{grid-column:1/-1;padding:16px 19px;border-left:5px solid var(--amber)}
+    .question small{display:block;color:#8a591d;font-weight:700;margin-bottom:4px}
+    .question h1{font:600 23px/1.4 "STKaiti","KaiTi",serif;margin:0 0 6px}
+    .question p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+    .range-card{grid-column:1/-1;padding:14px 16px 9px;min-width:0}
+    .head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:7px}
+    .head h2{font-size:15px;margin:0 0 3px}.head p{font-size:10px;line-height:1.55;color:var(--muted);margin:0}
+    .range-legend,.legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;color:var(--muted);font-size:9px}
+    .key{display:inline-flex;align-items:center;gap:5px}.key i{display:inline-block;width:14px;height:7px;border-radius:6px;background:var(--teal)}
+    .key i.limit{background:transparent;border:1px dashed #8aa0a7}.key i.now{width:2px;height:13px;border-radius:0;background:var(--amber)}
+    #rangeChart{width:100%;height:auto;display:block;min-height:220px}
+    .chart-card{padding:14px;min-width:0}.plot-wrap{position:relative;min-height:500px}
+    #paretoChart{width:100%;height:auto;display:block;overflow:visible}
+    .legend .family-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+    .legend .front-dot{width:10px;height:10px;border:2px solid var(--front);background:#fff;border-radius:50%;display:inline-block;margin-right:4px}
+    .controls{padding:15px}.controls h2{font-size:15px;margin:0 0 4px}.controls>p{font-size:11px;line-height:1.6;color:var(--muted);margin:0 0 9px}
+    .row{padding:9px 10px;margin:7px 0;border:1px solid var(--line);border-radius:9px;background:#fbfcfc}
+    .row label{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#53676e}.row output{color:var(--teal);font-weight:700;font-variant-numeric:tabular-nums}
+    .row input{width:100%;height:36px;accent-color:var(--teal)}
+    select{width:100%;margin-top:7px;min-height:38px;border:1px solid #c8d5d6;border-radius:7px;padding:6px 8px;background:#fff;color:var(--ink)}
+    .segmented{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}
+    button{border:1px solid #c8d5d6;border-radius:8px;background:#edf2f2;color:var(--ink);padding:8px;min-height:39px;font-size:10px;cursor:pointer}
+    button.active{border-color:var(--teal);background:var(--teal-open)}
+    button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid rgba(31,122,140,.24);outline-offset:2px}
+    .download{width:100%;margin-top:8px;background:#fff}
+    .selection{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr);gap:12px}
+    .answer,.method{padding:15px 17px}.answer{border-top:4px solid var(--amber)}.method{border-top:4px solid var(--teal)}
+    .eyebrow{display:block;font-size:9px;font-weight:700;color:#8a591d;margin-bottom:4px}.answer h3,.method h3{font-size:15px;margin:0 0 5px}
+    .answer p,.method p{font-size:11px;line-height:1.72;color:#455d65;margin:5px 0}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0}
+    .stat{padding:8px 9px;border-radius:8px;background:#f2f6f5;border:1px solid #e0e8e7}.stat span{display:block;font-size:8px;color:var(--muted)}.stat b{font-size:13px;font-variant-numeric:tabular-nums}
+    .method strong{color:#176d7d}.boundary{font-size:9.5px!important;color:#708187!important}
+    details{margin-top:9px;border-top:1px solid var(--line);padding-top:8px}summary{font-size:10px;color:#326c78;cursor:pointer}.detail-text{font-size:9.5px!important;line-height:1.65!important;color:var(--muted)!important}
+    @media(max-width:760px){.shell{grid-template-columns:1fr}.question,.range-card,.chart-card,.controls,.selection{grid-column:1}.selection{grid-template-columns:1fr}.plot-wrap{min-height:430px}}
+    @media(max-width:560px){body{padding:7px}.question h1{font-size:20px}.head{display:block}.range-legend,.legend{justify-content:flex-start;margin-top:7px}.stats{grid-template-columns:1fr 1fr}.range-card{padding-left:8px;padding-right:8px}.plot-wrap,#rangeChart{min-height:0}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="question card">
+    <small>先别急着找“冠军”</small>
+    <h1>同样要跨过 <span id="q-span">600</span> 米：最便宜的方案，为什么还不一定是最合适的？</h1>
+    <p>先固定必须跨过的距离，再看价格和一种性能。点一下图里的方案：如果左下方还有另一个点，它用更少的钱、同时表现得更好，这个方案就没有留下来的理由。</p>
+  </section>
+
+  <section class="range-card card">
+    <div class="head">
+      <div><h2>先看跨度把候选筛成什么样</h2><p>实色是参考资料给出的经济适用区；虚线延伸到参考极限。橙线是当前任务跨度。</p></div>
+      <div class="range-legend"><span class="key"><i></i>经济适用区</span><span class="key"><i class="limit"></i>经济区外至参考极限</span><span class="key"><i class="now"></i>当前跨度</span></div>
+    </div>
+    <svg id="rangeChart" viewBox="0 0 1120 278" role="img" aria-label="桥型经济适用跨度和参考极限跨度"></svg>
+  </section>
+
+  <section class="chart-card card">
+    <div class="head">
+      <div><h2>当前跨度下的候选方案</h2><p id="chart-subtitle">横轴与纵轴都越低越好；实心描边点组成当前二维比较的前沿。</p></div>
+      <div class="legend">
+        <span><i class="family-dot" style="background:var(--teal)"></i>梁</span>
+        <span><i class="family-dot" style="background:var(--amber)"></i>拱</span>
+        <span><i class="family-dot" style="background:var(--blue)"></i>斜拉</span>
+        <span><i class="family-dot" style="background:var(--violet)"></i>悬索</span>
+        <span><i class="front-dot"></i>前沿</span>
+      </div>
+    </div>
+    <div class="plot-wrap"><svg id="paretoChart" viewBox="0 0 900 520" role="img" aria-label="桥梁概念方案成本与性能帕累托前沿散点图"></svg></div>
+  </section>
+
+  <aside class="controls card">
+    <h2>只改三件事</h2>
+    <p>跨度先定任务，场地改变代价；性能一次只看一种，别把不同单位揉成一个神秘总分。</p>
+    <div class="row"><label>必须跨过的主跨 <output id="o-span">600 m</output></label><input id="span" type="range" min="20" max="2000" step="10" value="600"></div>
+    <div class="row"><label for="site">场地条件</label><select id="site"><option value="normal">一般河谷</option><option value="soft">深水、软土</option><option value="rock">岩质峡谷</option><option value="wind">强风场地</option></select></div>
+    <div class="row"><label for="metric">这一次拿什么代表“表现”</label><select id="metric"><option value="service">变形与振动敏感度</option><option value="carbon">材料与基础隐含碳指数</option><option value="construction">施工占用时间</option><option value="maintenance">百年维护负担指数</option></select></div>
+    <div class="row"><label>价格看哪一本账</label><div class="segmented"><button data-cost="capex">只看建造</button><button data-cost="life" class="active">看百年全寿命</button></div></div>
+    <button id="download" class="download">下载当前候选点 CSV</button>
+    <details><summary>这些点是怎样算出来的？</summary><p class="detail-text">先用参考经济区和参考极限筛选桥型，再用“固定投入 + 随跨度增长的代价”生成概念成本；场地、设计倾向与维护策略分别修正建造、使用和维护指标。所有数值都是相对指数，只为展示取舍关系，不是工程估价。</p></details>
+  </aside>
+
+  <section class="selection">
+    <article class="answer card">
+      <span class="eyebrow">点一个方案，看看它为什么留下或被淘汰</span>
+      <h3 id="selected-title">—</h3>
+      <div class="stats" id="stats"></div>
+      <p id="selected-answer"></p>
+      <p id="selected-range"></p>
+    </article>
+    <article class="method card">
+      <span class="eyebrow">看懂以后，再记名字</span>
+      <h3>这条边界叫“帕累托前沿”</h3>
+      <p>前沿上的点并不是都一样好。它只说明：想让其中一项再好一点，就得为另一项付出代价。最后选哪一个，仍要回到项目真正不能碰的条件。</p>
+      <p><strong>可以迁移到别处：</strong>选专业、买电脑、排工期也一样。先删掉被全面超过的选项，再讨论自己愿意用什么换什么。</p>
+      <p class="boundary">边界：跨度范围据你提供的参考表与课堂数量级录入，原表的年代、币值、地区与技术条件尚未核验；拱桥范围取本书课堂数量级。图中成本、碳、工期和性能均为教学用相对指标，不能用于真实桥型比选、报价或安全判断。</p>
+    </article>
+  </section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const COLORS={beam:'#1f7a8c',arch:'#d4872e',stay:'#4668a9',suspension:'#785a9e'};
+const FAMILY={beam:'梁桥体系',arch:'拱桥体系',stay:'斜拉桥体系',suspension:'悬索桥体系'};
+const TYPES=[
+  {id:'rc-slab',name:'钢筋混凝土板桥',family:'beam',econ:[10,20],limit:50,fixed:8,scale:28,exp:1.70,flex:1.08,carbon:1.18,duration:8,maint:.60,foundation:.72,wind:.20},
+  {id:'pc-simple',name:'预应力混凝土简支梁',family:'beam',econ:[20,50],limit:100,fixed:15,scale:25,exp:1.55,flex:1.02,carbon:1.05,duration:10,maint:.64,foundation:.72,wind:.24},
+  {id:'pc-cont',name:'预应力混凝土连续梁',family:'beam',econ:[50,150],limit:200,fixed:28,scale:22,exp:1.36,flex:.92,carbon:1.02,duration:14,maint:.70,foundation:.68,wind:.30},
+  {id:'rigid',name:'连续刚构',family:'beam',econ:[150,300],limit:400,fixed:45,scale:20,exp:1.25,flex:.86,carbon:1.08,duration:19,maint:.76,foundation:.76,wind:.38},
+  {id:'steel-girder',name:'钢—混组合连续梁',family:'beam',econ:[200,300],limit:400,fixed:68,scale:16,exp:1.18,flex:.94,carbon:.95,duration:17,maint:1.12,foundation:.58,wind:.48},
+  {id:'arch',name:'拱桥（课堂数量级）',family:'arch',econ:[100,400],limit:600,fixed:90,scale:17,exp:1.18,flex:.70,carbon:.92,duration:24,maint:.78,foundation:1.35,wind:.34},
+  {id:'pc-stay',name:'混凝土斜拉桥',family:'stay',econ:[200,500],limit:600,fixed:138,scale:14,exp:1.12,flex:.76,carbon:1.00,duration:25,maint:1.18,foundation:.90,wind:.74},
+  {id:'composite-stay',name:'组合梁斜拉桥',family:'stay',econ:[500,700],limit:800,fixed:178,scale:12,exp:1.10,flex:.78,carbon:.90,duration:26,maint:1.30,foundation:.84,wind:.82},
+  {id:'steel-stay',name:'钢箱梁斜拉桥',family:'stay',econ:[700,1200],limit:1500,fixed:208,scale:10.5,exp:1.08,flex:.82,carbon:.86,duration:30,maint:1.46,foundation:.82,wind:.92},
+  {id:'suspension',name:'悬索桥',family:'suspension',econ:[1000,5000],limit:6000,fixed:355,scale:7.8,exp:1.03,flex:1.02,carbon:.82,duration:36,maint:1.62,foundation:1.22,wind:1.18}
+];
+const VARIANTS=[
+  {id:'economy',name:'省建造费',capex:.91,service:1.20,carbon:.96,duration:.96,maint:1.18},
+  {id:'balanced',name:'均衡',capex:1,service:1,carbon:1,duration:1,maint:1},
+  {id:'stiff',name:'刚度优先',capex:1.11,service:.70,carbon:1.12,duration:1.08,maint:.94},
+  {id:'light',name:'轻量化',capex:.98,service:1.07,carbon:.79,duration:1.03,maint:1.16},
+  {id:'maintainable',name:'易检查更换',capex:1.08,service:.94,carbon:1.04,duration:1.12,maint:.66}
+];
+const SITES={
+  normal:{name:'一般河谷',fund:1,wind:1,construct:1,maint:1,family:{beam:1,arch:1,stay:1,suspension:1}},
+  soft:{name:'深水、软土',fund:1.34,wind:1.05,construct:1.18,maint:1.10,family:{beam:1.10,arch:1.30,stay:1.12,suspension:1.22}},
+  rock:{name:'岩质峡谷',fund:.88,wind:1.08,construct:1.10,maint:1.02,family:{beam:1.10,arch:.82,stay:1.01,suspension:.93}},
+  wind:{name:'强风场地',fund:1,wind:1.42,construct:1.06,maint:1.12,family:{beam:1.02,arch:1.03,stay:1.09,suspension:1.16}}
+};
+const METRICS={
+  service:{name:'变形与振动敏感度',unit:'指数'},
+  carbon:{name:'材料与基础隐含碳',unit:'指数'},
+  construction:{name:'施工占用时间',unit:'月'},
+  maintenance:{name:'百年维护负担',unit:'指数'}
+};
+const state={span:600,site:'normal',metric:'service',cost:'life',selected:null};
+
+function rangePenalty(t,L){
+  if(L<t.econ[0]) return 1+.30*Math.pow((t.econ[0]-L)/t.econ[0],1.1);
+  if(L>t.econ[1]) return 1+.38*Math.pow((L-t.econ[1])/Math.max(1,t.limit-t.econ[1]),1.35);
+  return 1;
+}
+function candidates(){
+  const L=state.span,site=SITES[state.site];
+  const rows=[];
+  for(const t of TYPES){
+    const technicalMin=Math.max(8,t.econ[0]*.35);
+    if(L<technicalMin||L>t.limit) continue;
+    for(const v of VARIANTS){
+      const familyCost=site.family[t.family];
+      const foundationCost=1+(site.fund-1)*t.foundation;
+      const base=(t.fixed+t.scale*Math.pow(L/100,t.exp))*rangePenalty(t,L)*familyCost*foundationCost;
+      const capex=base*v.capex;
+      const maintenance=25*t.maint*Math.pow(Math.max(.25,L/100),.52)*site.maint*v.maint;
+      const life=capex+maintenance;
+      const mid=Math.sqrt(t.econ[0]*t.econ[1]);
+      const service=100*t.flex*Math.pow(Math.max(.42,L/mid),1.08)*(1+(site.wind-1)*t.wind)*v.service;
+      const carbon=62*t.carbon*Math.pow(Math.max(.2,L/100),1.05)*(1+.18*(site.fund-1)*t.foundation)*site.construct*v.carbon;
+      const construction=(t.duration+6*Math.log2(1+L/100))*site.construct*v.duration;
+      rows.push({
+        id:`${t.id}-${v.id}`,type:t.name,family:t.family,familyName:FAMILY[t.family],variant:v.name,
+        econMin:t.econ[0],econMax:t.econ[1],limit:t.limit,inEconomic:L>=t.econ[0]&&L<=t.econ[1],
+        capex,life,service,carbon,construction,maintenance,span:L,site:site.name
+      });
+    }
+  }
+  return rows;
+}
+function xValue(d){return d[state.cost]}
+function yValue(d){return d[state.metric]}
+function dominates(a,b){
+  const ax=xValue(a),ay=yValue(a),bx=xValue(b),by=yValue(b),eps=1e-8;
+  return ax<=bx+eps&&ay<=by+eps&&(ax<bx-eps||ay<by-eps);
+}
+function markFront(rows){
+  rows.forEach(d=>{d.pareto=!rows.some(o=>o!==d&&dominates(o,d));});
+  return rows;
+}
+function nice(v){
+  if(v>=1000)return Math.round(v).toLocaleString('zh-CN');
+  if(v>=100)return v.toFixed(0);
+  return v.toFixed(1);
+}
+function metricValue(d,key){return `${nice(d[key])}${key==='construction'?' 月':''}`}
+function renderRange(){
+  const svg=$('rangeChart'),W=1120,H=278,left=198,right=30,top=15,rowH=22,bottom=36;
+  const min=8,max=6500,log=v=>Math.log10(v),x=v=>left+(log(v)-log(min))/(log(max)-log(min))*(W-left-right);
+  const ticks=[10,20,50,100,200,500,1000,2000,5000];
+  let out='';
+  ticks.forEach(t=>{out+=`<line x1="${x(t)}" y1="${top}" x2="${x(t)}" y2="${H-bottom}" stroke="#e3e9e8"/><text x="${x(t)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#6b7e85">${t>=1000?(t/1000)+'k':t}</text>`});
+  TYPES.forEach((t,i)=>{
+    const y=top+i*rowH+8,color=COLORS[t.family];
+    out+=`<text x="${left-10}" y="${y+7}" text-anchor="end" font-size="10" fill="#425961">${t.name.replace('（课堂数量级）','')}</text>`;
+    out+=`<line x1="${x(t.econ[0])}" y1="${y+3}" x2="${x(t.limit)}" y2="${y+3}" stroke="#8ba0a6" stroke-width="7" stroke-linecap="round" stroke-dasharray="3 5" opacity=".72"/>`;
+    out+=`<line x1="${x(t.econ[0])}" y1="${y+3}" x2="${x(t.econ[1])}" y2="${y+3}" stroke="${color}" stroke-width="9" stroke-linecap="round"/>`;
+    const active=state.span>=t.econ[0]&&state.span<=t.limit;
+    if(active)out+=`<circle cx="${x(Math.min(state.span,t.limit))}" cy="${y+3}" r="4" fill="${state.span<=t.econ[1]?color:'#fff'}" stroke="${color}" stroke-width="2"/>`;
+  });
+  const sx=x(Math.max(min,Math.min(max,state.span)));
+  out+=`<line x1="${sx}" y1="${top-5}" x2="${sx}" y2="${H-bottom}" stroke="#d4872e" stroke-width="2"/><rect x="${sx-27}" y="0" width="54" height="18" rx="8" fill="#fff5e9" stroke="#e5b777"/><text x="${sx}" y="12.5" text-anchor="middle" font-size="9" font-weight="700" fill="#8a591d">${state.span} m</text>`;
+  svg.innerHTML=out;
+}
+function ticks(min,max,count=5){
+  const d=(max-min)/(count-1||1);return Array.from({length:count},(_,i)=>min+d*i);
+}
+function renderScatter(rows){
+  const svg=$('paretoChart'),W=900,H=520,left=78,right=34,top=38,bottom=72,plotW=W-left-right,plotH=H-top-bottom;
+  const xs=rows.map(xValue),ys=rows.map(yValue);
+  let xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
+  const xpad=Math.max(1,(xmax-xmin)*.10),ypad=Math.max(1,(ymax-ymin)*.12);xmin=Math.max(0,xmin-xpad);xmax+=xpad;ymin=Math.max(0,ymin-ypad);ymax+=ypad;
+  const sx=v=>left+(v-xmin)/(xmax-xmin||1)*plotW,sy=v=>top+plotH-(v-ymin)/(ymax-ymin||1)*plotH;
+  let out=`<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#b45b45"/></marker></defs>`;
+  ticks(xmin,xmax).forEach(v=>{out+=`<line x1="${sx(v)}" y1="${top}" x2="${sx(v)}" y2="${H-bottom}" stroke="#e4eae9"/><text x="${sx(v)}" y="${H-bottom+22}" text-anchor="middle" font-size="10" fill="#6d7f85">${nice(v)}</text>`});
+  ticks(ymin,ymax).forEach(v=>{out+=`<line x1="${left}" y1="${sy(v)}" x2="${W-right}" y2="${sy(v)}" stroke="#e4eae9"/><text x="${left-9}" y="${sy(v)+3}" text-anchor="end" font-size="10" fill="#6d7f85">${nice(v)}</text>`});
+  out+=`<line x1="${left}" y1="${top}" x2="${left}" y2="${H-bottom}" stroke="#83969c"/><line x1="${left}" y1="${H-bottom}" x2="${W-right}" y2="${H-bottom}" stroke="#83969c"/>`;
+  out+=`<text x="${left}" y="19" font-size="11" font-weight="700" fill="#415861">${METRICS[state.metric].name}（越低越好）</text><text x="${left+plotW/2}" y="${H-20}" text-anchor="middle" font-size="11" font-weight="700" fill="#415861">${state.cost==='life'?'百年全寿命成本指数':'建造成本指数'}（越低越好）</text>`;
+  const front=rows.filter(d=>d.pareto).sort((a,b)=>xValue(a)-xValue(b));
+  if(front.length>1)out+=`<path d="${front.map((d,i)=>`${i?'L':'M'}${sx(xValue(d))},${sy(yValue(d))}`).join(' ')}" fill="none" stroke="#17303a" stroke-width="2.5" stroke-dasharray="7 5"/>`;
+  const selected=rows.find(d=>d.id===state.selected);
+  if(selected&&!selected.pareto){
+    const dom=rows.filter(d=>dominates(d,selected)).sort((a,b)=>(xValue(a)+yValue(a))-(xValue(b)+yValue(b)))[0];
+    if(dom)out+=`<line x1="${sx(xValue(selected))}" y1="${sy(yValue(selected))}" x2="${sx(xValue(dom))}" y2="${sy(yValue(dom))}" stroke="#b45b45" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow)"/><text x="${(sx(xValue(selected))+sx(xValue(dom)))/2}" y="${(sy(yValue(selected))+sy(yValue(dom)))/2-7}" text-anchor="middle" font-size="9" fill="#974735">被同时超过</text>`;
+  }
+  const ordered=[...rows].sort((a,b)=>(a.pareto?1:0)-(b.pareto?1:0));
+  ordered.forEach(d=>{
+    const x=sx(xValue(d)),y=sy(yValue(d)),sel=d.id===state.selected,color=COLORS[d.family],r=sel?8:d.pareto?6.5:5;
+    const fill=d.pareto?color:'#fff',opacity=d.pareto?1:.46,dash=d.inEconomic?'':'4 3';
+    out+=`<g class="point" data-id="${d.id}" tabindex="0" role="button" aria-label="${d.type}，${d.variant}，成本 ${nice(xValue(d))}，${METRICS[state.metric].name} ${nice(yValue(d))}"><circle cx="${x}" cy="${y}" r="${r+7}" fill="transparent"/><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" fill-opacity="${opacity}" stroke="${sel?'#17303a':color}" stroke-width="${sel?3:d.pareto?2:1.5}" stroke-dasharray="${dash}"/></g>`;
+    if(sel)out+=`<rect x="${Math.min(W-190,x+11)}" y="${Math.max(7,y-28)}" width="174" height="22" rx="7" fill="#fff" stroke="#cdd9d9"/><text x="${Math.min(W-180,x+20)}" y="${Math.max(22,y-13)}" font-size="9.5" font-weight="700" fill="#263f49">${d.type} · ${d.variant}</text>`;
+    else if(d.pareto&&front.length<=4)out+=`<text x="${x+8}" y="${y-8}" font-size="8.5" fill="#435a62">${d.type.replace('（课堂数量级）','')}·${d.variant}</text>`;
+  });
+  if(rows.length<8)out+=`<text x="${left+plotW/2}" y="${top+plotH/2}" text-anchor="middle" font-size="15" fill="#667980">当前跨度下可比桥型很少；此时更应该比较同一体系内部方案。</text>`;
+  svg.innerHTML=out;
+  svg.querySelectorAll('.point').forEach(g=>{
+    const choose=()=>{state.selected=g.dataset.id;render()};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}});
+  });
+}
+function renderSelection(rows){
+  let d=rows.find(x=>x.id===state.selected);
+  if(!d){d=rows.find(x=>x.pareto&&x.variant==='均衡')||rows.find(x=>x.pareto)||rows[0];state.selected=d?.id||null}
+  if(!d){$('selected-title').textContent='当前简化资料里没有可比较的候选';$('stats').innerHTML='';$('selected-answer').textContent='请减小跨度，或补入新的超大跨体系数据。';$('selected-range').textContent='';return}
+  $('selected-title').textContent=`${d.type} · ${d.variant}`;
+  $('stats').innerHTML=`<div class="stat"><span>${state.cost==='life'?'全寿命成本':'建造成本'}</span><b>${nice(xValue(d))}</b></div><div class="stat"><span>${METRICS[state.metric].name}</span><b>${metricValue(d,state.metric)}</b></div><div class="stat"><span>建造成本</span><b>${nice(d.capex)}</b></div><div class="stat"><span>百年维护负担</span><b>${nice(d.maintenance)}</b></div>`;
+  if(d.pareto){
+    $('selected-answer').textContent='它在当前这两项比较里留在边界上：没有另一个候选能同时用更少的钱、又把这项表现做得更好。但这还不是“唯一答案”，只是说明继续讨论它有意义。';
+  }else{
+    const dom=rows.filter(x=>dominates(x,d)).sort((a,b)=>(xValue(a)+yValue(a))-(xValue(b)+yValue(b)))[0];
+    $('selected-answer').textContent=dom?`${dom.type} · ${dom.variant} 在当前模型里同时更省、${METRICS[state.metric].name}也更低。红色箭头把这个“被全面超过”画了出来。`:'它不在当前前沿上；换一个性能口径，看看淘汰它的理由是否仍然成立。';
+  }
+  $('selected-range').textContent=d.inEconomic?`当前 ${state.span} m 落在这类桥的参考经济适用区 ${d.econMin}–${d.econMax} m 内。`:`当前 ${state.span} m 已在它的参考经济区之外，但没有超过参考极限 ${d.limit} m；“能做”与“合算”在这里分开了。`;
+}
+function render(){
+  const rows=markFront(candidates());
+  if(state.selected&&!rows.some(d=>d.id===state.selected))state.selected=null;
+  renderSelection(rows);renderRange();renderScatter(rows);
+  $('o-span').textContent=`${state.span} m`;$('q-span').textContent=state.span;
+  $('chart-subtitle').textContent=`${SITES[state.site].name} · ${rows.length} 个同粒度概念方案 · ${rows.filter(d=>d.pareto).length} 个前沿点；横纵轴都越低越好。`;
+}
+function csvDownload(){
+  const rows=markFront(candidates());
+  const head=['桥型','体系','设计倾向','主跨_m','场地','是否在参考经济区','建造成本指数','百年全寿命成本指数','变形振动敏感度','隐含碳指数','施工月数','百年维护负担指数','当前二维前沿'];
+  const body=rows.map(d=>[d.type,d.familyName,d.variant,d.span,d.site,d.inEconomic?'是':'否',d.capex,d.life,d.service,d.carbon,d.construction,d.maintenance,d.pareto?'是':'否']);
+  const esc=v=>`"${String(v).replaceAll('"','""')}"`;
+  const csv='\ufeff'+[head,...body].map(r=>r.map(esc).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`桥型帕累托候选_${state.span}m.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+$('span').addEventListener('input',e=>{state.span=+e.target.value;render()});
+$('site').addEventListener('change',e=>{state.site=e.target.value;render()});
+$('metric').addEventListener('change',e=>{state.metric=e.target.value;render()});
+document.querySelectorAll('[data-cost]').forEach(b=>b.addEventListener('click',()=>{state.cost=b.dataset.cost;document.querySelectorAll('[data-cost]').forEach(x=>x.classList.toggle('active',x===b));render()}));
+$('download').addEventListener('click',csvDownload);
+render();
+</script>
+</body>
+</html>

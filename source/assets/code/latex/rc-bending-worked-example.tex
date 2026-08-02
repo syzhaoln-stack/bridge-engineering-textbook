@@ -1,0 +1,163 @@
+\documentclass[11pt,a4paper]{ctexart}
+\usepackage[margin=20mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning,patterns}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.35em}
+\definecolor{ink}{HTML}{17313B}
+\definecolor{cyan}{HTML}{197F96}
+\definecolor{pale}{HTML}{E5F2F4}
+\definecolor{orange}{HTML}{D88B24}
+\definecolor{concrete}{HTML}{D9DEE0}
+\definecolor{steel}{HTML}{B74435}
+\hypersetup{colorlinks=true,linkcolor=cyan,urlcolor=cyan}
+\pagestyle{plain}
+\title{钢筋混凝土矩形梁抗弯设计\\\large 从受力图到离散配筋，再回到平衡}
+\author{《我所理解的桥梁工程》配套案例}
+\date{}
+
+\newtcolorbox{questionbox}{colback=pale,colframe=cyan,boxrule=0.7pt,arc=2mm}
+\newtcolorbox{boundarybox}{colback=orange!7,colframe=orange,boxrule=0.7pt,arc=2mm}
+
+\begin{document}
+\maketitle
+
+\begin{questionbox}
+\textbf{先问一句：}已知设计弯矩为 $115\,\mathrm{kN\!\cdot\!m}$，我们为什么先求等效矩形受压区深度 $x$，而不是直接求钢筋面积 $A_s$？
+\end{questionbox}
+
+这道题不从“第几步用哪个公式”开始。先看截面里谁在受压、谁在受拉，以及这两股力怎样形成抵抗外弯矩的内力偶。看清之后，公式只是把这张图写成等式。
+
+\section*{一、已知条件与教学模型}
+
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.31\linewidth}p{0.23\linewidth}p{0.32\linewidth}}
+\toprule
+量 & 数值 & 这一个量在回答什么 \\
+\midrule
+截面 $b\times h$ & $250\times500\,\mathrm{mm}$ & 梁有多宽、多高 \\
+受拉钢筋重心距边缘 $a_s$ & $40\,\mathrm{mm}$ & 钢筋真正放在什么高度 \\
+有效高度 $h_0=h-a_s$ & $460\,\mathrm{mm}$ & 压力与拉力之间可利用的高度 \\
+设计弯矩 $M_{Ed}$ & $115\,\mathrm{kN\!\cdot\!m}$ & 截面需要抵抗的外弯矩 \\
+混凝土设计强度 $f_{cd}$ & $13.8\,\mathrm{MPa}$ & 等效压应力块的强度 \\
+钢筋设计强度 $f_{sd}$ & $330\,\mathrm{MPa}$ & 本教学模型采用的钢筋拉应力 \\
+相对界限深度 $\xi_b$ & $0.53$ & 当前延性单筋模型的边界 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+这里的 $x$ 是\textbf{教学模型中的等效矩形压应力块深度}，不是把混凝土真实非线性应力分布原样搬过来。$a_s$ 也不是保护层；若保护层至箍筋外缘为 $c$，单层主筋可近似写成
+\[
+a_s=c+\phi_{\mathrm{st}}+\frac{\phi_l}{2}.
+\]
+
+\section*{二、先把截面里的两股力画出来}
+
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,>=Latex,font=\small]
+  \draw[fill=concrete,draw=ink,line width=.8pt] (0,0) rectangle (3.2,6.4);
+  \fill[cyan!25] (0,5.1) rectangle (3.2,6.4);
+  \draw[dashed,ink!60] (-.25,5.1)--(3.45,5.1);
+  \node[anchor=west,ink] at (3.45,5.1) {$x$};
+  \foreach \xx in {0.8,1.6,2.4}{\fill[steel] (\xx,.55) circle (.13);}
+  \draw[<->,ink!70] (-.45,0)--node[left]{$a_s$}(-.45,.55);
+  \draw[<->,ink!70] (-.45,.55)--node[left]{$h_0$}(-.45,6.4);
+
+  \draw[very thick,cyan,->] (1.6,5.75)--(4.65,5.75);
+  \node[anchor=west,cyan] at (4.75,5.75) {$C=f_{cd}bx$};
+  \draw[very thick,steel,->] (1.6,.55)--(4.65,.55);
+  \node[anchor=west,steel] at (4.75,.55) {$T=f_{sd}A_s$};
+  \draw[<->,orange,line width=1pt] (5.85,.55)--node[right,align=left]{$z=h_0-x/2$\\内力臂}(5.85,5.75);
+
+  \draw[very thick,orange,-{Latex[length=3mm]}] (8.25,2.0) arc[start angle=-80,end angle=220,radius=1.0];
+  \node[align=center,ink] at (8.25,3.45) {$M_{Rd}=Cz$\\抵抗外弯矩};
+\end{tikzpicture}
+\end{center}
+
+混凝土压力 $C$ 与钢筋拉力 $T$ 必须平衡；两股力相距 $z$，才形成抵抗弯矩的内力偶。由此得到两条关系：
+\[
+f_{cd}bx=f_{sd}A_s,
+\qquad
+M_{Ed}=f_{cd}bx\left(h_0-\frac{x}{2}\right).
+\]
+
+第二条式子只有一个未知量 $x$，所以先用它。不是因为课本规定“第一步求 $x$”，而是因为它是眼前最容易先解开的关系。
+
+\section*{三、先求需要多少，再选买得到的钢筋}
+
+单位先统一：$115\,\mathrm{kN\!\cdot\!m}=115\times10^6\,\mathrm{N\!\cdot\!mm}$。令
+\[
+K=\frac{M_{Ed}}{f_{cd}bh_0^2},\qquad
+\xi_{\mathrm{req}}=1-\sqrt{1-2K},
+\]
+可得
+\[
+x_{\mathrm{req}}=\xi_{\mathrm{req}}h_0\approx79.30\,\mathrm{mm},
+\qquad
+A_{s,\mathrm{req}}=\frac{f_{cd}bx_{\mathrm{req}}}{f_{sd}}
+\approx829.0\,\mathrm{mm^2}.
+\]
+
+$829.0\,\mathrm{mm^2}$ 是连续的计算需求，工地上却要选离散的根数和直径。选 $3\Phi20$：
+\[
+A_{s,\mathrm{prov}}=3\times\frac{\pi20^2}{4}=942.48\,\mathrm{mm^2}.
+\]
+
+\begin{questionbox}
+钢筋从“需要的 $829.0$”换成“实际的 $942.48$”以后，$x$ 还能继续沿用 $79.30\,\mathrm{mm}$ 吗？不能。拉力已经改变，截面必须重新达到平衡。
+\end{questionbox}
+
+\section*{四、用实际钢筋重新平衡}
+
+\[
+x_{\mathrm{prov}}
+=\frac{f_{sd}A_{s,\mathrm{prov}}}{f_{cd}b}
+\approx90.15\,\mathrm{mm},
+\]
+\[
+M_{Rd}
+=f_{cd}b x_{\mathrm{prov}}
+\left(h_0-\frac{x_{\mathrm{prov}}}{2}\right)
+\approx129.05\,\mathrm{kN\!\cdot\!m}.
+\]
+所以在这套教学参数与假定下，
+\[
+M_{Rd}>M_{Ed},
+\qquad
+\frac{M_{Rd}}{M_{Ed}}\approx1.122.
+\]
+
+这里的 $1.122$ 称为所选离散钢筋带来的\textbf{承载力余量}或利用率的倒数，不再额外叫“安全系数”。设计值体系里的可靠度，已经不是靠这一个比值单独表达。
+
+\section*{五、钢筋还要放得进去}
+
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,>=Latex,font=\small]
+  \draw[fill=concrete,draw=ink,line width=.8pt] (0,0) rectangle (6,3.6);
+  \draw[orange,line width=1.2pt,rounded corners=4pt] (.55,.45) rectangle (5.45,3.15);
+  \foreach \xx in {1.15,3,4.85}{\fill[steel] (\xx,.95) circle (.25);}
+  \draw[<->,ink!70] (0,-.45)--node[below]{$b=250\,\mathrm{mm}$}(6,-.45);
+  \draw[<->,ink!70] (1.15,1.55)--node[above]{$s_n$}(3,1.55);
+  \draw[<->,ink!70] (3,1.55)--node[above]{$s_n$}(4.85,1.55);
+  \draw[<->,cyan] (-.45,0)--node[left]{$c$}(-.45,.45);
+  \node[anchor=west,orange] at (6.25,2.8) {箍筋};
+  \node[anchor=west,steel] at (6.25,1.0) {主筋};
+  \node[anchor=west,ink] at (6.25,.25) {$a_s=c+\phi_{\mathrm{st}}+\phi_l/2$};
+\end{tikzpicture}
+\end{center}
+
+保护层、箍筋、主筋直径与净距必须分开记。三根主筋均匀布置时，净距要按同一套几何口径重算，不能把竖向的 $a_s$ 直接当成横向边距。
+
+\begin{boundarybox}
+\textbf{这页没有完成一根真实梁的全部设计。}它只演示矩形截面单筋抗弯教学模型。正式使用前要确认项目采用的现行规范、材料设计值、荷载组合与构造口径，并补做抗剪、裂缝、挠度、锚固、耐久性等检查。若 $\xi_{\mathrm{req}}>\xi_b$ 或实际配筋导致 $\xi_{\mathrm{prov}}>\xi_b$，应判定当前模型不适用，不能简单把 $x$ 截到界限值就宣布设计完成。
+\end{boundarybox}
+
+\section*{最后带走的一件事}
+
+从连续的需求换成离散的现实方案以后，所有依赖它的中间量都要回到基本关系重新平衡。换钢筋如此，换螺栓、换标准板厚、换设备型号，也一样。
+
+\end{document}

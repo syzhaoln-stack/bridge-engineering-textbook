@@ -1,3 +1,6 @@
+<!-- CURRENT-PROJECT-20261022 -->
+> 此仓库保留早期版本。**[当前教材请从这里进入](https://syzhaoln-stack.github.io/bridge-engineering-digital-textbook/)**。
+
 # 我所理解的桥梁工程
 
 从力学出发，重新理解桥梁。教材以文字为主，配合参数化可视化、三维模型、有限元实验、Manim 动画和判断闪卡。
